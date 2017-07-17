@@ -1,0 +1,22 @@
+{
+  "name": "spotify-notifier",
+  "version": "1.0.0",
+  "description": "A new music notifier for spotify",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/ryanpage/spotify-notifier.git"
+  },
+  "author": "Ryan Page",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/ryanpage/spotify-notifier/issues"
+  },
+  "homepage": "https://gitlab.com/ryanpage/spotify-notifier#README",
+  "dependencies": {
+    "express": "^4.15.3"
+  }
+}
