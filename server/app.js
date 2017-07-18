@@ -1,16 +1,56 @@
 /**
  * Created by dev on 7/17/2017.
  */
-var SpotifyWebApi = require('spotify-web-api-node');
+var path = require('path'),
+    bodyParser = require('body-parser'),
+    cookieParser = require('cookie-parser'),
+    passport = require('passport'),
+    session = require('express-session'),
+    SpotifyWebApi = require('spotify-web-api-node');
+
 /*
     handle middleware
  */
 const setupApp = function(app, express) {
+    var scopes = ['user-read-private', 'user-read-email'],
+        redirectUri = 'http://localhost:3000/callback',
+        clientSecret = '7e3b3a161dc6442f974655a3209505cd',
+        clientId = '180cc653f1f24ae9864d5d718d68f3c6';
+
+
+
+
     // add application credentials
     var spotifyApi = new SpotifyWebApi({
-        clientId: '180cc653f1f24ae9864d5d718d68f3c6',
-        clientSecret: '7e3b3a161dc6442f974655a3209505cd',
-        redirectUri: 'http://localhost:3000/callback'
+        clientId: clientId,
+        clientSecret: clientSecret,
+        redirectUri: redirectUri
+    });
+
+    var authorizeUrl = spotifyApi.createAuthorizeURL(scopes);
+    console.log(authorizeUrl);
+
+    // require routes
+    var authRoute = require('./routes/auth.js');
+
+    // routes
+    app.use('/user/', authRoute);
+
+    // serve angular front end files
+    app.use('/', express.static('public', {redirect: false}));
+
+
+    app.get('*', function(req, res, next) {
+       res.sendFile(path.join(__dirname, '../public/index.html'));
+    });
+
+    //  error handling
+    app.use(function(err, req, res) {
+        res.status(err.status || 500);
+        res.end(JSON.stringify({
+            message: err.message,
+            error: {}
+        }));
     });
 };
 
