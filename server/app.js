@@ -1,13 +1,12 @@
 /**
- * Created by dev on 7/17/2017.
+ * Created by ryan on 7/17/2017.
  */
 var path = require('path'),
     bodyParser = require('body-parser'),
     cookieParser = require('cookie-parser'),
     passport = require('passport'),
     SpotifyStrategy = require('passport-spotify').Strategy,
-    session = require('express-session'),
-    SpotifyWebApi = require('spotify-web-api-node');
+    session = require('express-session');
 
 /*
     handle middleware
@@ -47,12 +46,7 @@ const setupApp = function(app, express) {
         });
     }));
 
-    // add application credentials
-    var spotifyApi = new SpotifyWebApi({
-        clientId: clientId,
-        clientSecret: clientSecret,
-        redirectUri: redirectUri
-    });
+
 
 
     // require routes

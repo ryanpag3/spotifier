@@ -1,5 +1,5 @@
 /**
- * Created by dev on 7/18/2017.
+ * Created by ryan on 7/18/2017.
  */
 var express = require('express'),
     passport = require('passport'),
