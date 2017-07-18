@@ -17,6 +17,7 @@
   },
   "homepage": "https://gitlab.com/ryanpage/spotify-notifier#README",
   "dependencies": {
-    "express": "^4.15.3"
+    "express": "^4.15.3",
+    "spotify-web-api-node": "^2.4.0"
   }
 }
