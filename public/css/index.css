@@ -1,0 +1,19 @@
+html, body {
+    height: 100vh;
+    width: 100%;
+}
+header {
+    position: relative;
+    background-color: black;
+    width: 100%;
+
+}
+
+#h {
+    background-color: black;
+
+}
+h1 {
+    color: pink;
+    margin: 0;
+}

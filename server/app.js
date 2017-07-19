@@ -52,8 +52,7 @@ const setupApp = function(app, express) {
     // require routes
     var authRoute = require('./routes/auth.js');
 
-    // routes
-    app.use('', authRoute);
+
 
     // serve angular front end files
     app.use('/', express.static('public', {redirect: false}));
@@ -71,9 +70,18 @@ const setupApp = function(app, express) {
     app.use(passport.initialize());
     app.use(passport.session());
 
+    // routes
+    app.use('/user/', authRoute);
+
+    // serve angular front end files
+    app.use(express.static(path.join(__dirname, '../public')));
+    app.use('/', express.static('public', {redirect: false}));
+
+
     app.get('*', function(req, res, next) {
        res.sendFile(path.join(__dirname, '../public/index.html'));
     });
+
 
     // error handlers
     app.use(function(req, res, next) {
