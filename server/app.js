@@ -6,16 +6,17 @@ var path = require('path'),
     cookieParser = require('cookie-parser'),
     passport = require('passport'),
     SpotifyStrategy = require('passport-spotify').Strategy,
-    session = require('express-session');
+    session = require('express-session'),
+    spotifyApi = require('./utils/spotifyApi.js'),
+    SpotifyApi = require('spotify-web-api-node');
 
 /*
     handle middleware
  */
 const setupApp = function(app, express) {
-    var scopes = ['user-read-private', 'user-read-email'],
-        redirectUri = 'http://localhost:3000/callback',
+    var redirectUri = 'http://localhost:3000/user/callback',
         clientSecret = '7e3b3a161dc6442f974655a3209505cd',
-        clientId = '180cc653f1f24ae9864d5d718d68f3c6';
+        clientID = '180cc653f1f24ae9864d5d718d68f3c6';
 
     /*
         Passport session setup.
@@ -33,7 +34,7 @@ const setupApp = function(app, express) {
 
     // use the spotify strategy in passport
     passport.use(new SpotifyStrategy({
-        clientID: clientId,
+        clientID: clientID,
         clientSecret: clientSecret,
         callbackURL: redirectUri
     },
@@ -42,19 +43,12 @@ const setupApp = function(app, express) {
             // TODO
             // associate spotify account with a user record in db
             // return that user record instead
-           return done(null, profile);
+            spotifyApi.setTokens(accessToken, refreshToken);
+            return done(null, profile);
         });
     }));
 
 
-
-
-
-
-
-
-    // serve angular front end files
-    app.use('/', express.static('public', {redirect: false}));
 
     app.use(cookieParser());
     app.use(bodyParser.json());
@@ -69,6 +63,8 @@ const setupApp = function(app, express) {
     app.use(passport.initialize());
     app.use(passport.session());
 
+    // serve angular front end files
+    app.use('/', express.static('public', {redirect: false}));
     // serve angular front end files
     app.use(express.static(path.join(__dirname, '../public')));
 

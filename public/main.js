@@ -11,10 +11,7 @@ app.config(['$routeProvider', '$locationProvider', function($routeProvider, $loc
         .when('/login', {
             templateUrl: 'partials/login.html',
             restricted: false
-        })
-        .otherwise({
-        redirectTo: '/'
-    });
+        });
 
     $locationProvider.html5Mode(true);
 }]);
