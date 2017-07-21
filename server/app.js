@@ -7,8 +7,8 @@ var path = require('path'),
     passport = require('passport'),
     SpotifyStrategy = require('passport-spotify').Strategy,
     session = require('express-session'),
-    spotifyApi = require('./utils/spotifyApi.js'),
-    SpotifyApi = require('spotify-web-api-node');
+    mongoose = require('mongoose'),
+    spotifyApi = require('./utils/spotifyUserApi.js');
 
 /*
     handle middleware
@@ -17,6 +17,8 @@ const setupApp = function(app, express) {
     var redirectUri = 'http://localhost:3000/user/callback',
         clientSecret = '7e3b3a161dc6442f974655a3209505cd',
         clientID = '180cc653f1f24ae9864d5d718d68f3c6';
+
+    mongoose.connect('mongodb://localhost/spotifier');
 
     /*
         Passport session setup.
@@ -70,9 +72,13 @@ const setupApp = function(app, express) {
 
     // require routes
     var authRoute = require('./routes/auth.js');
+    var libraryRoute = require('./routes/library.js');
+
     // routes
     app.use('/user/', authRoute);
+    app.use('/library/', libraryRoute);
 
+    // for handling html5mode
     app.get('*', function(req, res, next) {
        res.sendFile(path.join(__dirname, '../public/index.html'));
     });
