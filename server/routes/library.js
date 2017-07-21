@@ -10,8 +10,17 @@ var express = require('express'),
     User = require('../models/user.js');
 
 router.get('/update', function(req, res) {
-   // todo
-   // handles updating client with user library
+    spotifyApi.getSavedTracks()
+        .then(function(data) {
+            res.sendStatus(200);
+        });
+});
+
+/**
+ *
+ */
+router.get('/sync', function(req, res) {
+
 });
 
 router.post('/add', function(req, res) {
@@ -23,5 +32,7 @@ router.get('/remove', function(req, res) {
    // todo
    // handles removing an artist from the users library
 });
+
+module.exports = router;
 
 

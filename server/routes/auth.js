@@ -6,7 +6,9 @@ var express = require('express'),
     spotifyApi = require('../utils/spotifyUserApi.js');
     router = express.Router();
 
-router.get('/login', passport.authenticate('spotify', {scope: ['user-read-private', 'user-read-email', 'user-library-read', 'user-library-modify'], showDialog: true}),
+router.get('/login', passport.authenticate('spotify', {
+    scope: ['user-read-private', 'user-read-email', 'user-library-read'],
+            showDialog: true}),
     // callback function
     function(req, res) {
         // this request redirects to spotify so it wont be called

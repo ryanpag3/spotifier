@@ -18,7 +18,9 @@ const setupApp = function(app, express) {
         clientSecret = '7e3b3a161dc6442f974655a3209505cd',
         clientID = '180cc653f1f24ae9864d5d718d68f3c6';
 
-    mongoose.connect('mongodb://localhost/spotifier');
+    mongoose.connect('mongodb://localhost/spotifier', {
+        useMongoClient: true
+    });
 
     /*
         Passport session setup.
@@ -48,6 +50,7 @@ const setupApp = function(app, express) {
             spotifyApi.setTokens(accessToken, refreshToken);
             return done(null, profile);
         });
+
     }));
 
 
