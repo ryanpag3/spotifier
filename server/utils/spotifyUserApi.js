@@ -36,20 +36,11 @@ var self = module.exports = {
                     if (data.body.items.length > 0) {
                         runQuery(offset += limit);
                     } else {
-                        done();
+                        deferred.resolve(savedTracks);
                     }
                 }, function (err) {
                     console.log('Something went wrong', err);
                 });
-        }
-
-        /**
-         * resolves the promise for returning
-         */
-        function done() {
-            for (var i = 0; i < savedTracks.length; i++) {
-                deferred.resolve(savedTracks);
-            }
         }
 
         return deferred.promise;
@@ -60,8 +51,22 @@ var self = module.exports = {
      * @returns an array of all saved artists.
      */
     getArtists: function() {
+        // todo
+    },
 
+    search: function(artistName) {
+        var deferred = Q.defer();
+        console.log('searching for ' + artistName);
+        spotifyApi.searchArtists(artistName)
+            .then(function(data) {
+                deferred.resolve(data);
+            }, function(err) {
+                deferred.reject(err);
+            });
+        return deferred.promise;
     }
+
+
 };
 
     // TODO

@@ -9,15 +9,29 @@ var express = require('express'),
     spotifyApi = require('../utils/spotifyUserApi'),
     User = require('../models/user.js');
 
+router.post('/search', function(req, res) {
+    spotifyApi.search(req.body.artistName)
+        .then(function(data) {
+            console.log(data.body.artists.items);
+        })
+        .catch(function(err){
+            console.log(err);
+        })
+});
+
 router.get('/update', function(req, res) {
     spotifyApi.getSavedTracks()
         .then(function(data) {
+            for (var i = 0; i < 1; i++) {
+                console.log(data[i]);
+            }
             res.sendStatus(200);
         });
 });
 
 /**
- *
+ * This will sync the users library artists with the database, and return an updated list
+ * for the client.
  */
 router.get('/sync', function(req, res) {
 
