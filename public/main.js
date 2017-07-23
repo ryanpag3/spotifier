@@ -11,6 +11,10 @@ app.config(['$routeProvider', '$locationProvider', function($routeProvider, $loc
         .when('/login', {
             templateUrl: 'partials/login.html',
             restricted: false
+        })
+        .when('/library', {
+            templateUrl: 'partials/user-library.html',
+            restricted: true
         });
 
     $locationProvider.html5Mode(true);

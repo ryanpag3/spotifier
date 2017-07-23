@@ -6,9 +6,13 @@
 
 var express = require('express'),
     router = express.Router(),
-    spotifyApi = require('../utils/spotifyUserApi'),
+    spotifyApi = require('../utils/spotify-user-api'),
     User = require('../models/user.js');
 
+/**
+ * When a user hits enter on the search bar, this page will call the spotifyApi service,
+ * and route the page to display the search results.
+ */
 router.post('/search', function(req, res) {
     spotifyApi.search(req.body.artistName)
         .then(function(data) {

@@ -7,12 +7,15 @@
     <link rel="stylesheet" type="text/css" href="css/index.css">
 </head>
 
-<body data-ng-app="spotifier" data-ng-controller="indexController">
+<body data-ng-app="spotifier" data-ng-controller="index-controller">
     <header>
         <h1>Spotifier</h1>
-        <form data-ng-submit="search(artistName)">
-            <input class="search-bar" placeholder="search for artists" data-ng-model="artistName">
-        </form >
+        <div>
+            <form data-ng-submit="search(artistName)">
+                <input class="search-bar" placeholder="search for artists" data-ng-model="artistName">
+            </form>
+            <div class="search-preview"></div>
+        </div>
 
         <a href="/user/login" target="_self" class="btn btn-success btn-login">login</a>
     </header>
@@ -23,10 +26,11 @@
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-route.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="./socket.io/socket.io.js"></script>
 <script src="./main.js"></script>
 <!--controllers-->
-<script src="./controllers/indexController.js"></script>
+<script src="controllers/index-controller.js"></script>
 <!--services-->
-<script src="services/authServ.js"></script>
-<script src="services/apiServ.js"></script>
+<script src="services/auth-service.js"></script>
+<script src="services/api-service.js"></script>
 </html>

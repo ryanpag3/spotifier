@@ -1,5 +1,5 @@
 var app = angular.module('spotifier');
-app.factory('apiServ', ['$q', '$http', function($q, $http) {
+app.factory('apiService', ['$q', '$http', function($q, $http) {
     return ({
         search: search
     });

@@ -3,7 +3,7 @@
  */
 var express = require('express'),
     passport = require('passport'),
-    spotifyApi = require('../utils/spotifyUserApi.js');
+    spotifyApi = require('../utils/spotify-user-api.js');
     router = express.Router();
 
 router.get('/login', passport.authenticate('spotify', {
