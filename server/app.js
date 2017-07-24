@@ -25,7 +25,7 @@ const setupApp = function(app, express) {
     /*
         Passport session setup.
         To support persistent login sessions, passport needs to be able to serialize users
-        int and deserialize users out of the session. Right now, the entire spotify profile is
+        in and deserialize users out of the session. Right now, the entire spotify profile is
         serialized and deserialized. Once a user db is created, we should simply use an ID.
      */
     passport.serializeUser(function(user, done) {
@@ -47,8 +47,11 @@ const setupApp = function(app, express) {
             // TODO
             // associate spotify account with a user record in db
             // return that user record instead
-            spotifyApi.setTokens(accessToken, refreshToken);
-            return done(null, profile);
+            // spotifyApi.saveTokens()
+            console.log(profile.id);
+            spotifyApi.saveTokens(profile.id, accessToken, refreshToken);
+            return done(null, {id: profile.id});
+
         });
 
     }));
