@@ -16,7 +16,7 @@ router.get('/login', passport.authenticate('spotify', {
 
 router.get('/logout', function(req, res) {
     req.logout();
-    res.redirect('/');
+    res.redirect('/login');
 });
 
 router.post('/status', function (req, res) {
@@ -35,7 +35,7 @@ router.post('/status', function (req, res) {
 router.get('/callback',
     passport.authenticate('spotify', {failureRedirect: '/login'}),
     function(req, res) {
-        res.redirect('/');
+        res.redirect('/library');
 });
 
 

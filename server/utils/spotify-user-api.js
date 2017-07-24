@@ -52,6 +52,14 @@ var self = module.exports = {
      */
     getArtists: function() {
         // todo
+        // get all saved songs
+        spotifyApi.getMySavedAlbums({
+            limit: 50,
+            offset: 0
+        })
+            .then(function(data) {
+                console.log(data.body.items);
+            })
     },
 
     search: function(artistName) {

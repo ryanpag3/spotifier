@@ -3,8 +3,7 @@ app.factory('apiService', ['$q', '$http', function($q, $http) {
     return ({
         search: search
     });
-
-
+    
     function search(artistName) {
        var deferred = $q.defer();
        $http.post('/library/search', {artistName: artistName})

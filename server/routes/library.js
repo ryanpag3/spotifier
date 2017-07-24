@@ -38,7 +38,8 @@ router.get('/update', function(req, res) {
  * for the client.
  */
 router.get('/sync', function(req, res) {
-
+    console.log('library/sync...');
+    spotifyApi.getArtists();
 });
 
 router.post('/add', function(req, res) {
