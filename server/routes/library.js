@@ -38,8 +38,9 @@ router.get('/update', function(req, res) {
  * for the client.
  */
 router.get('/sync', function(req, res) {
-    // console.log(req.user);
-    spotifyApi.getSavedArtists(req.user.id);
+    spotifyApi.getSavedArtists(req.user.id, function(data) {
+        console.log(data);
+    });
     return res.status(200);
 });
 

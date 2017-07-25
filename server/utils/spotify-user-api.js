@@ -11,7 +11,7 @@ var users = {};
 var self = module.exports = {
 
     /* saves user tokens to map */
-    saveTokens: function(userId, accessToken, refreshToken) {
+    saveTokens: function (userId, accessToken, refreshToken) {
         users[userId] = {accessToken: accessToken, refreshToken: refreshToken};
     },
 
@@ -22,7 +22,7 @@ var self = module.exports = {
     },
 
     /* clears the user tokens */
-    clearTokens: function() {
+    clearTokens: function () {
         spotifyApi.resetAccessToken();
         spotifyApi.resetRefreshToken();
     },
@@ -32,6 +32,7 @@ var self = module.exports = {
      * @returns an array of tracks {added_at: (date), track: {}}
      */
     getSavedTracks: function (userId) {
+        self.setTokens(userId);
         var savedTracks = [],
             limit = 50;
         var deferred = Q.defer();
@@ -56,52 +57,79 @@ var self = module.exports = {
                 });
         }
 
+        self.clearTokens();
         return deferred.promise;
     },
 
     /**
-     * Iterates through all followed songs
+     * Iterates through all saved songs in user library, saving the recent album
+     * information for every new artist we run into.
      * @returns an array of all saved artists.
      */
-    getSavedArtists: function(userId) {
-        self.setTokens(userId);
-        var savedArtists = {},
-            deferred = Q.defer();
-        // todo
-        // get all saved songs
-        spotifyApi.getMySavedAlbums({
-            limit: 50,
-            offset: 0
-        })
-            .then(function (data) {
-                for (var i = 0; i < data.body.items.length; i++) {
-                    // get artists array from each album
-                    var artists = data.body.items[i].album.artists;
-                    // iterate through artists array
-                    for (var j = 0; j < artists.length; j++){
-                        if (savedArtists[artists[j].id] === undefined) {
-                            console.log('NAME ' + artists[j].name);
-                            self.getMostRecentRelease(userId, artists[j].id, function(data) {
-                                var recentRelease = data;
-                                savedArtists[recentRelease.artists[0].id] = {
-                                    name: recentRelease.artists[0].name,
-                                    recentRelease: {
-                                        name: recentRelease.name,
-                                        date: recentRelease.release_date,
-                                        images: recentRelease.images,
-                                        url: recentRelease.external_urls.spotify
+    getSavedArtists: function (userId, callback) {
+        var savedArtists = {};
+
+        // start recursive function
+        runQuery(0, 50);
+
+        function runQuery(offset, limit) {
+            self.setTokens(userId);
+            spotifyApi.getMySavedTracks({
+                limit: limit,
+                offset: offset
+            })
+                .then(function (data) {
+                    var length = data.body.items.length;
+                    var trackList = data.body;
+                    // iterate through each track in query block
+                    for (var i = 0; i < length; i++) {
+                        (function(i){
+                            setTimeout(function() {
+                                var track = trackList.items[i].track;
+                                // iterate through each artist in each song
+                                // songs can have multiple contributing artists, we save all by default
+                                for (var j = 0; j < track.artists.length; j++) {
+                                    var artist = track.artists[j];
+                                    // if artist has not been saved yet
+                                    if (savedArtists[artist.id] === undefined) {
+                                        // get most recent release and save to savedArtists
+                                        self.getMostRecentRelease(userId, artist.id,
+                                            function (data) {
+                                                var recentRelease = data;
+                                                console.log('added artist: ' + recentRelease.artists[0].name + ' | ' + recentRelease.name);
+                                                savedArtists[recentRelease.artists[0].id] = {
+                                                    name: recentRelease.artists[0].name,
+                                                    recentRelease: {
+                                                        name: recentRelease.name,
+                                                        date: recentRelease.release_date,
+                                                        images: recentRelease.images,
+                                                        url: recentRelease.external_urls.spotify
+                                                    }
+                                                };
+                                            });
                                     }
-                                };
-                                console.log(savedArtists[recentRelease.artists[0].id]);
-                            });
-                        }
+                                }
+                            }, 500);
+                        })(i);
                     }
-                }
-            });
-        self.clearTokens();
+                    // // check if callback thrown
+                    // if (length > 0) {
+                    //     runQuery(offset += limit, limit);
+                    //     console.log('length of savedArtists: ' + Object.keys(savedArtists).length);
+                    // } else {
+                    //     console.log('THIS SHOULD COME LAST');
+                    //     callback(savedArtists);
+                    //     self.clearTokens();
+                    // }
+                });
+        }
     },
 
-    getMostRecentRelease: function(userId, artistId, callback) {
+    /*
+        Queries artist albums by artist id, getting the most recent one, then calls getAlbum to get
+        more detailed information on that specific album and returns it through a callback.
+     */
+    getMostRecentRelease: function (userId, artistId, callback) {
         // set user tokens
         self.setTokens(userId);
         // get most recent album or single
@@ -109,36 +137,38 @@ var self = module.exports = {
             limit: 1,
             offset: 0
         }))
-            .then(function(data) {
+            .then(function (data) {
                 // grab id from most recent release from artist
-                console.log(data.body.items[0]);
                 var albumId = data.body.items[0].id;
 
                 // get detailed album information for callback
-                self.getAlbum(userId, albumId, function(albumInfo) {
+                self.getAlbum(userId, albumId, function (albumInfo) {
                     callback(albumInfo);
                 });
             });
         self.clearTokens();
     },
 
-    getAlbum: function(userId, albumId, callback) {
+    /*
+        Takes an albumId and provides the JSON object information through a callback.
+     */
+    getAlbum: function (userId, albumId, callback) {
         self.setTokens(userId);
         spotifyApi.getAlbum(albumId)
-            .then(function(data) {
-               callback(data.body);
+            .then(function (data) {
+                callback(data.body);
             });
         self.clearTokens();
     },
 
-    search: function(userId, artistName) {
+    search: function (userId, artistName) {
         self.setTokens(userId);
         var deferred = Q.defer();
         console.log('searching for ' + artistName);
         spotifyApi.searchArtists(artistName)
-            .then(function(data) {
+            .then(function (data) {
                 deferred.resolve(data);
-            }, function(err) {
+            }, function (err) {
                 deferred.reject(err);
             });
         self.clearTokens();
@@ -146,11 +176,11 @@ var self = module.exports = {
     }
 };
 
-    // TODO
-    // create wrapper functions for handling importing users saved tracks
-    // setup database schema for handling checking artists
-    // create a application client ID authorization flow for handling checking db
-    // for new releases
+// TODO
+// create wrapper functions for handling importing users saved tracks
+// setup database schema for handling checking artists
+// create a application client ID authorization flow for handling checking db
+// for new releases
 
 
 
