@@ -38,10 +38,10 @@ router.get('/update', function(req, res) {
  * for the client.
  */
 router.get('/sync', function(req, res) {
-    spotifyApi.getSavedArtists(req.user.id, function(data) {
-        console.log(data);
+    spotifyApi.getSavedArtists(req.user.id);
+    return res.status(200).json({
+        msg: 'OK'
     });
-    return res.status(200);
 });
 
 router.post('/add', function(req, res) {

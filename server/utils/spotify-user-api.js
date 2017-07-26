@@ -66,37 +66,41 @@ var self = module.exports = {
      * information for every new artist we run into.
      * @returns an array of all saved artists.
      */
-    getSavedArtists: function (userId, callback) {
+    getSavedArtists: function (userId) {
+
         var savedArtists = {};
 
-        // start recursive function
-        runQuery(0, 50);
+        runQuery(50,0);
 
-        function runQuery(offset, limit) {
+        function runQuery(limit, offset) {
             self.setTokens(userId);
+            // request song
             spotifyApi.getMySavedTracks({
                 limit: limit,
                 offset: offset
             })
-                .then(function (data) {
-                    var length = data.body.items.length;
-                    var trackList = data.body;
-                    // iterate through each track in query block
-                    for (var i = 0; i < length; i++) {
-                        (function(i){
-                            setTimeout(function() {
-                                var track = trackList.items[i].track;
-                                // iterate through each artist in each song
-                                // songs can have multiple contributing artists, we save all by default
-                                for (var j = 0; j < track.artists.length; j++) {
-                                    var artist = track.artists[j];
-                                    // if artist has not been saved yet
-                                    if (savedArtists[artist.id] === undefined) {
-                                        // get most recent release and save to savedArtists
-                                        self.getMostRecentRelease(userId, artist.id,
-                                            function (data) {
-                                                var recentRelease = data;
-                                                console.log('added artist: ' + recentRelease.artists[0].name + ' | ' + recentRelease.name);
+                .then(function(data) {
+                    function go(callback) {
+                        var i = 0;
+                        function add() {
+                            // console.log(data.body);
+                            var artistId = data.body.items[i].track.artists[0].id;
+                            if (savedArtists[artistId] !== undefined) {
+                                // do nothing
+                            }
+                            else {
+                                // get most recent album of artist
+                                spotifyApi.getArtistAlbums(artistId, ({
+                                    limit: 1,
+                                    offset: 0
+                                }))
+                                    .then(function (data) {
+                                        var albumId = data.body.items[0].id;
+                                        // get album information
+                                        spotifyApi.getAlbum(albumId)
+                                            .then(function (data) {
+                                                var recentRelease = data.body;
+                                                // console.log('added artist: ' + recentRelease.artists[0].name + ' | ' + recentRelease.name);
                                                 savedArtists[recentRelease.artists[0].id] = {
                                                     name: recentRelease.artists[0].name,
                                                     recentRelease: {
@@ -106,23 +110,52 @@ var self = module.exports = {
                                                         url: recentRelease.external_urls.spotify
                                                     }
                                                 };
-                                            });
-                                    }
-                                }
-                            }, 500);
-                        })(i);
+                                            })
+                                    })
+                                    .catch(function(err) {
+                                        console.log(err);
+                                    })
+                            }
+
+                            if (++i < data.body.items.length) {
+                                setTimeout(add, 200);
+                            } else {
+                               callback();
+                            }
+                        }
+                        add();
                     }
-                    // // check if callback thrown
-                    // if (length > 0) {
-                    //     runQuery(offset += limit, limit);
-                    //     console.log('length of savedArtists: ' + Object.keys(savedArtists).length);
-                    // } else {
-                    //     console.log('THIS SHOULD COME LAST');
-                    //     callback(savedArtists);
-                    //     self.clearTokens();
-                    // }
+                    go(function() {
+                        if (offset < data.body.total) {
+                            var add = ((data.body.total - offset < 50) ? data.body.total-offset :  50);
+                            runQuery(limit, offset += add);
+                            console.log(offset + '/' + data.body.total);
+                        } else {
+                            console.log(savedArtists);
+                        }
+                    });
+                })
+                .catch(function(err) {
+                    console.log(err);
+                    console.log(savedArtists);
                 });
-        }
+            }
+
+        // self.clearTokens();
+    },
+
+    getTrackInfo: function (userId, limit, offset, callback) {
+        spotifyApi.getMySavedTracks({
+            limit: limit,
+            offset: offset
+        })
+            .then(function(data) {
+                var artistId = data.body.items[0].track.artists[0].id;
+                console.log(artistId);
+                self.getMostRecentRelease(userId, artistId, function(albumInfo) {
+
+                });
+            })
     },
 
     /*
