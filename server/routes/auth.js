@@ -3,8 +3,16 @@
  */
 var express = require('express'),
     passport = require('passport'),
+    SpotifyApi = require('spotify-web-api-node'),
     // spotifyApi = require('../utils/spotify-user-api.js');
     router = express.Router();
+
+var credentials = {
+    clientId: '180cc653f1f24ae9864d5d718d68f3c6',
+    clientSecret: '7e3b3a161dc6442f974655a3209505cd',
+    redirectUri: 'http://localhost:3000/user/callback'
+},
+    spotifyApi = new SpotifyApi(credentials);
 
 router.get('/login', passport.authenticate('spotify', {
     scope: ['user-read-private', 'user-read-email', 'user-library-read'],
@@ -41,7 +49,22 @@ router.post('/status', function (req, res) {
 router.get('/callback',
     passport.authenticate('spotify', {failureRedirect: '/login'}),
     function(req, res) {
+        spotifyApi.setAccessToken(req.user.accessToken);
+        spotifyApi.setRefreshToken(req.user.refreshToken);
         res.redirect('/library');
+});
+
+router.get('/confirm-login', function(req, res) {
+    if (req.user !== undefined) {
+        spotifyApi.refreshAccessToken()
+            .then(function(data) {
+                req.user.accessToken = data.body.access_token;
+                res.send({user: req.user});
+            })
+            .catch(function(err) {
+                console.log(err);
+            });
+    }
 });
 
 
