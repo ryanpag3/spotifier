@@ -6,7 +6,7 @@
 
 var express = require('express'),
     router = express.Router(),
-    spotifyApi = require('../utils/spotify-user-api'),
+    spotifyApi = require('../utils/spotify-user-api-test'),
     User = require('../models/user.js');
 
 /**
@@ -14,23 +14,23 @@ var express = require('express'),
  * and route the page to display the search results.
  */
 router.post('/search', function(req, res) {
-    spotifyApi.search(req.body.artistName)
-        .then(function(data) {
-            console.log(data.body.artists.items);
-        })
-        .catch(function(err){
-            console.log(err);
-        })
+    // spotifyApi.search(req.body.artistName)
+    //     .then(function(data) {
+    //         console.log(data.body.artists.items);
+    //     })
+    //     .catch(function(err){
+    //         console.log(err);
+    //     })
 });
 
 router.get('/update', function(req, res) {
-    spotifyApi.getSavedTracks()
-        .then(function(data) {
-            for (var i = 0; i < 1; i++) {
-                console.log(data[i]);
-            }
-            res.sendStatus(200);
-        });
+    // spotifyApi.getSavedTracks()
+    //     .then(function(data) {
+    //         for (var i = 0; i < 1; i++) {
+    //             console.log(data[i]);
+    //         }
+    //         res.sendStatus(200);
+    //     });
 });
 
 /**

@@ -1,9 +1,10 @@
 /**
  * Created by ryan on 7/18/2017.
  */
-var app = angular.module('spotifier', ['ngRoute']);
+var app = angular.module('spotifier', ['ngRoute', 'spotify']);
 
-app.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
+app.config(['$routeProvider', '$locationProvider', 'SpotifyProvider',
+    function($routeProvider, $locationProvider, SpotifyProvider) {
     // TODO
     // add routes for each partial
     // add ensure authentication route middleware
@@ -18,4 +19,8 @@ app.config(['$routeProvider', '$locationProvider', function($routeProvider, $loc
         });
 
     $locationProvider.html5Mode(true);
+    SpotifyProvider.setClientId('180cc653f1f24ae9864d5d718d68f3c6');
+    SpotifyProvider.setRedirectUri('http://localhost:3000/user/callback');
+    SpotifyProvider.setScope('user-read-private user-read-email user-library-read')
+
 }]);

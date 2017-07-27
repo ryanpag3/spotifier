@@ -17,6 +17,7 @@
   },
   "homepage": "https://gitlab.com/ryanpage/spotify-notifier#README",
   "dependencies": {
+    "angular-spotify": "^1.5.1",
     "body-parser": "^1.17.2",
     "cookie-parser": "^1.4.3",
     "express": "^4.15.3",

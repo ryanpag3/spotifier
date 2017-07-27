@@ -7,8 +7,8 @@ var path = require('path'),
     passport = require('passport'),
     SpotifyStrategy = require('passport-spotify').Strategy,
     session = require('express-session'),
-    mongoose = require('mongoose'),
-    spotifyApi = require('./utils/spotify-user-api.js');
+    mongoose = require('mongoose');
+    // spotifyApi = require('./utils/spotify-user-api.js');
 
 /*
     handle middleware
@@ -44,13 +44,7 @@ const setupApp = function(app, express) {
     },
     function(accessToken, refreshToken, profile, done) {
         process.nextTick(function() {
-            // TODO
-            // associate spotify account with a user record in db
-            // return that user record instead
-            // spotifyApi.saveTokens()
-            console.log(profile.id);
-            spotifyApi.saveTokens(profile.id, accessToken, refreshToken);
-            return done(null, {id: profile.id});
+            return done(null, {id: profile.id, accessToken: accessToken, refreshToken: refreshToken});
 
         });
 

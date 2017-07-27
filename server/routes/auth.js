@@ -3,7 +3,7 @@
  */
 var express = require('express'),
     passport = require('passport'),
-    spotifyApi = require('../utils/spotify-user-api.js');
+    // spotifyApi = require('../utils/spotify-user-api.js');
     router = express.Router();
 
 router.get('/login', passport.authenticate('spotify', {
@@ -17,6 +17,12 @@ router.get('/login', passport.authenticate('spotify', {
 router.get('/logout', function(req, res) {
     req.logout();
     res.redirect('/login');
+});
+
+router.get('/me', function(req, res) {
+   return res.status(200).json({
+       user: req.user
+   })
 });
 
 router.post('/status', function (req, res) {
