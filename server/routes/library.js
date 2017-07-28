@@ -6,7 +6,6 @@
 
 var express = require('express'),
     router = express.Router(),
-    spotifyApi = require('../utils/spotify-user-api-test'),
     User = require('../models/user.js');
 
 /**
@@ -14,34 +13,20 @@ var express = require('express'),
  * and route the page to display the search results.
  */
 router.post('/search', function(req, res) {
-    // spotifyApi.search(req.body.artistName)
-    //     .then(function(data) {
-    //         console.log(data.body.artists.items);
-    //     })
-    //     .catch(function(err){
-    //         console.log(err);
-    //     })
+   // TODO
 });
 
 router.get('/update', function(req, res) {
-    // spotifyApi.getSavedTracks()
-    //     .then(function(data) {
-    //         for (var i = 0; i < 1; i++) {
-    //             console.log(data[i]);
-    //         }
-    //         res.sendStatus(200);
-    //     });
+    // TODO
 });
 
 /**
  * This will sync the users library artists with the database, and return an updated list
  * for the client.
  */
-router.get('/sync', function(req, res) {
-    spotifyApi.getSavedArtists(req.user.id);
-    return res.status(200).json({
-        msg: 'OK'
-    });
+router.post('/sync', function(req, res) {
+    console.log('user: ' + req.user.id);
+    console.log(req.body);
 });
 
 router.post('/add', function(req, res) {

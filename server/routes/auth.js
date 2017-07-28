@@ -54,7 +54,7 @@ router.get('/callback',
         res.redirect('/library');
 });
 
-router.get('/confirm-login', function(req, res) {
+router.get('/get-access-token', function(req, res) {
     if (req.user !== undefined) {
         spotifyApi.refreshAccessToken()
             .then(function(data) {

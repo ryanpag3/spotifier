@@ -53,8 +53,8 @@ const setupApp = function(app, express) {
 
 
     app.use(cookieParser());
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({ extended: false }));
+    app.use(bodyParser.json({limit: '5mb'}));
+    app.use(bodyParser.urlencoded({ extended: false, limit: '5mb' }));
     app.use(session({
         secret: 'spotifier secret',
         resave: false,

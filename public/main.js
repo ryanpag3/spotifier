@@ -26,13 +26,13 @@ app.config(['$routeProvider', '$locationProvider', 'SpotifyProvider',
 
 }]);
 
-app.run(function($http, $rootScope, $location) {
-    $http.get('/user/confirm-login')
+app.run(function($http, $rootScope, $location, apiService) {
+    $http.get('/user/get-access-token')
         .then(function(res) {
-            console.log(res.data.user);
             $rootScope.user = res.data.user;
+            apiService.setAuthToken(res.data.user.accessToken);
         })
         .catch(function(err) {
-            console.log('ERROR: ' + err);
+            console.log(err);
         })
 });
