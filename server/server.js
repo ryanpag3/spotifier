@@ -3,9 +3,7 @@
  */
 var express = require('express'),
     app = express(),
-    server = require('http').createServer(app),
-    io = require('socket.io')(server),
-    socket = require('./utils/socket.js')(io);
+    server = require('http').createServer(app);
 
 require('./app.js')(app, express); // expose middleware/setup application
 

@@ -6,7 +6,8 @@
 
 var express = require('express'),
     router = express.Router(),
-    User = require('../models/user.js');
+    artistDb = require('../utils/db-artist-wrapper.js'),
+    userDb = require('../utils/db-user-wrapper.js');
 
 /**
  * When a user hits enter on the search bar, this page will call the spotifyApi service,
@@ -27,6 +28,15 @@ router.get('/update', function(req, res) {
 router.post('/sync', function(req, res) {
     console.log('user: ' + req.user.id);
     console.log(req.body);
+    var artists = req.body.artists,
+        i = 0;
+    function go() {
+        artistDb.insert(artists[i++].artistId);
+        if (i < artists.length){
+            setTimeout(go, 250);
+        }
+    }
+    go();
 });
 
 router.post('/add', function(req, res) {
