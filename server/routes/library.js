@@ -6,6 +6,7 @@
 
 var express = require('express'),
     router = express.Router(),
+    syncQueue = require('../utils/sync-queue.js'),
     artistDb = require('../utils/db-artist-wrapper.js'),
     userDb = require('../utils/db-user-wrapper.js');
 
@@ -26,17 +27,11 @@ router.get('/update', function(req, res) {
  * for the client.
  */
 router.post('/sync', function(req, res) {
-    console.log('user: ' + req.user.id);
-    console.log(req.body);
-    var artists = req.body.artists,
-        i = 0;
-    function go() {
-        artistDb.insert(artists[i++].artistId);
-        if (i < artists.length){
-            setTimeout(go, 250);
-        }
-    }
-    go();
+    var data = {user: req.user.id, artists: req.body.artists};
+    syncQueue.create(data, function() {
+        // do nothing
+    });
+    return res.status(200);
 });
 
 router.post('/add', function(req, res) {

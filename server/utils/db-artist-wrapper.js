@@ -31,7 +31,6 @@ var self = module.exports = {
                                 if (err) {
                                     console.log(err);
                                 }
-                                console.log(artist);
                             })
                     })
                     .catch(function(err) {

@@ -51,7 +51,7 @@ app.factory('apiService', ['$q', '$http', 'Spotify',
                             }
                             offset += ((res.data.total - offset < limit) ? res.data.total - offset : limit);
                             if (offset < res.data.total - 1) {
-                                go(limit, offset += limit);
+                                setTimeout(go(limit, offset += limit), 500);
                             } else {
                                 console.log('sending artists to server...');
                                 $http.post('/library/sync', {
