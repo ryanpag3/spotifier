@@ -19,50 +19,50 @@ app.factory('apiService', ['$q', '$http', 'Spotify',
             // TODO: DISABLE UI ELEMENT AND SHOW LOADING BAR DURING FUNCTION RUN
          */
         function syncLibrary() {
-            // set default values
-            var savedArtists = {};
-
-
-            getArtistIds();
-
-            /**
-             * Get's all artist ID's of each unique artist in a user library
-             */
-            function getArtistIds() {
-                var limit = 50,
-                    offset = 0,
-                    artistArray = [];
-                // start
-                go(limit, offset);
-                console.log('getting unique artists...');
-                function go(limit, offset) {
-                    Spotify.getSavedUserTracks({
-                        limit: limit,
-                        offset: offset
-                    })
-                        .then(function(res) {
-                            for (var i = 0; i < res.data.items.length; i++) {
-                                var artistId = res.data.items[i].track.artists[0].id;
-                                if (savedArtists[artistId] === undefined && res.data.items[i].track.preview_url !== null) {
-                                    var artistName = res.data.items[i].track.artists[0].name;
-                                    savedArtists[artistId] = {artistId: artistId, artistName: artistName};
-                                    artistArray.push({artistId: artistId, artistName: artistName});
-                                }
-                            }
-                            offset += ((res.data.total - offset < limit) ? res.data.total - offset : limit);
-                            if (offset < res.data.total - 1) {
-                                setTimeout(go(limit, offset += limit), 500);
-                            } else {
-                                console.log('sending artists to server...');
-                                $http.post('/library/sync', {
-                                    artists: artistArray
-                                })
-                                    .then(function(res) {
-                                        console.log(res);
-                                    })
-                            }
-                        })
-                }
+            // // set default values
+            // var savedArtists = {};
+            //
+            //
+            // getArtistIds();
+            //
+            // /**
+            //  * Get's all artist ID's of each unique artist in a user library
+            //  */
+            // function getArtistIds() {
+            //     var limit = 50,
+            //         offset = 0,
+            //         artistArray = [];
+            //     // start
+            //     go(limit, offset);
+            //     console.log('getting unique artists...');
+            //     function go(limit, offset) {
+            //         Spotify.getSavedUserTracks({
+            //             limit: limit,
+            //             offset: offset
+            //         })
+            //             .then(function(res) {
+            //                 for (var i = 0; i < res.data.items.length; i++) {
+            //                     var artistId = res.data.items[i].track.artists[0].id;
+            //                     if (savedArtists[artistId] === undefined && res.data.items[i].track.preview_url !== null) {
+            //                         var artistName = res.data.items[i].track.artists[0].name;
+            //                         savedArtists[artistId] = {artistId: artistId, artistName: artistName};
+            //                         artistArray.push({artistId: artistId, artistName: artistName});
+            //                     }
+            //                 }
+            //                 offset += ((res.data.total - offset < limit) ? res.data.total - offset : limit);
+            //                 if (offset < res.data.total - 1) {
+            //                     setTimeout(go(limit, offset += limit), 500);
+            //                 } else {
+            //                     console.log('sending artists to server...');
+            //                     $http.post('/library/sync', {
+            //                         artists: artistArray
+            //                     })
+            //                         .then(function(res) {
+            //                             console.log(res);
+            //                         })
+            //                 }
+            //             })
+            //     }
             }
 
             // deprecated: causes 429 errors when run across multiple clients, cannot sustain production
@@ -148,5 +148,4 @@ app.factory('apiService', ['$q', '$http', 'Spotify',
             //             })
             //     }
             // }
-        }
     }]);

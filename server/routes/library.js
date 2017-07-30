@@ -26,12 +26,21 @@ router.get('/update', function(req, res) {
  * This will sync the users library artists with the database, and return an updated list
  * for the client.
  */
-router.post('/sync', function(req, res) {
-    var data = {user: req.user.id, artists: req.body.artists};
-    syncQueue.create(data, function() {
-        // do nothing
-    });
-    return res.status(200);
+router.get('/sync', function(req, res) {
+    console.log('sync called...');
+
+    if (req.user === undefined) {
+        console.log('req.user === undefined');
+        res.redirect('/library');
+    } else {
+        var data = {user: req.user, artists: req.body.artists};
+        syncQueue.create(data, function() {
+            // do nothing
+        });
+       res.redirect('/library');
+    }
+
+
 });
 
 router.post('/add', function(req, res) {

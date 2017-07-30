@@ -31,6 +31,7 @@ var self = module.exports = {
                                 if (err) {
                                     console.log(err);
                                 }
+                                console.log(artist.name + ' has been successfully added to the artist master list.');
                             })
                     })
                     .catch(function(err) {
