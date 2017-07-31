@@ -6,7 +6,7 @@
 
 var express = require('express'),
     router = express.Router(),
-    syncQueue = require('../utils/sync-queue.js'),
+    jobQueue = require('../utils/job-queue.js'),
     artistDb = require('../utils/db-artist-wrapper.js'),
     userDb = require('../utils/db-user-wrapper.js');
 
@@ -34,7 +34,7 @@ router.get('/sync', function(req, res) {
         res.redirect('/library');
     } else {
         var data = {user: req.user, artists: req.body.artists};
-        syncQueue.create(data, function() {
+        jobQueue.createSyncLibJob(data, function() {
             // do nothing
         });
        res.redirect('/library');

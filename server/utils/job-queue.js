@@ -17,10 +17,12 @@ function syncLibrary(data, done) {
                 console.log(err);
                 done(err);
             } else {
+                queue.activeCount(function(err, total) {
+                    console.log(total);
+                });
                 done();
             }
         });
-
 }
 
 queue.process('sync-library', 1, function(job, done) {
@@ -28,15 +30,6 @@ queue.process('sync-library', 1, function(job, done) {
     /* Get all unique artists in user's saved tracks library */
     spotifyApiUser.getLibraryArtists(job.data.user)
         .then(function(artists) {
-            // var names = [];
-            // for (var i = 0; i < artists.length; i++){
-            //     names.push(artists[i].artistName);
-            // }
-            // names.sort();
-            // for (var i = 0; i < names.length; i++){
-            //     console.log(names[i]);
-            // }
-
             console.log('inserting them into the db');
             function go() {
                 // insert them into the database
@@ -52,14 +45,16 @@ queue.process('sync-library', 1, function(job, done) {
         .catch(function(err) {
             console.log(err);
         });
-
-
-
 });
 
 
+
+
 module.exports = {
-    create: function(data, done) {
+    createSyncLibJob: function(data, done) {
         syncLibrary(data, done);
     }
+
+
+
 };

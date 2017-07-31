@@ -39,5 +39,9 @@ var self = module.exports = {
                     })
             }
         })
+    },
+    /** get an artist's info by their _ID **/
+    get: function(id) {
+
     }
 };

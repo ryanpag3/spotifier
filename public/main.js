@@ -3,14 +3,14 @@
  */
 var app = angular.module('spotifier', ['ngRoute', 'spotify']);
 
-app.config(['$routeProvider', '$locationProvider', 'SpotifyProvider',
-    function($routeProvider, $locationProvider, SpotifyProvider) {
+app.config(['$routeProvider', '$locationProvider',
+    function($routeProvider, $locationProvider) {
     // TODO
     // add routes for each partial
     // add ensure authentication route middleware
     $routeProvider
-        .when('/login', {
-            templateUrl: 'partials/login.html',
+        .when('/', {
+            templateUrl: 'partials/landing.html',
             restricted: false
         })
         .when('/library', {
@@ -19,20 +19,9 @@ app.config(['$routeProvider', '$locationProvider', 'SpotifyProvider',
         });
 
     $locationProvider.html5Mode(true);
-    // TODO: retrieve these variables at runtime from server to avoid exposing them in production
-    SpotifyProvider.setClientId('180cc653f1f24ae9864d5d718d68f3c6');
-    SpotifyProvider.setRedirectUri('http://localhost:3000/user/callback');
-    SpotifyProvider.setScope('user-read-private user-read-email user-library-read')
 
 }]);
 
 app.run(function($http, $rootScope, $location, apiService) {
-    $http.get('/user/get-access-token')
-        .then(function(res) {
-            $rootScope.user = res.data.user;
-            apiService.setAuthToken(res.data.user.accessToken);
-        })
-        .catch(function(err) {
-            console.log(err);
-        })
+
 });

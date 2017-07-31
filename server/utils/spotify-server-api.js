@@ -1,3 +1,4 @@
+/** This file handles all the client authenticated calls to the spotify api. **/
 var SpotifyApi = require('spotify-web-api-node'),
     Q = require('q'),
     credentials = {

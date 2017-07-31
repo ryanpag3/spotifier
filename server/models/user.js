@@ -10,6 +10,10 @@ var Schema = mongoose.Schema;
  */
 var User = new Schema({
     username: String,
-    saved_artist_ids: [String],
-    new_releases: [String]
+    email: {
+        address: String,
+        confirmed: Boolean
+    },
+    saved_artist_ids: [Schema.types.ObjectId],
+    new_releases: [Schema.types.ObjectId]
 });
