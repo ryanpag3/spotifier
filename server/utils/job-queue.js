@@ -1,7 +1,7 @@
 var kue = require('kue'),
     queue = kue.createQueue(),
     artistDb = require('../utils/db-artist-wrapper.js'),
-    userDb = require('../utils/db-user-wrapper.js'),
+    user = require('../utils/db-user-wrapper.js'),
     spotifyApiUser = require('../utils/spotify-user-api');
 
 function syncLibrary(data, done) {
@@ -33,7 +33,8 @@ queue.process('sync-library', 1, function(job, done) {
             console.log('inserting them into the db');
             function go() {
                 // insert them into the database
-                artistDb.insert(artists[i++].artistId);
+                user.addArtist(job.data.user.id, artists[i++].artistId);
+
                 if (i < artists.length - 1){
                     setTimeout(go, 225);
                 } else {
@@ -51,6 +52,7 @@ queue.process('sync-library', 1, function(job, done) {
 
 
 module.exports = {
+    /** data = {user: req.user, artists: req.body.artists}; **/
     createSyncLibJob: function(data, done) {
         syncLibrary(data, done);
     }

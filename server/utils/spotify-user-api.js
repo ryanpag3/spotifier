@@ -52,7 +52,6 @@ var self = module.exports = {
         self.getAccessToken(user)
             .then(function(accessToken) {
                 user.accessToken = accessToken;
-                console.log(data);
                 spotifyApi.setAccessToken(user.accessToken.token);
                 console.log('grabbing artists for ' + user.id);
                 function go() {

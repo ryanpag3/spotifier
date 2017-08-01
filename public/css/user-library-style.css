@@ -3,3 +3,45 @@
     width: 100%;
     background-color: lightblue;
 }
+
+.library-container {
+    overflow: auto;
+    margin: 0 auto;
+    height: 95%;
+    background-color: lightgrey;
+}
+
+.artist-container {
+    width: 95%;
+    height: 50px;
+    margin: 0 auto;
+    margin-top: 4px;
+    background-color: darkgrey;
+}
+
+.artist-element {
+    height: 100%;
+    font-size: 1.25vw;
+    color: white;
+    vertical-align: middle;
+    line-height: 50px;
+    float: left;
+}
+
+#artist-name {
+
+}
+
+#artist-release {
+}
+
+#artist-release-art {
+
+}
+
+#artist-release-title {
+
+}
+
+#artist-release-date {
+}

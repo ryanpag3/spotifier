@@ -16,7 +16,7 @@ var Artist = new Schema({
         release_date: String,
         images: []
     },
-    users_tracking: [String]
+    users_tracking: [Schema.ObjectId]
 });
 
 module.exports = mongoose.model('artists', Artist);

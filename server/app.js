@@ -8,6 +8,7 @@ var path = require('path'),
     SpotifyStrategy = require('passport-spotify').Strategy,
     session = require('express-session'),
     mongoose = require('mongoose');
+    mongoose.Promise = require('bluebird');
 
 /*
     handle middleware

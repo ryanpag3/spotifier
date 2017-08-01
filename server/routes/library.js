@@ -7,8 +7,7 @@
 var express = require('express'),
     router = express.Router(),
     jobQueue = require('../utils/job-queue.js'),
-    artistDb = require('../utils/db-artist-wrapper.js'),
-    userDb = require('../utils/db-user-wrapper.js');
+    user = require('../utils/db-user-wrapper.js');
 
 /**
  * When a user hits enter on the search bar, this page will call the spotifyApi service,
@@ -19,7 +18,13 @@ router.post('/search', function(req, res) {
 });
 
 router.get('/update', function(req, res) {
-    // TODO
+    user.getLibrary(req.user.id)
+        .then(function(library) {
+            console.log('returning library');
+            return res.status(200).json({
+                library: library
+            })
+        })
 });
 
 /**

@@ -9,11 +9,13 @@ var Schema = mongoose.Schema;
  * new_releases: this is an array of mongo IDs of artists who have new releases found
  */
 var User = new Schema({
-    username: String,
+    name: String,
     email: {
         address: String,
         confirmed: Boolean
     },
-    saved_artist_ids: [Schema.types.ObjectId],
-    new_releases: [Schema.types.ObjectId]
+    saved_artists: [Schema.ObjectId],
+    new_releases: [Schema.ObjectId]
 });
+
+module.exports = mongoose.model('users', User);
