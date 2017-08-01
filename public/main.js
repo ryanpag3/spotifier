@@ -3,8 +3,8 @@
  */
 var app = angular.module('spotifier', ['ngRoute', 'spotify']);
 
-app.config(['$routeProvider', '$locationProvider',
-    function($routeProvider, $locationProvider) {
+app.config(['$routeProvider', '$locationProvider', 'SpotifyProvider',
+    function($routeProvider, $locationProvider, SpotifyProvider) {
     // TODO
     // add routes for each partial
     // add ensure authentication route middleware
@@ -19,9 +19,9 @@ app.config(['$routeProvider', '$locationProvider',
         });
 
     $locationProvider.html5Mode(true);
-
+    SpotifyProvider.setClientId('180cc653f1f24ae9864d5d718d68f3c6');
 }]);
 
-app.run(function($http, $rootScope, $location, apiService) {
+app.run(function($http, $rootScope, $location) {
 
 });

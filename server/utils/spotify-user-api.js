@@ -90,5 +90,45 @@ var self = module.exports = {
                 console.log(err);
             });
         return deferred.promise;
-   }
+   },
+
+    /* queries the spotify api for an artist and returns the top 10 results */
+    searchArtists: function(user, query) {
+        var spotifyApi = new SpotifyApi(credentials),
+            limit = 5,
+            offset = 0,
+            deferred = Q.defer(),
+            results = [],
+            query = query.trim() + '*';
+        // refresh access token if necessary
+        self.getAccessToken(user)
+            .then(function(accessToken) {
+                // set token
+                spotifyApi.setAccessToken(accessToken.token);
+                // search for artist
+                spotifyApi.searchArtists(query, ({
+                    limit: limit,
+                    offset: offset,
+                    from_token: accessToken.token
+                }))
+                    .then(function(res) {
+                        // build results
+                        for (var i = 0; i < res.body.artists.items.length; i++) {
+                            // console.log(res.body.artists.items[i].images[2].url);
+                            results.push({
+                                name: res.body.artists.items[i].name,
+                                id: res.body.artists.items[i].id,
+                                url: res.body.artists.items[i].images
+                            })
+                        }
+                        // return
+                        deferred.resolve(results);
+                    })
+                    .catch(function(err) {
+                        console.log(err);
+                        deferred.resolve(err);
+                    })
+        });
+        return deferred.promise;
+    }
 };

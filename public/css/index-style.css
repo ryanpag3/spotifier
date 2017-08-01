@@ -21,6 +21,12 @@ header {
     margin-left: 10px;
 }
 
+.search-results {
+    height: 400px;
+    width: 20%;
+    background-color: yellow;
+}
+
 #h {
     background-color: black;
 }

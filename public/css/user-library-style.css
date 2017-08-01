@@ -5,30 +5,31 @@
 }
 
 .library-container {
-    overflow: auto;
+    overflow-y: scroll;
     margin: 0 auto;
-    height: 95%;
-    background-color: lightgrey;
+    max-height: 100%;
+    background-color: darkgrey;
 }
 
 .artist-container {
     width: 95%;
-    height: 50px;
+    height: 40px;
     margin: 0 auto;
-    margin-top: 4px;
-    background-color: darkgrey;
+    margin-top: 2px;
+    background-color: lightgrey;
 }
 
 .artist-element {
     height: 100%;
-    font-size: 1.25vw;
-    color: white;
+    font-size: 16px;
+    color: black;
     vertical-align: middle;
-    line-height: 50px;
+    line-height: 40px;
     float: left;
 }
 
 #artist-name {
+    overflow: hidden;
 
 }
 
@@ -36,10 +37,16 @@
 }
 
 #artist-release-art {
-
+    background-size: contain;
+    width: 30px;
+    height: 30px;
+    margin: 5px;
 }
 
 #artist-release-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 
 }
 

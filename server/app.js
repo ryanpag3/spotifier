@@ -73,10 +73,12 @@ const setupApp = function(app, express) {
     // require routes
     var authRoute = require('./routes/auth.js');
     var libraryRoute = require('./routes/library.js');
+    var artistRoute = require('./routes/artist.js');
 
     // routes
     app.use('/user/', authRoute);
     app.use('/library/', libraryRoute);
+    app.use('/artist/', artistRoute);
 
     // for handling html5mode
     app.get('*', function(req, res, next) {

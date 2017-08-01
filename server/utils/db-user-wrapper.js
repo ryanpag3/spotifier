@@ -17,10 +17,7 @@ var self = module.exports = {
                 var user = new User({
                     name: username
                 }).save(function (err, user) {
-                    console.log(user);
                 });
-            } else {
-                console.log(user);
             }
         })
     },
@@ -89,6 +86,7 @@ var self = module.exports = {
                                     console.log(err);
                                 }
                             });
+                            console.log(artist.name + ' added ' + user.name + ' to tracking list.');
                         }
                         if (!self.userTrackingArtist(artist._id, user._id)){
                             // associate artist with user
@@ -98,8 +96,9 @@ var self = module.exports = {
                                     console.log(err);
                                 }
                             });
+                            console.log(user.name + ' associated with ' + artist.name);
                         }
-                        console.log(user.name + ' associated with ' + artist.name);
+
                     }
                 })
             }

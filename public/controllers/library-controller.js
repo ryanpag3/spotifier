@@ -1,8 +1,10 @@
 var app = angular.module('spotifier');
-app.controller('library-controller', ['$scope', '$rootScope', 'apiService', 'dbService',
-    function($scope, $rootScope, apiService, dbService) {
+app.controller('library-controller', ['$scope', '$rootScope', '$timeout', 'libraryService',
+    function($scope, $rootScope, $timeout, libraryService) {
+        init();
+
         // sort by date added
-        $scope.library = {};
+        $scope.library = [];
         $scope.libraryReversed = {};
         // sort by artist
         $scope.libraryArtistAscending = {};
@@ -14,15 +16,14 @@ app.controller('library-controller', ['$scope', '$rootScope', 'apiService', 'dbS
         $scope.libraryReleaseDateAscending = {};
         $scope.libraryReleaseDateDescending = {};
 
-
         $scope.syncLibrary = function() {
-            apiService.syncLibrary();
+            libraryService.sync();
         };
         function init() {
-            dbService.getLibrary()
+            libraryService.get()
                 .then(function(library) {
                     $scope.library = library;
                 });
         }
-        init();
+
 }]);

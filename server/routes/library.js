@@ -9,10 +9,7 @@ var express = require('express'),
     jobQueue = require('../utils/job-queue.js'),
     user = require('../utils/db-user-wrapper.js');
 
-/**
- * When a user hits enter on the search bar, this page will call the spotifyApi service,
- * and route the page to display the search results.
- */
+/* handles searching a user's saved artists */
 router.post('/search', function(req, res) {
    // TODO
 });
@@ -20,7 +17,6 @@ router.post('/search', function(req, res) {
 router.get('/update', function(req, res) {
     user.getLibrary(req.user.id)
         .then(function(library) {
-            console.log('returning library');
             return res.status(200).json({
                 library: library
             })
@@ -56,6 +52,12 @@ router.post('/add', function(req, res) {
 router.get('/remove', function(req, res) {
    // todo
    // handles removing an artist from the users library
+});
+
+router.get('/me', function(req, res) {
+    return res.status(200).json({
+        user: req.user
+    })
 });
 
 module.exports = router;

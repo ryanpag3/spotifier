@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <base href="/">
@@ -12,13 +12,12 @@
         <h1>Spotifier</h1>
         <div>
             <form data-ng-submit="search(artistName)">
-                <input class="search-bar" placeholder="search for artists" data-ng-model="artistName">
+                <input id="spotify-search" class="search-bar" placeholder="search for artists" data-ng-model="artistName">
             </form>
-            <div class="search-preview"></div>
+            <div class="search-results"></div>
         </div>
 
         <div style="position: absolute; right: 0; top: 0">
-            <button class="btn btn-primary" data-ng-click="test()">TEST</button>
             <a href="/user/login" target="_self" class="btn btn-success btn-login">login</a>
             <a href="/user/logout" target="_self" class="btn btn-primary btn-login">logout</a>
         </div>
@@ -27,17 +26,18 @@
     <div data-ng-view></div>
 </body>
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-route.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 <script src="./lib/angular-spotify.js"></script>
 <script src="./main.js"></script>
+
 <!--controllers-->
 <script src="controllers/index-controller.js"></script>
 <script src="controllers/library-controller.js"></script>
 <!--services-->
 <script src="services/auth-service.js"></script>
-<script src="services/api-service.js"></script>
+<script src="services/library-service.js"></script>
 <script src="services/database-service.js"></script>
 </html>

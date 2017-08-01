@@ -4,21 +4,21 @@
     <link rel="stylesheet" type="text/css" href="../css/user-library-style.css">
     <!--USER LIBRARY PARTIAL PAGE-->
     <a class="btn btn-success" href="/library/sync" target="_self">SYNC W/ LIBRARY</a>
-    <div class="library-container container-fluid col-lg-10 col-md-10 col-sm-10 col-xs-10">
-        <div data-ng-repeat="artist in library" class="artist-container .container">
-            <div style="height: 100%; width: 2%; float: left"></div>
-            <div style="height: 100%; width: 98%; float: left;">
-                <div id="artist-name" class="artist-element col-xs-4">{{artist.name}}</div>
-                <div id="artist-release" class="artist-element col-xs-8">
-                        <div data-ng-style="{'background-image' : 'url(artist.recent_release.images[2].url)'}" id="artist-release-art" class="artist-element col-xs-1"></div>
+    <div class="library-container container-fluid col-xs-9">
+        <div>
+            <div data-ng-repeat="artist in library" class="artist-container .container">
+                <div style="height: 100%; width: 5%; float: left"></div>
+                <div style="height: 100%; width: 95%; float: left;">
+                    <div id="artist-name" class="artist-element col-xs-4">{{artist.name}}</div>
+                    <div id="artist-release" class="artist-element col-xs-8">
+                        <div data-ng-style="{'background-image' : 'url(' + artist.recent_release.images[2].url + ')'}" id="artist-release-art" class="artist-element col-xs-1"></div>
                         <div id="artist-release-title" class="artist-element col-xs-8">{{artist.recent_release.title}}</div>
                         <div id="artist-release-date" class="artist-element col-xs-3">{{artist.recent_release.release_date}}</div>
+                    </div>
                 </div>
             </div>
-
         </div>
     </div>
-
 </div>
 
 

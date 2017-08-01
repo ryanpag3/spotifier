@@ -4,6 +4,7 @@ var kue = require('kue'),
     user = require('../utils/db-user-wrapper.js'),
     spotifyApiUser = require('../utils/spotify-user-api');
 
+// create event and specify event handlers
 function syncLibrary(data, done) {
     var job = queue.create('sync-library', data);
         job.on('start', function() {
@@ -24,7 +25,7 @@ function syncLibrary(data, done) {
             }
         });
 }
-
+// sync library job process
 queue.process('sync-library', 1, function(job, done) {
     var i = 0;
     /* Get all unique artists in user's saved tracks library */
@@ -48,13 +49,42 @@ queue.process('sync-library', 1, function(job, done) {
         });
 });
 
+function searchArtist(data, done) {
+    var job = queue.create('search-artist', data);
+    job.on('start', function() {
+        // todo
+    }).on('complete', function(res) {
+        done(res);
+    })
+        .removeOnComplete(true)
+        .save(function(err) {
+            if (err) {
+                done(err);
+            }
+        })
+}
+
+queue.process('search-artist', 1, function(job, done) {
+    spotifyApiUser.searchArtists(job.data.user, job.data.query)
+        .then(function(res) {
+            done(null, res);
+        })
+        .catch(function(err) {
+            done(err, null);
+        });
+});
 
 
 
 module.exports = {
-    /** data = {user: req.user, artists: req.body.artists}; **/
+    // data = {user: req.user, artists: req.body.artists};
     createSyncLibJob: function(data, done) {
         syncLibrary(data, done);
+    },
+
+    // data = {user: req.user, query: req.body.query};
+    createSearchArtistJob: function(data, done) {
+        searchArtist(data, done);
     }
 
 

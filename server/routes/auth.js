@@ -19,11 +19,7 @@ router.get('/logout', function(req, res) {
     res.redirect('/login');
 });
 
-router.get('/me', function(req, res) {
-   return res.status(200).json({
-       user: req.user
-   })
-});
+
 
 router.post('/status', function (req, res) {
     if (!req.isAuthenticated()) {
@@ -58,7 +54,6 @@ router.get('/callback',
 
         // DEBUGGING
         res.redirect('/library');
-
 });
 
 module.exports = router;
