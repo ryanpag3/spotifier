@@ -1,7 +1,7 @@
 /** This file handles all of the user authenticated api calls to Spotify **/
 var SpotifyApi = require('spotify-web-api-node'),
     Q = require('q'),
-    userDb = require('../utils/db-user-wrapper.js'),
+    userDb = require('./db-wrapper.js'),
     credentials = {
         clientId: '180cc653f1f24ae9864d5d718d68f3c6',
         clientSecret: '7e3b3a161dc6442f974655a3209505cd'

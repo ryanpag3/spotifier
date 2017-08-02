@@ -3,7 +3,7 @@
  */
 var express = require('express'),
     passport = require('passport'),
-    userDb = require('../utils/db-user-wrapper.js'),
+    userDb = require('../utils/db-wrapper.js'),
     router = express.Router();
 
 router.get('/login', passport.authenticate('spotify', {

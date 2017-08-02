@@ -1,8 +1,9 @@
 var kue = require('kue'),
     queue = kue.createQueue(),
-    artistDb = require('../utils/db-artist-wrapper.js'),
-    user = require('../utils/db-user-wrapper.js'),
-    spotifyApiUser = require('../utils/spotify-user-api');
+    artistDb = require('./db-artist-wrapper-DEPRECATED.js'),
+    user = require('./db-wrapper.js'),
+    spotifyApiUser = require('../utils/spotify-user-api'),
+    spotifyApiServer = require('../utils/spotify-server-api.js');
 
 // create event and specify event handlers
 function syncLibrary(data, done) {
@@ -74,9 +75,37 @@ queue.process('search-artist', 1, function(job, done) {
         });
 });
 
+// creates job for getting detailed artist release information
 function getArtistDetails(data, done) {
-
+    var job = queue.create('get-artist-details', data);
+    job.on('start', function() {
+        // todo
+    }). on ('complete', function() {
+        done();
+    })
+        .removeOnComplete(true)
+        .save(function(err) {
+            if (err) {
+                done(err);
+            }
+        })
 }
+
+queue.process('get-artist-details', 1, function(job, done) {
+    spotifyApiServer.getRecentRelease(job.data.artistId)
+        .then(function(albumId) {
+            spotifyApiServer.getAlbumInfo(albumId)
+                .then(function(album) {
+                    console.log(album);
+                })
+                .catch(function(err) {
+                    console.log(err);
+                })
+        })
+        .catch(function(err) {
+            console.log(err);
+        })
+});
 
 
 

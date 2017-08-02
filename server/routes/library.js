@@ -7,7 +7,7 @@
 var express = require('express'),
     router = express.Router(),
     jobQueue = require('../utils/job-queue.js'),
-    user = require('../utils/db-user-wrapper.js');
+    user = require('../utils/db-wrapper.js');
 
 /* handles searching a user's saved artists */
 router.post('/search', function(req, res) {
