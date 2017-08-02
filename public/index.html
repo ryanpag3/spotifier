@@ -10,11 +10,17 @@
 <body data-ng-app="spotifier" data-ng-controller="index-controller">
     <header>
         <h1>Spotifier</h1>
-        <div>
+        <div class="search">
             <form data-ng-submit="search(artistName)">
                 <input id="spotify-search" class="search-bar" placeholder="search for artists" data-ng-model="artistName">
             </form>
-            <div class="search-results"></div>
+            <div class="search-results">
+                <div class="result">
+                    <div class="result-add"></div>
+                    <div class="result-name"></div>
+                    <div class="result-pic"></div>
+                </div>
+            </div>
         </div>
 
         <div style="position: absolute; right: 0; top: 0">
