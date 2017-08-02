@@ -14,11 +14,11 @@
             <form data-ng-submit="search(artistName)">
                 <input id="spotify-search" class="search-bar" placeholder="search for artists" data-ng-model="artistName">
             </form>
-            <div class="search-results">
-                <div class="result">
+            <div class="search-results" data-ng-cloak data-ng-show="resultsShown">
+                <div class="result" data-ng-repeat="artist in results">
                     <div class="result-add"></div>
-                    <div class="result-name"></div>
-                    <div class="result-pic"></div>
+                    <div class="result-name"><div style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden">{{artist.name}}</div></div>
+                    <div class="result-pic" data-ng-style="{'background-image' : 'url(' + artist.url + ')'}"></div>
                 </div>
             </div>
         </div>

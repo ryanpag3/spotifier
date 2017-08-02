@@ -30,37 +30,47 @@ header {
 }
 
 .search-results {
-    height: 300px;
+    height: 236px;
     width: 100%;
     margin-left: 10px;
-    background-color: #272927;
+    background-color: #484d46;
     float: left;
     overflow: auto;
 }
 
 .result {
+    display: flex;
     height: 42px;
     width: 242px;
     margin: 4px;
-    background-color: red;
 }
 
 .result-add {
-    width: 50px;
-    height: 50px;
+    min-width: 42px;
+    height: 42px;
     background-color: whitesmoke;
 }
 
 .result-name {
-    width: 150px;
-    height: 50px;
-    background-color: green;
+    display: flex;
+    flex-direction: column;
+    width: 158px;
+    min-width: 0;
+    justify-content: center;
+    padding-left: 4px;
+    /*padding-right: 8px;*/
+    font-size: 14px;
+    color: #bdc5ba;
+    overflow: hidden;
 }
 
 .result-pic {
-    width: 50px;
-    height: 50px;
-    background-color: yellow;
+    border-radius: 42px;
+    width: 42px;
+    height: 42px;
+    background-color: lightgray;
+    background-position: center;
+    background-size: cover;
 }
 
 #h {

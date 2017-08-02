@@ -74,6 +74,10 @@ queue.process('search-artist', 1, function(job, done) {
         });
 });
 
+function getArtistDetails(data, done) {
+
+}
+
 
 
 module.exports = {
@@ -85,6 +89,10 @@ module.exports = {
     // data = {user: req.user, query: req.body.query};
     createSearchArtistJob: function(data, done) {
         searchArtist(data, done);
+    },
+
+    createGetArtistDetailsJob: function(data, done) {
+        getArtistDetails(data,done);
     }
 
 

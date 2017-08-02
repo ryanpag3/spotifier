@@ -114,11 +114,13 @@ var self = module.exports = {
                     .then(function(res) {
                         // build results
                         for (var i = 0; i < res.body.artists.items.length; i++) {
-                            // console.log(res.body.artists.items[i].images[2].url);
+                            var artist = res.body.artists.items[i];
+                            var url = res.body.artists.items[i].images.length > 0 ? res.body.artists.items[i].images[res.body.artists.items[i].images.length-1].url : '';
+
                             results.push({
-                                name: res.body.artists.items[i].name,
-                                id: res.body.artists.items[i].id,
-                                url: res.body.artists.items[i].images
+                                name: artist.name,
+                                id: artist.id,
+                                url: url
                             })
                         }
                         // return

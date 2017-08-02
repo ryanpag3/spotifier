@@ -1,6 +1,6 @@
 var app = angular.module('spotifier');
-app.factory('libraryService', ['$q', '$http', 'Spotify',
-    function($q, $http, Spotify) {
+app.factory('libraryService', ['$q', '$http',
+    function($q, $http) {
         return ({
             sync: sync,
             get: get,
@@ -8,7 +8,7 @@ app.factory('libraryService', ['$q', '$http', 'Spotify',
             search: search
         });
 
-        /* initiates the sync-library queue job */
+        // initiates a library sync job for the user
         function sync() {
                 var deferred = $q.defer();
                 $http.get('/library/sync', function(req, res) {
@@ -18,7 +18,7 @@ app.factory('libraryService', ['$q', '$http', 'Spotify',
                 });
             return deferred.promise;
         }
-
+        // gets an up to date version of the users library
         function get() {
             var deferred = $q.defer();
             $http.get('library/update')
@@ -29,7 +29,7 @@ app.factory('libraryService', ['$q', '$http', 'Spotify',
                 });
             return deferred.promise;
         }
-
+        // gets spotify api artist search results from http request
         function searchSpotify(query) {
             var deferred = $q.defer();
             console.log(query);
@@ -42,11 +42,12 @@ app.factory('libraryService', ['$q', '$http', 'Spotify',
                     }
                 })
                 .catch(function(res) {
-                    deferred.reject(res.data.err);
+                    deferred.reject(res);
                 });
             return deferred.promise;
         }
 
+        // gets user library search results from http request
         function search(query) {
             // todo
         }
