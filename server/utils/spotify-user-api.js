@@ -53,7 +53,7 @@ var self = module.exports = {
             .then(function(accessToken) {
                 user.accessToken = accessToken;
                 spotifyApi.setAccessToken(user.accessToken.token);
-                console.log('grabbing artists for ' + user.id);
+                console.log('grabbing artists for ' + user.name);
                 function go() {
                     spotifyApi.getMySavedTracks({
                         limit: limit,
@@ -65,9 +65,9 @@ var self = module.exports = {
                                 // grab primary artist id, ignore features
                                 var artistId = track.artists[0].id;
                                 if (artistAdded[artistId] === undefined && track.preview_url !== null) {
-                                    var artistName = track.artists[0].name;
+                                    var name = track.artists[0].name;
                                     artistAdded[artistId] = true;
-                                    artists.push({artistId: artistId, artistName: artistName});
+                                    artists.push({spotifyId: artistId, name: name});
                                 }
                             }
                             offset += ((data.body.total - offset < limit) ? data.body.total - offset : limit);
@@ -115,7 +115,10 @@ var self = module.exports = {
                         // build results
                         for (var i = 0; i < res.body.artists.items.length; i++) {
                             var artist = res.body.artists.items[i];
-                            var url = res.body.artists.items[i].images.length > 0 ? res.body.artists.items[i].images[res.body.artists.items[i].images.length-1].url : '';
+                            var url =
+                                res.body.artists.items[i].images.length > 0
+                                ? res.body.artists.items[i].images[res.body.artists.items[i].images.length-1].url
+                                : '';
 
                             results.push({
                                 name: artist.name,

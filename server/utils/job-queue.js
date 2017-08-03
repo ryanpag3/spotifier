@@ -1,7 +1,7 @@
 var kue = require('kue'),
     queue = kue.createQueue(),
     artistDb = require('./db-artist-wrapper-DEPRECATED.js'),
-    user = require('./db-wrapper.js'),
+    db = require('../utils/db-wrapper.js'),
     spotifyApiUser = require('../utils/spotify-user-api'),
     spotifyApiServer = require('../utils/spotify-server-api.js');
 
@@ -9,9 +9,10 @@ var kue = require('kue'),
 function syncLibrary(data, done) {
     var job = queue.create('sync-library', data);
         job.on('start', function() {
-            console.log('Now syncing ' + data.user.id + '\'s library.')
+            console.log('Now syncing ' + data.user.name + '\'s library.')
         }).on('complete', function(){
-            console.log(data.user.id + '\'s library has been synced.');
+            console.log(data.user.name + '\'s library has been synced.');
+            done();
         })
             .removeOnComplete(true)
             .save(function(err) {
@@ -22,7 +23,7 @@ function syncLibrary(data, done) {
                 queue.activeCount(function(err, total) {
                     console.log(total);
                 });
-                done();
+
             }
         });
 }
@@ -35,12 +36,14 @@ queue.process('sync-library', 1, function(job, done) {
             console.log('inserting them into the db');
             function go() {
                 // insert them into the database
-                user.addArtist(job.data.user.id, artists[i++].artistId);
+                db.addArtist(job.data.user, artists[i++]);
 
                 if (i < artists.length - 1){
-                    setTimeout(go, 225);
+                    setTimeout(go, 0);
+                    // go();
                 } else {
-                    done(); // invoke callback
+                    // set delay to allow for db to catch up
+                    done();
                 }
             }
             go();
@@ -50,6 +53,7 @@ queue.process('sync-library', 1, function(job, done) {
         });
 });
 
+// creates queue job for searching for an artist, used only during high concurrency
 function searchArtist(data, done) {
     var job = queue.create('search-artist', data);
     job.on('start', function() {
@@ -79,9 +83,9 @@ queue.process('search-artist', 1, function(job, done) {
 function getArtistDetails(data, done) {
     var job = queue.create('get-artist-details', data);
     job.on('start', function() {
-        // todo
-    }). on ('complete', function() {
-        done();
+        // console.log('getting details for ' + data.artist.name);
+    }). on ('complete', function(res) {
+        done(res);
     })
         .removeOnComplete(true)
         .save(function(err) {
@@ -92,15 +96,9 @@ function getArtistDetails(data, done) {
 }
 
 queue.process('get-artist-details', 1, function(job, done) {
-    spotifyApiServer.getRecentRelease(job.data.artistId)
-        .then(function(albumId) {
-            spotifyApiServer.getAlbumInfo(albumId)
-                .then(function(album) {
-                    console.log(album);
-                })
-                .catch(function(err) {
-                    console.log(err);
-                })
+    spotifyApiServer.getRecentRelease(job.data.artist)
+        .then(function(album) {
+            done(null, album);
         })
         .catch(function(err) {
             console.log(err);
@@ -123,7 +121,4 @@ module.exports = {
     createGetArtistDetailsJob: function(data, done) {
         getArtistDetails(data,done);
     }
-
-
-
 };

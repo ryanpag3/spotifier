@@ -3,12 +3,13 @@
  */
 var Q = require('q'),
     User = require('../models/user.js'),
-    Artist = require('../models/artist.js'),
-    jobQueue = require('../utils/job-queue.js');
+    Artist = require('../models/artist.js');
+    // jobQueue = require('../utils/job-queue.js');
 
 var self = module.exports = {
     createUser: function (user) {
-        var deferred = Q.defer();
+        var deferred = Q.defer(),
+            username = user.name;
         User.findOne({'name': user.name}, function (err, user) {
             if (err) {
                 console.log(err);
@@ -28,7 +29,7 @@ var self = module.exports = {
     },
 
     /** add artist to user library **/
-    addArtist: function(user, artist) {
+    addArtist: function(user, mArtist) {
         var deferred = Q.defer();
         // query for user
         User.findOne({'name' : user.name}, function(err, user) {
@@ -40,20 +41,20 @@ var self = module.exports = {
                 // create user and start over
                 self.createUser(user)
                     .then(function() {
-                        self.addArtist(user, artist);
+                        self.addArtist(user, mArtist);
                     })
             } else {
                 // query for artist
-                Artist.findOne({'spotify_id' : artist.spotifyId}, function(err, artist) {
+                Artist.findOne({'spotify_id' : mArtist.spotifyId}, function(err, artist) {
                     // if exists in db
                     if (artist !== null) {
-                        self.assignArtist(user, artist);
+                        self.assignArtist(user, mArtist);
                     } else {
-                        // create new artist entry in db
-                        self.createArtist(artist)
+                        // create new artist entry in db and call addArtist again
+                        self.createArtist(mArtist)
                             .then(function() {
                                 // assign user to artist
-                                self.assignArtist(user, artist);
+                                self.addArtist(user, mArtist);
                             })
                             .catch(function(err) {
                                 console.log(err);
@@ -62,31 +63,37 @@ var self = module.exports = {
                 })
             }
         });
-
-
+        return deferred.promise;
     },
 
     /** create new artists in database **/
-    createArtist: function(artist) {
-        var deferred = Q.defer();
+    createArtist: function(mArtist) {
+        var deferred = Q.defer(),
+            jobQueue = require('../utils/job-queue.js');
         var artist = new Artist({
-            spotify_id: artist.spotifyId,
-            name: artist.name,
+            spotify_id: mArtist.spotifyId,
+            name: mArtist.name,
             recent_release: {
-                title: 'request sent to spotify, pending...' // placeholder
+                title: 'waiting on album info from spotify...' // placeholder
             }
         }).save(function(err, artist) {
             if (err) {
                deferred.reject(err);
             }
-            jobQueue.createGetArtistDetailsJob({artist: artist}, function() {
-                // queue up get artist details job
-                // todo: handle callback
+            jobQueue.createGetArtistDetailsJob({artist: mArtist}, function(album) {
+                // assign album information once job has been processed
+                artist.recent_release = {
+                    id: album.id,
+                    title: album.name,
+                    release_date: album.release_date,
+                    images: album.images
+                };
+                artist.save();
             });
             deferred.resolve();
         });
 
-        return deferred.promise();
+        return deferred.promise;
     },
 
     /** assign an artist to a user and vice versa **/
@@ -96,7 +103,6 @@ var self = module.exports = {
             if (err) {
                 deferred.reject(err);
             }
-
             // query for artist
             Artist.findOne({'spotify_id' : artist.spotifyId}, function(err, artist) {
                 if (err) {
@@ -212,6 +218,7 @@ var self = module.exports = {
     removeArtist: function (username, artistId) {
 
     },
+
     /**
      * retrieves the user's library from the db
      * @param username

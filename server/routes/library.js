@@ -6,6 +6,8 @@
 
 var express = require('express'),
     router = express.Router(),
+    spotifyApiUser = require('../utils/spotify-user-api.js'),
+    db = require('../utils/db-wrapper.js'),
     jobQueue = require('../utils/job-queue.js'),
     user = require('../utils/db-wrapper.js');
 
@@ -15,7 +17,7 @@ router.post('/search', function(req, res) {
 });
 
 router.get('/update', function(req, res) {
-    user.getLibrary(req.user.id)
+    user.getLibrary(req.user.name)
         .then(function(library) {
             return res.status(200).json({
                 library: library
@@ -29,19 +31,11 @@ router.get('/update', function(req, res) {
  */
 router.get('/sync', function(req, res) {
     console.log('sync called...');
-
-    if (req.user === undefined) {
-        console.log('req.user === undefined');
+    jobQueue.createSyncLibJob({user: req.user}, function() {
+        console.log('sync library callback, issuing refresh.');
         res.redirect('/library');
-    } else {
-        var data = {user: req.user, artists: req.body.artists};
-        jobQueue.createSyncLibJob(data, function() {
-            // do nothing
-        });
-       res.redirect('/library');
-    }
-
-
+    });
+    return res.status(200);
 });
 
 router.post('/add', function(req, res) {

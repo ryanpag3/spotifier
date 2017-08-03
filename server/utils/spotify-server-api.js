@@ -25,13 +25,13 @@ var self = module.exports = {
         return deferred.promise;
     },
 
-    getRecentRelease: function (artistId) {
+    getRecentRelease: function (artist) {
         var deferred = Q.defer();
         // ensure fresh token
         self.refreshClientToken()
             .then(function () {
                 // retrieve most recent release
-                spotifyApi.getArtistAlbums(artistId, ({
+                spotifyApi.getArtistAlbums(artist.spotifyId, ({
                     limit: 1,
                     offset: 0
                 }))
