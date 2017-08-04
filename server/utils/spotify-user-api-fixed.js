@@ -17,7 +17,7 @@ function Api() {
 
 /** METHODS **/
 
-Api.prototype.syncLibrary = function(user, done) {
+Api.prototype.syncLibrary = function(user) {
     var api = this,
         deferred = Q.defer();
 
@@ -26,21 +26,23 @@ Api.prototype.syncLibrary = function(user, done) {
               api.getLibraryArtists(user)
                   .then(function(artists) {
                       var db = new Db();
-                      console.log(db.id);
                       console.log(user.name + '\'s library is being added.');
                       // for (var i = 0; i < artists.length; i++){
                       //     console.log(artists[i].name);
                       // }
                       db.addAllArtists(user, artists);
-                      done();
+                      deferred.resolve();
               })
                   .catch(function(err) {
                       console.log(err);
+                      deferred.reject(err);
                   })
       })
         .catch(function(err) {
             console.log(err);
-        })
+            deferred.reject(err);
+        });
+    return deferred.promise;
 };
 
 /**
@@ -113,14 +115,13 @@ Api.prototype.getLibraryArtists = function (user) {
                     offset: self.offset
                 })
                     .then(function (data) {
-                        console.log('TOTAL: ' + data.body.total);
                         // iterate through the 50 tracks that are returned
                         for (var i = 0; i < data.body.items.length; i++) {
                             var track = data.body.items[i].track;
                             // grab primary artist id and ignore features
                             var artistId = track.artists[0].id;
                             // if we havent added the artist already and the artist currently is active on spotify
-                            if (self.artistAdded[artistId] === undefined && track.available_markets !== []) {
+                            if (self.artistAdded[artistId] === undefined && track.available_markets.length > 0) {
                                 var name = track.artists[0].name;
                                 self.artistAdded[artistId] = true; // flag artist added
                                 self.artists.push({spotifyId: artistId, name: name}); // push artist to array
@@ -130,7 +131,7 @@ Api.prototype.getLibraryArtists = function (user) {
                         self.offset += ((data.body.total - self.offset < limit) ? data.body.total - self.offset : limit);
                         // if offset is behind the end of the track list
                         if (self.offset < data.body.total - 1) {
-                            go(); // run again
+                            setTimeout(go, 0); // run again
                         } else {
                             console.log('artists successfully grabbed with a length of: ' + self.artists.length);
                             deferred.resolve(self.artists); // return array

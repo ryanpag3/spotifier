@@ -12,27 +12,38 @@ function syncLibrary(data, done) {
             console.log('Now syncing ' + data.user.name + '\'s library.')
         }).on('complete', function(){
             console.log(data.user.name + '\'s library has been synced.');
+            queue.failedCount(function(err, total) {
+               console.log('failed ' + total);
+            });
+            queue.activeCount(function(err, total) {
+                console.log('active ' + total);
+            });
+            queue.inactiveCount(function(err, total) {
+                console.log('inactive ' + total);
+            });
             done();
         })
+            .attempts(9999)
             .removeOnComplete(true)
             .save(function(err) {
             if (err) {
                 console.log(err);
                 done(err);
             } else {
-                queue.activeCount(function(err, total) {
-                    console.log(total);
-                });
-
+                console.log('sync library job entered into queue...');
             }
         });
 }
 // sync library job process
-queue.process('sync-library', 2, function(job, done) {
+queue.process('sync-library', 3, function(job, done) {
     var api = new SpotifyApiUser();
-    api.syncLibrary(job.data.user, function() {
-        done();
-    });
+    api.syncLibrary(job.data.user)
+        .then(function() {
+            done();
+        })
+        .catch(function(err) {
+            done(new Error('Failed to sync a library! Reason: ' + err));
+        })
 });
 
 // creates queue job for searching for an artist, used only during high concurrency
@@ -65,10 +76,13 @@ queue.process('search-artist', 1, function(job, done) {
 function getArtistDetails(data, done) {
     var job = queue.create('get-artist-details', data);
     job.on('start', function() {
-        // console.log('getting details for ' + data.artist.name);
-    }). on ('complete', function(res) {
+        console.log('get artist details job starting...');
+    }).on('complete', function(res) {
         done(res);
-    })
+    }).on('failed', function(err) {
+            console.log(err);
+        })
+        .attempts(9999)
         .removeOnComplete(true)
         .save(function(err) {
             if (err) {
@@ -77,13 +91,14 @@ function getArtistDetails(data, done) {
         })
 }
 
-queue.process('get-artist-details', 1, function(job, done) {
+queue.process('get-artist-details', 2, function(job, done) {
     spotifyApiServer.getRecentRelease(job.data.artist)
         .then(function(album) {
             done(null, album);
         })
         .catch(function(err) {
             console.log(err);
+            done(new Error('failed to get recent release information!'));
         })
 });
 

@@ -45,6 +45,7 @@ var self = module.exports = {
                             })
                     })
                     .catch(function (err) {
+                        console.log(artist);
                         deferred.reject('**getArtistAlbums** ' + err);
                     })
             })

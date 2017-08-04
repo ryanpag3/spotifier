@@ -7,7 +7,7 @@ var Q = require('q'),
 // jobQueue = require('../utils/job-queue.js');
 
 var Db = function () {
-    this.id = Math.floor(Math.random() * 100);
+    this.addIndex = 0;
 };
 
 Db.prototype.createUser = function (user) {
@@ -32,31 +32,26 @@ Db.prototype.createUser = function (user) {
 };
 
 Db.prototype.addAllArtists = function(mUser, artists) {
-    console.log('addAllArtists ' + mUser.name + ' and ' + artists.length);
-    var db = this;
-    var i = 0;
-    var u = null;
+    var db = this,
+        i = this.addIndex;
 
     this.getUser(mUser)
         .then(function(user) {
             go();
             function go() {
-                // console.log('add artist ' + user.name + ' and ' + artists[i].name + ' and ' + artists.length);
                 db.addArtist(user, artists[i++]);
-                if (i < artists.length - 1) {
-                    setTimeout(go, 50);
-                } else {
-                    // do nothing
+                if (i < artists.length) {
+                    setTimeout(go, 0);
                 }
             }
         });
-
 };
+
+
 
 Db.prototype.getUser = function(user) {
   var deferred = Q.defer();
   User.findOne({'name' : user.name}, function(err, user) {
-      // console.log('query run and found ' + user.name);
       deferred.resolve(user);
   });
     return deferred.promise;
@@ -64,41 +59,8 @@ Db.prototype.getUser = function(user) {
 
 /** add artist to user library **/
 Db.prototype.addArtist = function (user, mArtist) {
-    // console.log(user.name + ' is adding ' + mArtist.name);
-    var db = this;
-    // query for user
-    // User.findOne({'name': mUser.name}, function (err, user) {
-    //     if (err) {
-    //         console.log(err);
-    //     }
-    //     // if user does not exist
-    //     if (user === null) {
-    //         // create user and start over
-    //         db.createUser(mUser)
-    //             .then(function () {
-    //                 db.addArtist(mUser, mArtist);
-    //             })
-    //     } else {
-    //         // query for artist
-    //         Artist.findOne({'spotify_id': mArtist.spotifyId}, function (err, artist) {
-    //             // if exists in db
-    //             if (artist !== null) {
-    //                 db.assignArtist(mUser, mArtist);
-    //             } else {
-    //                 // create new artist entry in db and call addArtist again
-    //                 db.createArtist(mArtist)
-    //                     .then(function () {
-    //                         // assign user to artist
-    //                         db.assignArtist(mUser, mArtist);
-    //                     })
-    //                     .catch(function (err) {
-    //                         console.log(err);
-    //                     })
-    //             }
-    //         })
-    //     }
-    // });
-
+    var db = this,
+        jobQueue = require('../utils/job-queue.js');
     Artist.findOne({'spotify_id' : mArtist.spotifyId}, function(err, artist) {
        if (artist === null) {
             db.createArtist(mArtist)
@@ -108,7 +70,20 @@ Db.prototype.addArtist = function (user, mArtist) {
                 .catch(function(err) {
                     console.log(err);
                 })
-        } else {
+        } else if (artist.recent_release.id === undefined){
+
+           console.log('release id undefined!');
+           jobQueue.createGetArtistDetailsJob({artist: mArtist}, function(album) {
+               // assign album information once job has been processed
+               artist.recent_release = {
+                   id: album.id,
+                   title: album.name,
+                   release_date: album.release_date,
+                   images: album.images
+               };
+               artist.save();
+           });
+       } else {
             db.assignArtist(user, artist);
         }
 
@@ -147,59 +122,25 @@ Db.prototype.createArtist = function (mArtist) {
 
     /** assign an artist to a user and vice versa **/
     Db.prototype.assignArtist = function (user, artist) {
-        // console.log('assigning ' + user.name + ' to ' + artist.name);
         var db = this;
-        // console.log('assigning ' + user.name + ' to ' + artist.name);
-        // var db = this;
-        // var deferred = Q.defer();
-        // User.findOne({'name': mUser.name}, function (err, user) {
-        //     if (err) {
-        //         deferred.reject(err);
-        //     }
-        //     // query for artist
-        //     Artist.findOne({'spotify_id': mArtist.spotifyId}, function (err, artist) {
-        //         if (err) {
-        //             deferred.reject(err);
-        //         }
-        //         // we don't need to check if artist exists because we do it in calling function
-        //         // assign user to artist if they arent already
-        //         if (!db.artistTrackingUser(artist._id, user._id)) {
-        //             console.log('pushing ' + user.name + ' to ' + artist.name);
-        //             artist.users_tracking.push(user._id);
-        //             artist.save(function (err) {
-        //                 deferred.reject(err);
-        //             })
-        //         }
-        //
-        //         // assign artist to user if they aren't already
-        //         if (!db.userTrackingArtist(artist._id, user._id)) {
-        //             console.log('pushing ' + artist.name + ' to ' + user.name);
-        //             user.saved_artists.push(artist._id);
-        //             user.save(function (err) {
-        //                 deferred.reject(err);
-        //             })
-        //         }
-        //     })
-        // });
-        // return deferred.promise;
 
-                if (!db.artistTrackingUser(artist._id, user._id)) {
-                    artist.users_tracking.push(user._id);
-                    artist.save(function (err) {
-                        if (err) {
-                            console.log(err);
-                        }
-                    })
+        if (!db.artistTrackingUser(artist._id, user._id)) {
+            artist.users_tracking.push(user._id);
+            artist.save(function (err) {
+                if (err) {
+                    console.log(err);
                 }
+            })
+        }
 
-                if (!db.userTrackingArtist(artist._id, user._id)) {
-                    user.saved_artists.push(artist._id);
-                    user.save(function (err) {
-                        if (err) {
-                            console.log(err);
-                        }
-                    })
+        if (!db.userTrackingArtist(artist._id, user._id)) {
+            user.saved_artists.push(artist._id);
+            user.save(function (err) {
+                if (err) {
+                    console.log(err);
                 }
+            })
+        }
     };
 
 Db.prototype.removeArtist = function (username, artistId) {
@@ -275,5 +216,43 @@ Db.prototype.emailConfirmed = function (username) {
     });
     return user !== null && user.email.confirmed === true;
 };
+
+// debug tool for validating libraries
+// Db.prototype.validateArtistLibrary = function(mUser, mArtists) {
+//   User.findOne({'name' : mUser.name}, function(err, user) {
+//       if (err) {
+//           console.log(err);
+//       }
+//       if (user) {
+//           Artist.find({'_id' : user.saved_artists}, function(err, artists) {
+//               var mNames = [], names = [];
+//               for (var i = 0; i < mArtists.length;  i++) {
+//                   mNames.push(mArtists[i].name);
+//               }
+//
+//               for (var x = 0; x < artists.length;  x++) {
+//                   names.push(artists[x].name);
+//               }
+//
+//               for (var j = 0; j < artists.length; j++) {
+//                   if (!mNames.includes(artists[j].name)) {
+//                       console.log('user library incorrectly added, artist on db that is not on user library');
+//                       console.log('scanned user library did not contain: ' + artists[j].name + ' for ' + mUser.name);
+//                       console.log(mUser.name + '\'s library size: + ' + mArtists.length);
+//                   }
+//               }
+//
+//               for (var k = 0; k < mArtists.length; k++) {
+//                   if (!names.includes(mArtists[k].name)) {
+//                       console.log('user library incorrectly added, artist on user library but not on db');
+//                       console.log('db library does not contain: ' + mArtists[k].name + ' for ' + mUser.name);
+//                   }
+//               }
+//           })
+//       } else {
+//           console.log(mUser.name +  ' does not exist in database.')
+//       }
+//   })
+// };
 
 module.exports = Db;
