@@ -1,3 +1,5 @@
+// TODO REVISE COMMENTS FOR THIS FILE, IMPROVE COMMENT LEGIBILITY AND ACCURACY
+
 /**
  *  This file provides wrapper functions for managing the user mongodb collection.
  */
