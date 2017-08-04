@@ -76,7 +76,7 @@ queue.process('search-artist', 1, function(job, done) {
 function getArtistDetails(data, done) {
     var job = queue.create('get-artist-details', data);
     job.on('start', function() {
-        console.log('get artist details job starting...');
+        console.log('getting ' + data.artist.name + ' details.');
     }).on('complete', function(res) {
         done(res);
     }).on('failed', function(err) {

@@ -13,6 +13,7 @@ function Api() {
      this.artistAdded = {};
      this.offset = 0;
      this.total = 0;
+     this.searchResults = [];
 }
 
 /** METHODS **/
@@ -101,8 +102,6 @@ Api.prototype.getLibraryArtists = function (user) {
     const api = this.spotifyApi;
     const limit = 50;
     var offset = 0,
-        artists = [],
-        artistAdded = {},
         deferred = Q.defer();
 
 
@@ -112,7 +111,7 @@ Api.prototype.getLibraryArtists = function (user) {
             .then(function() {
                 api.getMySavedTracks({
                     limit: limit,
-                    offset: self.offset
+                    offset: offset
                 })
                     .then(function (data) {
                         // iterate through the 50 tracks that are returned
@@ -128,9 +127,9 @@ Api.prototype.getLibraryArtists = function (user) {
                             }
                         }
                         // adjust offset to either 50 ahead or to the end of the track list
-                        self.offset += ((data.body.total - self.offset < limit) ? data.body.total - self.offset : limit);
+                        offset += ((data.body.total - offset < limit) ? data.body.total - offset : limit);
                         // if offset is behind the end of the track list
-                        if (self.offset < data.body.total - 1) {
+                        if (offset < data.body.total - 1) {
                             setTimeout(go, 0); // run again
                         } else {
                             console.log('artists successfully grabbed with a length of: ' + self.artists.length);
@@ -158,7 +157,42 @@ Api.prototype.getLibraryArtists = function (user) {
  * @param query
  */
 Api.prototype.searchArtists = function (user, query) {
-    // TODO
+    const limit = 5;
+    var deferred = Q.defer(),
+        api = this.spotifyApi,
+        offset = 0,
+        query = query.trim() + '*';
+
+    this.setAccessToken(user)
+        .then(function() {
+            api.searchArtists(query, ({
+                limit: limit,
+                offset: offset,
+                from_token: user.accessToken.token
+            }))
+                .then(function(res) {
+                    var results = [];
+                    for (var i = 0; i < res.body.artists.items.length; i++) {
+                        var artist = res.body.artists.items[i];
+                        var url =
+                            res.body.artists.items[i].images.length > 0
+                                ? res.body.artists.items[i].images[res.body.artists.items[i].images.length - 1].url
+                                : '';
+
+                        results.push({
+                            name: artist.name,
+                            id: artist.id,
+                            url: url
+                        })
+                    }
+                    deferred.resolve(results);
+                })
+                .catch(function(err) {
+                    console.log(err);
+                    deferred.reject(err);
+                })
+        });
+    return deferred.promise;
 };
 
 module.exports = Api;

@@ -9,7 +9,6 @@ var path = require('path'),
     session = require('express-session'),
     mongoose = require('mongoose');
     mongoose.Promise = require('bluebird');
-
 /*
     handle middleware
  */

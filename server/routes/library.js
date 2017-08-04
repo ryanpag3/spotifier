@@ -70,6 +70,7 @@ router.get('/me', function(req, res) {
 });
 
 /** HELPER FUNCTIONS **/
+// refreshes user access token if expired or missing
 function refreshAccessToken(user) {
     var api = new SpotifyApiUser(),
         deferred = Q.defer();

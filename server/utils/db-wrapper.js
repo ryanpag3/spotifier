@@ -71,8 +71,6 @@ Db.prototype.addArtist = function (user, mArtist) {
                     console.log(err);
                 })
         } else if (artist.recent_release.id === undefined){
-
-           console.log('release id undefined!');
            jobQueue.createGetArtistDetailsJob({artist: mArtist}, function(album) {
                // assign album information once job has been processed
                artist.recent_release = {
