@@ -1,8 +1,8 @@
 var kue = require('kue'),
     queue = kue.createQueue(),
     artistDb = require('./db-artist-wrapper-DEPRECATED.js'),
-    db = require('../utils/db-wrapper.js'),
-    spotifyApiUser = require('../utils/spotify-user-api'),
+    Db = require('../utils/db-wrapper.js'),
+    SpotifyApiUser = require('../utils/spotify-user-api-fixed'),
     spotifyApiServer = require('../utils/spotify-server-api.js');
 
 // create event and specify event handlers
@@ -28,29 +28,11 @@ function syncLibrary(data, done) {
         });
 }
 // sync library job process
-queue.process('sync-library', 1, function(job, done) {
-    var i = 0;
-    /* Get all unique artists in user's saved tracks library */
-    spotifyApiUser.getLibraryArtists(job.data.user)
-        .then(function(artists) {
-            console.log('inserting them into the db');
-            function go() {
-                // insert them into the database
-                db.addArtist(job.data.user, artists[i++]);
-
-                if (i < artists.length - 1){
-                    setTimeout(go, 0);
-                    // go();
-                } else {
-                    // set delay to allow for db to catch up
-                    done();
-                }
-            }
-            go();
-        })
-        .catch(function(err) {
-            console.log(err);
-        });
+queue.process('sync-library', 2, function(job, done) {
+    var api = new SpotifyApiUser();
+    api.syncLibrary(job.data.user, function() {
+        done();
+    });
 });
 
 // creates queue job for searching for an artist, used only during high concurrency

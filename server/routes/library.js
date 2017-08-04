@@ -5,11 +5,11 @@
  */
 
 var express = require('express'),
+    Q = require('q'),
     router = express.Router(),
-    spotifyApiUser = require('../utils/spotify-user-api.js'),
-    db = require('../utils/db-wrapper.js'),
-    jobQueue = require('../utils/job-queue.js'),
-    user = require('../utils/db-wrapper.js');
+    SpotifyApiUser = require('../utils/spotify-user-api-fixed.js'),
+    Db = require('../utils/db-wrapper.js'),
+    jobQueue = require('../utils/job-queue.js');
 
 /* handles searching a user's saved artists */
 router.post('/search', function(req, res) {
@@ -17,7 +17,8 @@ router.post('/search', function(req, res) {
 });
 
 router.get('/update', function(req, res) {
-    user.getLibrary(req.user.name)
+    var db = new Db();
+    db.getLibrary(req.user.name)
         .then(function(library) {
             return res.status(200).json({
                 library: library
@@ -30,12 +31,26 @@ router.get('/update', function(req, res) {
  * for the client.
  */
 router.get('/sync', function(req, res) {
-    console.log('sync called...');
-    jobQueue.createSyncLibJob({user: req.user}, function() {
-        console.log('sync library callback, issuing refresh.');
-        res.redirect('/library');
-    });
-    return res.status(200);
+    refreshAccessToken(req.user)
+        .then(function(accessToken){
+            if (accessToken){
+                req.session.passport.user.accessToken = accessToken;
+                req.session.save(function(err) {
+                    if (err){
+                        console.log(err);
+                    }
+                });
+            }
+            jobQueue.createSyncLibJob({user: req.user}, function() {
+                // todo job queue callback
+                console.log('sync library job done...');
+            });
+        })
+        // catch refresh access token error
+        .catch(function(err) {
+            console.log(err);
+        });
+    res.redirect('/library');
 });
 
 router.post('/add', function(req, res) {
@@ -53,6 +68,24 @@ router.get('/me', function(req, res) {
         user: req.user
     })
 });
+
+/** HELPER FUNCTIONS **/
+function refreshAccessToken(user) {
+    var api = new SpotifyApiUser(),
+        deferred = Q.defer();
+    api.getAccessToken(user)
+        .then(function(accessToken) {
+            if (accessToken){
+                deferred.resolve(accessToken);
+            } else {
+                deferred.resolve();
+            }
+        })
+        .catch(function(err) {
+            deferred.reject(err);
+        });
+    return deferred.promise;
+}
 
 module.exports = router;
 

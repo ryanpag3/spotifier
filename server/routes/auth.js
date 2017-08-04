@@ -3,7 +3,7 @@
  */
 var express = require('express'),
     passport = require('passport'),
-    db = require('../utils/db-wrapper.js'),
+    Db = require('../utils/db-wrapper.js'),
     router = express.Router();
 
 router.get('/login', passport.authenticate('spotify', {
@@ -37,6 +37,7 @@ router.post('/status', function (req, res) {
 router.get('/callback',
     passport.authenticate('spotify', {failureRedirect: '/'}),
     function(req, res) {
+        var db = new Db();
         // creates new user object in db if it doesn't already exist
         db.createUser(req.user);
         // if user has not setup their email, route to email entry page
