@@ -5,7 +5,8 @@ app.factory('libraryService', ['$q', '$http',
             sync: sync,
             get: get,
             searchSpotify: searchSpotify,
-            search: search
+            search: search,
+            add: add
         });
 
         // initiates a library sync job for the user
@@ -49,7 +50,40 @@ app.factory('libraryService', ['$q', '$http',
 
         // gets user library search results from http request
         function search(query) {
-            // todo
+            // todo create ajax call and handle promises
+        }
+
+        /**
+         * Add an artist to a user's library
+         */
+        function add(artist) {
+            var deferred = $q.defer();
+            $http.post('/library/add', {artist: artist})
+                .then(function(res) {
+                    // todo handle success response
+                    deferred.resolve();
+                })
+                .catch(function(err) {
+                    // todo handle error response
+                    deferred.reject();
+                });
+            return deferred.promise;
         }
 
     }]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

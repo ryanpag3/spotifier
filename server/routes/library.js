@@ -18,7 +18,7 @@ router.post('/search', function(req, res) {
 
 router.get('/update', function(req, res) {
     var db = new Db();
-    db.getLibrary(req.user.name)
+    db.getLibrary(req.user)
         .then(function(library) {
             return res.status(200).json({
                 library: library
@@ -56,6 +56,9 @@ router.get('/sync', function(req, res) {
 router.post('/add', function(req, res) {
    // todo
    // handles adding an artist to the users library
+    console.log(req.body.artist);
+    var db = new Db();
+    db.addArtist(req.user, req.body.artist);
 });
 
 router.get('/remove', function(req, res) {

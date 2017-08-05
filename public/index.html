@@ -16,7 +16,7 @@
             </form>
             <div class="search-results" data-ng-cloak data-ng-show="resultsShown">
                 <div class="result" data-ng-repeat="artist in results">
-                    <div class="result-add"></div>
+                    <button class="result-add" data-ng-click="add(artist)"><i class="fa fa-align-center fa-plus fa-2x"></i></button>
                     <div class="result-name"><div style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden">{{artist.name}}</div></div>
                     <div class="result-pic" data-ng-style="{'background-image' : 'url(' + artist.url + ')'}"></div>
                 </div>
@@ -36,7 +36,8 @@
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-route.js"></script>
 <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-<script src="./lib/angular-spotify.js"></script>
+<script src="https://use.fontawesome.com/7222f42b52.js"></script>
+<script src="lib/scripts/angular-spotify.js"></script>
 <script src="./main.js"></script>
 
 <!--controllers-->

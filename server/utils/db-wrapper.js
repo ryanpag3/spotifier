@@ -1,21 +1,24 @@
-// TODO REVISE COMMENTS FOR THIS FILE, IMPROVE COMMENT LEGIBILITY AND ACCURACY
-
 /**
  *  This file provides wrapper functions for managing the user mongodb collection.
  */
 var Q = require('q'),
     User = require('../models/user.js'),
     Artist = require('../models/artist.js');
-// jobQueue = require('../utils/job-queue.js');
 
+/**
+ * @constructor
+ */
 var Db = function () {
-    this.addIndex = 0;
+    this._addIndex = 0;
 };
-
-Db.prototype.createUser = function (user) {
+/**
+ * creates a new user document in the db
+ * @param mUser: user object serialized in cookie {name, accessToken, refreshToken}
+ */
+Db.prototype.createUser = function (mUser) {
     var deferred = Q.defer(),
-        username = user.name;
-    User.findOne({'name': user.name}, function (err, user) {
+        username = mUser.name;
+    User.findOne({'name': mUser.name}, function (err, user) {
         if (err) {
             console.log(err);
         }
@@ -32,16 +35,23 @@ Db.prototype.createUser = function (user) {
     });
     return deferred.promise;
 };
-
-Db.prototype.addAllArtists = function(mUser, artists) {
+/**
+ * queries for user information and adds all artists in array
+ * @param mUser: user object serialized in cookie {name, accessToken, refreshToken}
+ * @param artists: array of simple artist objects to retrieve detailed information and
+ *                 add to db
+ */
+Db.prototype.addAllArtists = function (mUser, artists) {
     var db = this,
-        i = this.addIndex;
+        i = this._addIndex;
 
     this.getUser(mUser)
-        .then(function(user) {
-            go();
+        .then(function (user) {
+            go(); // start
             function go() {
-                db.addArtist(user, artists[i++]);
+                // add artist
+                db.add(user, artists[i++]);
+                // if reached end of artists array
                 if (i < artists.length) {
                     setTimeout(go, 0);
                 }
@@ -49,48 +59,78 @@ Db.prototype.addAllArtists = function(mUser, artists) {
         });
 };
 
+/**
+ * queries for user information and adds artist to user library
+ * @param mUser: user object serialized in cookie {name, accessToken, refreshToken}
+ * @param mArtist: simple artist object {spotifyId, name}
+ */
+Db.prototype.addArtist = function (mUser, mArtist) {
+    var db = this;
+    // get detailed user information
+    db.getUser(mUser)
+        .then(function (user) {
+            // add to user library
+            db.add(user, mArtist);
+        })
+};
 
-
-Db.prototype.getUser = function(user) {
-  var deferred = Q.defer();
-  User.findOne({'name' : user.name}, function(err, user) {
-      deferred.resolve(user);
-  });
+/**
+ * queries for user and returns user information
+ * todo: add error handling for non-existent users
+ * @param mUser: user object serialized in cookie {name, accessToken, refreshToken}
+ * @returns: {Promise} Promise object with user document information from mongodb
+ */
+Db.prototype.getUser = function (mUser) {
+    var deferred = Q.defer();
+    User.findOne({'name': mUser.name}, function (err, user) {
+        deferred.resolve(user);
+    });
     return deferred.promise;
 };
 
-/** add artist to user library **/
-Db.prototype.addArtist = function (user, mArtist) {
+/**
+ * add an artist to a user library
+ * @param user: this is the full mongodb user object
+ * @param mArtist: simple artist object {spotifyId, name}
+ */
+Db.prototype.add = function (user, mArtist) {
     var db = this,
         jobQueue = require('../utils/job-queue.js');
-    Artist.findOne({'spotify_id' : mArtist.spotifyId}, function(err, artist) {
-       if (artist === null) {
+
+    Artist.findOne({'spotify_id': mArtist.spotifyId}, function (err, artist) {
+        if (artist === null) {
             db.createArtist(mArtist)
-                .then(function(artist) {
+                .then(function (artist) {
                     db.assignArtist(user, artist);
                 })
-                .catch(function(err) {
+                .catch(function (err) {
                     console.log(err);
                 })
-        } else if (artist.recent_release.id === undefined){
-           jobQueue.createGetArtistDetailsJob({artist: mArtist}, function(album) {
-               // assign album information once job has been processed
-               artist.recent_release = {
-                   id: album.id,
-                   title: album.name,
-                   release_date: album.release_date,
-                   images: album.images
-               };
-               artist.save();
-           });
-       } else {
+        } else if (artist.recent_release.id === undefined) {
+            jobQueue.createGetArtistDetailsJob({artist: mArtist}, function (album) {
+                // assign album information once job has been processed
+                artist.recent_release = {
+                    id: album.id,
+                    title: album.name,
+                    release_date: album.release_date,
+                    images: album.images
+                };
+                artist.save();
+            });
+        } else {
             db.assignArtist(user, artist);
         }
 
     })
 };
 
-/** create new artists in database **/
+/**
+ * Creates a new artist entry in the database, does not check if artist is currently in db
+ * because calling function does. Might need to change that later.
+ * @param mArtist: simple artist object {name, spotifyId}
+ * @returns: {Promise} Promise object with artist document information from db
+ * @returns: {Promise} Promise object with error message from mongoose
+ **/
 Db.prototype.createArtist = function (mArtist) {
     var deferred = Q.defer(),
         jobQueue = require('../utils/job-queue.js');
@@ -98,7 +138,7 @@ Db.prototype.createArtist = function (mArtist) {
         spotify_id: mArtist.spotifyId,
         name: mArtist.name,
         recent_release: {
-            title: 'waiting on album info from spotify...' // placeholder
+            title: 'recent release info pending from Spotify...' // placeholder
         }
     }).save(function (err, artist) {
         if (err) {
@@ -116,44 +156,55 @@ Db.prototype.createArtist = function (mArtist) {
         });
         deferred.resolve(artist);
     });
-
     return deferred.promise;
-},
+};
 
-    /** assign an artist to a user and vice versa **/
-    Db.prototype.assignArtist = function (user, artist) {
-        var db = this;
+/**
+ * Associates an artist and a user by serializing their respective id's to their
+ * database document.
+ * @param user: mongodb user document, see models/user for schema information
+ * @param artist: mongodb artist document, see models/artist for schema information
+ * todo: handle error thrown during serialization
+ */
+Db.prototype.assignArtist = function (user, artist) {
+    var db = this;
+    // if artist is not already tracking this user
+    if (!db.artistTrackingUser(artist._id, user._id)) {
+        // push user id to artist array
+        artist.users_tracking.push(user._id);
+        // serialize into db
+        artist.save(function (err) {
+            if (err) {
+                console.log(err);
+            }
+        })
+    }
+    // if user is not already tracking this artist
+    if (!db.userTrackingArtist(artist._id, user._id)) {
+        // push artist id to user array
+        user.saved_artists.push(artist._id);
+        // serialize into db
+        user.save(function (err) {
+            if (err) {
+                console.log(err);
+            }
+        })
+    }
+};
 
-        if (!db.artistTrackingUser(artist._id, user._id)) {
-            artist.users_tracking.push(user._id);
-            artist.save(function (err) {
-                if (err) {
-                    console.log(err);
-                }
-            })
-        }
-
-        if (!db.userTrackingArtist(artist._id, user._id)) {
-            user.saved_artists.push(artist._id);
-            user.save(function (err) {
-                if (err) {
-                    console.log(err);
-                }
-            })
-        }
-    };
-
+// todo
 Db.prototype.removeArtist = function (username, artistId) {
 
 };
 
 /**
  * retrieves the user's library from the db
- * @param username
+ * @param mUser: user object serialized in cookie {name, accessToken, refreshToken}
+ * @returns: {Promise} Promise object with user library artist information
  */
-Db.prototype.getLibrary = function (username) {
+Db.prototype.getLibrary = function (mUser) {
     var deferred = Q.defer();
-    User.findOne({'name': username}, function (err, user) {
+    User.findOne({'name': mUser.name}, function (err, user) {
         var artistIds = user.saved_artists;
         Artist.find({'_id': artistIds}, function (err, artists) {
             deferred.resolve(artists);
@@ -166,6 +217,7 @@ Db.prototype.getLibrary = function (username) {
  * checks if an artist is already tracking a user
  * @param artistId: mongo _id of artist
  * @param userId: mongo _id of user
+ * @returns: {boolean}
  */
 Db.prototype.artistTrackingUser = function (artistId, userId) {
     Artist.findOne({'_id': artistId}, {'users_tracking': userId}, function (err, artist) {
@@ -180,6 +232,7 @@ Db.prototype.artistTrackingUser = function (artistId, userId) {
  * checks if a user is already tracking an artist
  * @param artistId: mongo _id of artist
  * @param userId: mongo _id of user
+ * @returns: {boolean}
  */
 Db.prototype.userTrackingArtist = function (artistId, userId) {
     User.findOne({'_id': userId}, {'saved_artists': artistId}, function (err, user) {
@@ -190,8 +243,13 @@ Db.prototype.userTrackingArtist = function (artistId, userId) {
     })
 };
 
-Db.prototype.userExists = function (username) {
-    User.findOne({'username': username}, function (err, user) {
+/**
+ * returns boolean whether user exists in mongodb
+ * @param mUser: user object serialized in cookie {name, accessToken, refreshToken}
+ * @returns: {boolean}
+ */
+Db.prototype.userExists = function (mUser) {
+    User.findOne({'username': mUser.name}, function (err, user) {
         if (err) {
             console.log(err);
         }
@@ -199,8 +257,13 @@ Db.prototype.userExists = function (username) {
     })
 };
 
-Db.prototype.emailExists = function (username) {
-    User.findOne({'username': username}, function (err, user) {
+/**
+ * returns boolean based on whether the user has an email in the database
+ * @param mUser: user object serialized in cooke {name, accessToken, refreshToken}
+ * @returns: {boolean}
+ */
+Db.prototype.emailExists = function (mUser) {
+    User.findOne({'username': mUser}, function (err, user) {
         if (err) {
             console.log(err);
         }
@@ -208,13 +271,19 @@ Db.prototype.emailExists = function (username) {
     })
 };
 
-Db.prototype.emailConfirmed = function (username) {
-    User.findOne({'username': username}, function (err, user) {
+/**
+ * returns boolean based on whether the user has confirmed their email in the database
+ * @param mUser: user object serialized in cooke {name, accessToken, refreshToken}
+ * @returns {boolean}
+ */
+Db.prototype.emailConfirmed = function (mUser) {
+    User.findOne({'username': mUser.name}, function (err, user) {
         if (err) {
             console.log(err);
         }
+        return user !== null && user.email.confirmed === true;
     });
-    return user !== null && user.email.confirmed === true;
+
 };
 
 // debug tool for validating libraries

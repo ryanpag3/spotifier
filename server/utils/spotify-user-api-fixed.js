@@ -181,7 +181,7 @@ Api.prototype.searchArtists = function (user, query) {
 
                         results.push({
                             name: artist.name,
-                            id: artist.id,
+                            spotifyId: artist.id,
                             url: url
                         })
                     }
