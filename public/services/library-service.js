@@ -61,6 +61,7 @@ app.factory('libraryService', ['$q', '$http',
             $http.post('/library/add', {artist: artist})
                 .then(function(res) {
                     // todo handle success response
+                    console.log('we here...');
                     deferred.resolve();
                 })
                 .catch(function(err) {

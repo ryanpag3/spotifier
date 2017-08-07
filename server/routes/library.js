@@ -31,16 +31,8 @@ router.get('/update', function(req, res) {
  * for the client.
  */
 router.get('/sync', function(req, res) {
-    refreshAccessToken(req.user)
-        .then(function(accessToken){
-            if (accessToken){
-                req.session.passport.user.accessToken = accessToken;
-                req.session.save(function(err) {
-                    if (err){
-                        console.log(err);
-                    }
-                });
-            }
+    refreshAccessToken(req)
+        .then(function(){
             jobQueue.createSyncLibJob({user: req.user}, function() {
                 // todo job queue callback
                 console.log('sync library job done...');
@@ -58,7 +50,20 @@ router.post('/add', function(req, res) {
    // handles adding an artist to the users library
     console.log(req.body.artist);
     var db = new Db();
-    db.addArtist(req.user, req.body.artist);
+    // add artist for user
+    db.addArtist(req.user, req.body.artist)
+        // on success
+        .then(function() {
+            console.log('sending success...');
+            res.status(200).send();
+        })
+        // on failure
+        .catch(function(err) {
+            console.log('sending failure...');
+            return res.status(500).json({
+                err: err
+            })
+        });
 });
 
 router.get('/remove', function(req, res) {
@@ -73,15 +78,27 @@ router.get('/me', function(req, res) {
 });
 
 /** HELPER FUNCTIONS **/
-// refreshes user access token if expired or missing
-function refreshAccessToken(user) {
+/**
+ * This will refresh an access token for a user if it becomes expired and serialized
+ * @param req
+ */
+function refreshAccessToken(req) {
     var api = new SpotifyApiUser(),
         deferred = Q.defer();
-    api.getAccessToken(user)
+    api.getAccessToken(req.user)
         .then(function(accessToken) {
             if (accessToken){
-                deferred.resolve(accessToken);
+                // access token was expired, need to refresh
+                req.session.passport.user.accessToken = accessToken;
+                req.session.save(function(err) {
+                    if (err){
+                        console.log(err);
+                    }
+                    deferred.resolve();
+                });
+                deferred.resolve();
             } else {
+                // access token is valid
                 deferred.resolve();
             }
         })

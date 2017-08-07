@@ -1,11 +1,13 @@
+"use strict";
+
 var app = angular.module('spotifier');
 app.controller('library-controller', ['$scope', '$rootScope', '$timeout', 'libraryService',
-    function($scope, $rootScope, $timeout, libraryService) {
+    function ($scope, $rootScope, $timeout, libraryService) {
 
 
         // sort by date added
         $scope.library = [];
-        $scope.libraryReversed = {};
+        $scope.libraryReversed = [];
         // sort by artist
         $scope.libraryArtistAscending = [];
         $scope.libraryArtistDescending = [];
@@ -17,12 +19,23 @@ app.controller('library-controller', ['$scope', '$rootScope', '$timeout', 'libra
         $scope.libraryDateDescending = [];
 
         init();
-        $scope.syncLibrary = function() {
+
+        function init() {
+            getLibrary();
+        }
+
+        $scope.syncLibrary = function () {
             libraryService.sync();
         };
-        function init() {
+
+
+        $scope.$on('update-library', function () {
+            getLibrary();
+        });
+
+        function getLibrary() {
             libraryService.get()
-                .then(function(library) {
+                .then(function (library) {
                     $scope.library = library;
                     $scope.libraryArtistAscending = sortBy(library, 'name');
                     $scope.libraryArtistDescending = (sortBy(library, 'name')).reverse();
@@ -33,37 +46,42 @@ app.controller('library-controller', ['$scope', '$rootScope', '$timeout', 'libra
                 });
         }
 
-        // sorting utility for user libraries
+        /**
+         * Each sort creates a copy of the array parameter sorts it by a specified key value, and returns the result.
+         * @param array: library artists
+         * @param key: sorting key based on object key types.
+         * @returns {Array}: the sorted array
+         */
         function sortBy(array, key) {
             switch (key) {
                 case 'name':
-                    return array.sort(function(a,b) {
+                    return array.slice().sort(function (a, b) {
                         var aName = a.name.toLowerCase();
                         var bName = b.name.toLowerCase();
 
-                        if (aName < bName){
+                        if (aName < bName) {
                             return -1;
                         }
-                        if (aName > bName){
+                        if (aName > bName) {
                             return 1;
                         }
                         return 0;
-                    }).slice();
+                    });
                 case 'title':
-                    return array.sort(function(a,b) {
+                    return array.slice().sort(function (a, b) {
                         var aTitle = a.recent_release.title.toLowerCase();
                         var bTitle = b.recent_release.title.toLowerCase();
 
-                        if (aTitle < bTitle){
+                        if (aTitle < bTitle) {
                             return -1;
                         }
-                        if (aTitle > bTitle){
+                        if (aTitle > bTitle) {
                             return 1;
                         }
                         return 0;
-                    }).slice();
+                    });
                 case 'date':
-                    return array.sort(function(a,b) {
+                    return array.slice().sort(function (a, b) {
                         var aDate = new Date(a.recent_release.release_date);
                         var bDate = new Date(b.recent_release.release_date);
                         if (aDate < bDate) {
@@ -73,8 +91,9 @@ app.controller('library-controller', ['$scope', '$rootScope', '$timeout', 'libra
                             return 1;
                         }
                         return 0;
-                    }).slice();
+                    });
             }
         }
     }
 ]);
+

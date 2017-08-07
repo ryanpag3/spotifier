@@ -1,7 +1,5 @@
 var kue = require('kue'),
     queue = kue.createQueue(),
-    artistDb = require('./db-artist-wrapper-DEPRECATED.js'),
-    Db = require('../utils/db-wrapper.js'),
     SpotifyApiUser = require('../utils/spotify-user-api-fixed'),
     spotifyApiServer = require('../utils/spotify-server-api.js');
 

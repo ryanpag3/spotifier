@@ -7,7 +7,7 @@
 .library-container {
     overflow-y: scroll;
     margin: 0 auto;
-    max-height: 100%;
+    height: 100%;
     background-color: darkgrey;
 }
 
@@ -26,6 +26,22 @@
     vertical-align: middle;
     line-height: 40px;
     float: left;
+}
+
+.toggle-container {
+    display: flex;
+    height: 100%;
+    width: 5%;
+    float: left;
+    justify-content: center;
+}
+
+.toggle-button {
+    background: transparent;
+    border: none;
+    outline: none;
+    line-height: inherit;
+    vertical-align: middle;
 }
 
 #artist-name {

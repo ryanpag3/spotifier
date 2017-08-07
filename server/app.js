@@ -14,8 +14,8 @@ var path = require('path'),
  */
 const setupApp = function(app, express) {
     var redirectUri = 'http://localhost:3000/user/callback',
-        clientSecret = '7e3b3a161dc6442f974655a3209505cd',
-        clientID = '180cc653f1f24ae9864d5d718d68f3c6';
+        clientSecret = 'a0d232e3a1844de785777c20944f2618',
+        clientID = '5c3f5262d39e44ec999a8a0a9babac3e';
 
     mongoose.connect('mongodb://localhost/spotifier', {
         useMongoClient: true

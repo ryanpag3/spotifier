@@ -2,8 +2,8 @@ var SpotifyApi = require('spotify-web-api-node'),
     Q = require('q'),
     Db = require('../utils/db-wrapper.js'),
     credentials = {
-        clientId: '180cc653f1f24ae9864d5d718d68f3c6',
-        clientSecret: '7e3b3a161dc6442f974655a3209505cd'
+        clientId: '5c3f5262d39e44ec999a8a0a9babac3e',
+        clientSecret: 'a0d232e3a1844de785777c20944f2618'
     };
 
 // constructor

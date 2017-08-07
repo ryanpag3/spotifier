@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  *  This file provides wrapper functions for managing the user mongodb collection.
  */
@@ -65,13 +67,27 @@ Db.prototype.addAllArtists = function (mUser, artists) {
  * @param mArtist: simple artist object {spotifyId, name}
  */
 Db.prototype.addArtist = function (mUser, mArtist) {
-    var db = this;
+    var db = this,
+        deferred = Q.defer();
+    // error handling
+    if (mUser === null) {
+        deferred.reject('user cannot be null!');
+    } else if (mArtist === null) {
+        deferred.reject('artist cannot be null!')
+    }
+
     // get detailed user information
     db.getUser(mUser)
         .then(function (user) {
             // add to user library
             db.add(user, mArtist);
+            deferred.resolve();
         })
+        // catch err
+        .catch(function(err) {
+            deferred.reject(err);
+        });
+    return deferred.promise;
 };
 
 /**
@@ -83,7 +99,11 @@ Db.prototype.addArtist = function (mUser, mArtist) {
 Db.prototype.getUser = function (mUser) {
     var deferred = Q.defer();
     User.findOne({'name': mUser.name}, function (err, user) {
-        deferred.resolve(user);
+        if (user){
+            deferred.resolve(user);
+        } else {
+            deferred.reject('user not found in database...');
+        }
     });
     return deferred.promise;
 };
@@ -120,7 +140,6 @@ Db.prototype.add = function (user, mArtist) {
         } else {
             db.assignArtist(user, artist);
         }
-
     })
 };
 

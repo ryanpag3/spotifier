@@ -43,6 +43,8 @@ app.controller('index-controller', ['$scope', '$rootScope', 'libraryService',
             libraryService.add(artist)
                 .then(function () {
                     // todo handle service response
+                    console.log('trying to broadcast event...');
+                    $scope.$broadcast('update-library');
                 })
                 .catch(function () {
                     // todo handle service error response
