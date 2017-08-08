@@ -27,8 +27,6 @@ app.controller('index-controller', ['$scope', '$rootScope', 'libraryService',
                         prevQuery = mQuery;
                         $scope.results = res;
                         $scope.resultsShown = true;
-                        console.log($scope.results);
-                        console.log($scope.resultsShown);
                     })
                     .catch(function (err) {
 
@@ -42,9 +40,8 @@ app.controller('index-controller', ['$scope', '$rootScope', 'libraryService',
         $scope.add = function (artist) {
             libraryService.add(artist)
                 .then(function () {
-                    // todo handle service response
-                    console.log('trying to broadcast event...');
-                    $scope.$broadcast('update-library');
+                    // todo put placeholder album info into config file
+                    $scope.$broadcast('add-artist', {artist: artist});
                 })
                 .catch(function () {
                     // todo handle service error response

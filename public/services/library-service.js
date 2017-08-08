@@ -6,7 +6,8 @@ app.factory('libraryService', ['$q', '$http',
             get: get,
             searchSpotify: searchSpotify,
             search: search,
-            add: add
+            add: add,
+            remove: remove
         });
 
         // initiates a library sync job for the user
@@ -61,12 +62,28 @@ app.factory('libraryService', ['$q', '$http',
             $http.post('/library/add', {artist: artist})
                 .then(function(res) {
                     // todo handle success response
-                    console.log('we here...');
                     deferred.resolve();
                 })
                 .catch(function(err) {
                     // todo handle error response
                     deferred.reject();
+                });
+            return deferred.promise;
+        }
+
+        /**
+         * handle AJAX call and response from server for removing an artist from a user's library
+         * @param {Object} artist: artist information to be passed to server
+         */
+        function remove(artist) {
+            console.log(artist);
+            var deferred = $q.defer();
+            $http.post('/library/remove', {artist: artist})
+                .then(function() {
+                    deferred.resolve();
+                })
+                .catch(function(err) {
+                    deferred.reject(err);
                 });
             return deferred.promise;
         }

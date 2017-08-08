@@ -13,6 +13,7 @@ var Q = require('q'),
 var Db = function () {
     this._addIndex = 0;
 };
+
 /**
  * creates a new user document in the db
  * @param mUser: user object serialized in cookie {name, accessToken, refreshToken}
@@ -37,6 +38,25 @@ Db.prototype.createUser = function (mUser) {
     });
     return deferred.promise;
 };
+
+/**
+ * queries for user and returns user information
+ * todo: add error handling for non-existent users
+ * @param mUser: user object serialized in cookie {name, accessToken, refreshToken}
+ * @returns: {Promise} Promise object with user document information from mongodb
+ */
+Db.prototype.getUser = function (mUser) {
+    var deferred = Q.defer();
+    User.findOne({'name': mUser.name}, function (err, user) {
+        if (user){
+            deferred.resolve(user);
+        } else {
+            deferred.reject('user not found in database...');
+        }
+    });
+    return deferred.promise;
+};
+
 /**
  * queries for user information and adds all artists in array
  * @param mUser: user object serialized in cookie {name, accessToken, refreshToken}
@@ -87,24 +107,6 @@ Db.prototype.addArtist = function (mUser, mArtist) {
         .catch(function(err) {
             deferred.reject(err);
         });
-    return deferred.promise;
-};
-
-/**
- * queries for user and returns user information
- * todo: add error handling for non-existent users
- * @param mUser: user object serialized in cookie {name, accessToken, refreshToken}
- * @returns: {Promise} Promise object with user document information from mongodb
- */
-Db.prototype.getUser = function (mUser) {
-    var deferred = Q.defer();
-    User.findOne({'name': mUser.name}, function (err, user) {
-        if (user){
-            deferred.resolve(user);
-        } else {
-            deferred.reject('user not found in database...');
-        }
-    });
     return deferred.promise;
 };
 
@@ -188,38 +190,114 @@ Db.prototype.createArtist = function (mArtist) {
 Db.prototype.assignArtist = function (user, artist) {
     var db = this;
     // if artist is not already tracking this user
-    if (!db.artistTrackingUser(artist._id, user._id)) {
-        // push user id to artist array
-        artist.users_tracking.push(user._id);
-        // serialize into db
-        artist.save(function (err) {
-            if (err) {
-                console.log(err);
+    db.artistTrackingUser(user, artist)
+        .then(function(tracking) {
+            // if not tracking
+            if (!tracking) {
+                // push user id to artist array
+                artist.users_tracking.push(user._id);
+                // serialize into db
+                artist.save(function (err) {
+                    if (err) {
+                        console.log(err);
+                    }
+                })
             }
         })
-    }
-    // if user is not already tracking this artist
-    if (!db.userTrackingArtist(artist._id, user._id)) {
-        // push artist id to user array
-        user.saved_artists.push(artist._id);
-        // serialize into db
-        user.save(function (err) {
-            if (err) {
-                console.log(err);
+        .catch(function(err) {
+           console.log(err);
+        });
+
+    db.userTrackingArtist(user, artist)
+        .then(function(tracking) {
+            // if not tracking
+            if(!tracking) {
+                // push artist id to user array
+                user.saved_artists.push(artist._id);
+                // serialize into db
+                user.save(function (err) {
+                    if (err) {
+                        console.log(err);
+                    }
+                })
             }
         })
-    }
+        .catch(function(err) {
+            // catch err
+            console.log(err);
+        })
 };
 
-// todo
-Db.prototype.removeArtist = function (username, artistId) {
+/**
+ *
+ * @param user
+ * @param artist
+ */
+Db.prototype.removeArtist = function (user, artist) {
+    var db = this,
+        deferred = Q.defer();
+    // get user information from database
+    db.getUser(user)
+        .then(function(qUser) {
+            db.remove(qUser, artist);
+            deferred.resolve();
+        })
+        .catch(function(err) {
+            // thrown if user not found in db
+            deferred.reject(err);
+        });
+    return deferred.promise;
+};
 
+Db.prototype.remove = function(user, artist) {
+    console.log('removing ' + artist.name);
+    var db = this;
+    Artist.findOne({'name' : artist.name}, function(err, qArtist){
+        // check if artist is tracking user
+        db.artistTrackingUser(user, qArtist)
+            .then(function(tracking) {
+                // if they are
+                if (tracking) {
+                    console.log('editing for ' + artist.name);
+                    // get index value of user id
+                    var index = qArtist.users_tracking.indexOf(user._id.toString());
+                    qArtist.users_tracking.splice(index, 1); // splice out
+                    qArtist.save(function(err) { // serialize document into db
+                        if (err) {
+                            console.log(err);
+                        }
+                    })
+                }
+            })
+            .catch(function(err) {
+                console.log(err);
+            });
+
+        // check if user is tracking artist
+        db.userTrackingArtist(user, qArtist)
+            .then(function(tracking) {
+                // if they are
+                if (tracking) {
+                    console.log('editing for ' + artist.name);
+                    // get index value of artist
+                    var index = user.saved_artists.indexOf(qArtist._id.toString());
+                    user.saved_artists.splice(index, 1); // splice out
+                    user.save(function(err) {
+                        if (err) {
+                            console.log(err);
+                        }
+                    });
+                    console.log(user);
+                }
+            })
+    });
 };
 
 /**
  * retrieves the user's library from the db
  * @param mUser: user object serialized in cookie {name, accessToken, refreshToken}
  * @returns: {Promise} Promise object with user library artist information
+ * todo: refactor to use getUser method
  */
 Db.prototype.getLibrary = function (mUser) {
     var deferred = Q.defer();
@@ -234,32 +312,45 @@ Db.prototype.getLibrary = function (mUser) {
 
 /**
  * checks if an artist is already tracking a user
- * @param artistId: mongo _id of artist
- * @param userId: mongo _id of user
+ * @param artist: mongo doc of artist
+ * @param user: mongo doc of user
  * @returns: {boolean}
  */
-Db.prototype.artistTrackingUser = function (artistId, userId) {
-    Artist.findOne({'_id': artistId}, {'users_tracking': userId}, function (err, artist) {
+Db.prototype.artistTrackingUser = function (user, artist) {
+    var deferred = Q.defer();
+    // query for artist that has id and is tracking user
+    Artist.findOne({$and: [
+        {'_id' : artist._id },
+        {'users_tracking': user._id}]
+    }, function (err, qArtist) {
         if (err) {
-            console.log(err);
+            deferred.reject(err);
         }
-        return artist !== null;
-    })
+        // returns if exists
+        deferred.resolve(qArtist !== null);
+    });
+    return deferred.promise;
 };
 
 /**
  * checks if a user is already tracking an artist
- * @param artistId: mongo _id of artist
- * @param userId: mongo _id of user
+ * @param artist: mongo doc of artist
+ * @param user: mongo doc of user
  * @returns: {boolean}
  */
-Db.prototype.userTrackingArtist = function (artistId, userId) {
-    User.findOne({'_id': userId}, {'saved_artists': artistId}, function (err, user) {
+Db.prototype.userTrackingArtist = function (user, artist) {
+    var deferred = Q.defer();
+    // query for user with by unique id and is tracking artist
+    User.findOne({$and: [
+        {'_id' : user._id},
+        {'saved_artists': artist._id}]
+    }, function (err, qUser) {
         if (err) {
-            console.log(err);
+            deferred.reject(err);
         }
-        return user !== null;
-    })
+        deferred.resolve(qUser !== null);
+    });
+    return deferred.promise;
 };
 
 /**

@@ -48,7 +48,6 @@ router.get('/sync', function(req, res) {
 router.post('/add', function(req, res) {
    // todo
    // handles adding an artist to the users library
-    console.log(req.body.artist);
     var db = new Db();
     // add artist for user
     db.addArtist(req.user, req.body.artist)
@@ -66,9 +65,20 @@ router.post('/add', function(req, res) {
         });
 });
 
-router.get('/remove', function(req, res) {
-   // todo
-   // handles removing an artist from the users library
+// todo: handle success and fail cases
+router.post('/remove', function(req, res) {
+    var deferred = Q.defer(),
+        db = new Db();
+    db.removeArtist(req.user, req.body.artist)
+        .then(function() {
+            res.status(200).send();
+        })
+        .catch(function(err) {
+            return res.status(200).json({
+                err: err
+            })
+        });
+    return deferred.promise;
 });
 
 router.get('/me', function(req, res) {
