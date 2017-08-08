@@ -1,0 +1,47 @@
+.page-container {
+    display: flex;
+    width: 100vw;
+    height: calc(100vh - 50px);
+    background-color: darkgrey;
+    justify-content: center;
+}
+
+.email-container {
+    width: 50%;
+    min-width: 400px;
+    height: 100%;
+    background-color: white;
+}
+
+.email-directions-container {
+    height: 150px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: lightgray;
+}
+
+.email-form-container {
+    display: flex;
+    justify-content: center;
+    height: 250px;
+    width: 100%;
+    background-color: lightblue;
+}
+
+.email-form {
+    width: 380px;
+    background-color: pink;
+    text-align: center;
+}
+
+.email-input {
+    width: 80%;
+    margin: 4px;
+}
+
+#email-submit {
+    width: 60%;
+}
+

@@ -1,0 +1,19 @@
+<link type="text/css" rel="stylesheet" href="../css/email-style.css">
+<div class="page-container" data-ng-controller="email-controller">
+    <div class="email-container">
+        <div class="email-directions-container">
+            <div style="text-align: center; padding: 24px">
+                This site sends out emails to notify you of new releases on Spotify. Please enter your email
+                below to be sent a confirmation email. We will not send you any emails besides new release
+                notifications, we promise!
+            </div>
+        </div>
+        <div class="email-form-container">
+            <form class="email-form">
+                <input class="email-input" placeholder="Enter email" data-ng-model="email">
+                <input class="email-input" placeholder="Confirm email" data-ng-model="confirmEmail">
+                <button id="email-submit" data-ng-click="submit()">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>

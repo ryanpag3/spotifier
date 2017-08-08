@@ -12,6 +12,10 @@ app.config(['$routeProvider', '$locationProvider', 'SpotifyProvider',
             templateUrl: 'partials/landing.html',
             restricted: false
         })
+        .when('/email', {
+            templateUrl: 'partials/email.html',
+            restricted: true
+        })
         .when('/library', {
             templateUrl: 'partials/user-library.html',
             restricted: true
