@@ -76,7 +76,6 @@ app.factory('libraryService', ['$q', '$http',
          * @param {Object} artist: artist information to be passed to server
          */
         function remove(artist) {
-            console.log(artist);
             var deferred = $q.defer();
             $http.post('/library/remove', {artist: artist})
                 .then(function() {

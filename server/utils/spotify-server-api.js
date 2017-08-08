@@ -31,7 +31,7 @@ var self = module.exports = {
         self.refreshClientToken()
             .then(function () {
                 // retrieve most recent release
-                spotifyApi.getArtistAlbums(artist.spotifyId, ({
+                spotifyApi.getArtistAlbums(artist.spotify_id, ({
                     limit: 1,
                     offset: 0
                 }))

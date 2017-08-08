@@ -1,6 +1,6 @@
 var kue = require('kue'),
     queue = kue.createQueue(),
-    SpotifyApiUser = require('../utils/spotify-user-api-fixed'),
+    SpotifyApiUser = require('./spotify-user-api'),
     spotifyApiServer = require('../utils/spotify-server-api.js');
 
 // create event and specify event handlers

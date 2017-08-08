@@ -8,6 +8,7 @@ app.controller('library-controller', ['$scope', '$rootScope', '$timeout', 'libra
          *
          */
         $scope.removeArtist = function(artist) {
+            console.log(artist);
             libraryService.remove(artist)
                 .then(function() {
                     removeArtistLoc(artist);
@@ -30,6 +31,7 @@ app.controller('library-controller', ['$scope', '$rootScope', '$timeout', 'libra
         $scope.$on('add-artist', function (event, args) {
             $scope.library.push({
                 name: args.artist.name,
+                spotify_id: args.artist.spotify_id,
                 recent_release: {
                     title: 'recent release info pending from Spotify...' // placeholder text matching server
                 }
@@ -61,7 +63,6 @@ app.controller('library-controller', ['$scope', '$rootScope', '$timeout', 'libra
         function getLibrary() {
             libraryService.get()
                 .then(function (library) {
-                        console.log('updating library');
                         $scope.library = library;
                         // $scope.libraryArtistAscending = sortBy(library, 'name');
                         // $scope.libraryArtistDescending = (sortBy(library, 'name')).reverse();

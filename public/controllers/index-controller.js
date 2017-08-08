@@ -38,6 +38,7 @@ app.controller('index-controller', ['$scope', '$rootScope', 'libraryService',
         };
 
         $scope.add = function (artist) {
+            console.log(artist);
             libraryService.add(artist)
                 .then(function () {
                     // todo put placeholder album info into config file

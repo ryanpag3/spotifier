@@ -123,7 +123,7 @@ Api.prototype.getLibraryArtists = function (user) {
                             if (self.artistAdded[artistId] === undefined && track.available_markets.length > 0) {
                                 var name = track.artists[0].name;
                                 self.artistAdded[artistId] = true; // flag artist added
-                                self.artists.push({spotifyId: artistId, name: name}); // push artist to array
+                                self.artists.push({spotify_id: artistId, name: name}); // push artist to array
                             }
                         }
                         // adjust offset to either 50 ahead or to the end of the track list
@@ -181,7 +181,7 @@ Api.prototype.searchArtists = function (user, query) {
 
                         results.push({
                             name: artist.name,
-                            spotifyId: artist.id,
+                            spotify_id: artist.id,
                             url: url
                         })
                     }

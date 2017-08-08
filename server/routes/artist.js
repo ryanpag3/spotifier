@@ -1,7 +1,7 @@
 var express = require('express'),
     Q = require('q'),
     router = express.Router(),
-    SpotifyApiUser = require('../utils/spotify-user-api-fixed.js'),
+    SpotifyApiUser = require('../utils/spotify-user-api.js'),
     jobQueue = require('../utils/job-queue.js');
 
 router.post('/search', function(req, res) {

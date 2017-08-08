@@ -7,7 +7,7 @@
 var express = require('express'),
     Q = require('q'),
     router = express.Router(),
-    SpotifyApiUser = require('../utils/spotify-user-api-fixed.js'),
+    SpotifyApiUser = require('../utils/spotify-user-api.js'),
     Db = require('../utils/db-wrapper.js'),
     jobQueue = require('../utils/job-queue.js');
 
@@ -67,6 +67,7 @@ router.post('/add', function(req, res) {
 
 // todo: handle success and fail cases
 router.post('/remove', function(req, res) {
+    console.log('remove is called.');
     var deferred = Q.defer(),
         db = new Db();
     db.removeArtist(req.user, req.body.artist)
