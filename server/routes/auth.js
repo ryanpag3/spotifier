@@ -39,7 +39,13 @@ router.get('/callback',
     function(req, res) {
         var db = new Db();
         // creates new user object in db if it doesn't already exist
-        db.createUser(req.user);
+        db.createUser(req.user)
+            .then(function() {
+
+            })
+            .catch(function(err) {
+
+            });
         // if user has not setup their email, route to email entry page
         // if  user has not confirmed their email, route to confirmation send page
         // else route to library page
@@ -56,6 +62,8 @@ router.get('/callback',
         // DEBUGGING
         res.redirect('/library');
 });
+
+
 
 module.exports = router;
 

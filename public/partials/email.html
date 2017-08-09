@@ -9,11 +9,11 @@
             </div>
         </div>
         <div class="email-form-container">
-            <form name="emailform" class="email-form" novalidate data-ng-submit="email-form.$valid && submit()">
+            <form name="emailform" class="email-form" novalidate data-ng-submit="email-form.$valid && submitEmail()">
                 <input class="form-control email-input" placeholder="Enter email" data-ng-model="email" required>
                 <input class="form-control email-input" placeholder="Confirm email" data-ng-model="confirmEmail" required>
                 <input type="submit" class="btn" id="email-submit" data-ng-click="submit()" value="submit" data-ng-disabled="emailform.$invalid">
-                <div data-ng-show="notMatching">Please check that the emails are matching!</div>
+                <div data-ng-show="!matching">Please check that the emails are matching!</div>
             </form>
         </div>
     </div>

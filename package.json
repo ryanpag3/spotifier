@@ -31,5 +31,9 @@
     "q": "^1.5.0",
     "socket.io": "^2.0.3",
     "spotify-web-api-node": "^2.4.0"
+  },
+  "devDependencies": {
+    "chai": "^4.1.1",
+    "sinon": "^3.1.0"
   }
 }

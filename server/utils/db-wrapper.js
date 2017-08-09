@@ -32,10 +32,13 @@ Db.prototype.createUser = function (mUser) {
             var user = new User({
                 name: username
             }).save(function (err, user) {
-                deferred.resolve();
+                if (err){
+                    deferred.reject(err);
+                }
+                deferred.resolve(user);
             });
         } else {
-            deferred.resolve();
+            deferred.resolve(user);
         }
     });
     return deferred.promise;
@@ -43,7 +46,6 @@ Db.prototype.createUser = function (mUser) {
 
 /**
  * queries for user and returns user information
- * todo: add error handling for non-existent users
  * @param mUser: user object serialized in cookie {name, accessToken, refreshToken}
  * @returns: {Promise} Promise object with user document information from mongodb
  */
@@ -111,10 +113,10 @@ Db.prototype.addArtist = function (user, artist) {
         // define query parameters
         var query = {'spotify_id': artist.spotify_id};
         // query for artist
-        Artist.findOne(query, function (err, artist) {
+        Artist.findOne(query, function (err, qArtist) {
             // if exists
-            if (artist) {
-                db.assignArtist(user, artist);
+            if (qArtist) {
+                db.assignArtist(user, qArtist);
                 deferred.resolve();
             } else {
                 // assign document update variables

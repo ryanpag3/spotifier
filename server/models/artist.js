@@ -8,14 +8,14 @@ var Schema = mongoose.Schema;
  * users_tracking: this is an array of mongodb IDs used for handling emails
  */
 var Artist = new Schema({
-    spotify_id: String,
-    name: String,
-    recent_release: {
+    spotify_id: {type: String, required: true},
+    name: {type: String, required: true},
+    recent_release: {type: {
         id: String,
         title: String,
         release_date: String,
         images: []
-    },
+    }, required: true},
     users_tracking: [Schema.ObjectId]
 });
 

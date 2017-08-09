@@ -9,7 +9,7 @@ var Schema = mongoose.Schema;
  * new_releases: this is an array of mongo IDs of artists who have new releases found
  */
 var User = new Schema({
-    name: String,
+    name: {type: String, required: true},
     email: {
         address: String,
         confirmed: Boolean
