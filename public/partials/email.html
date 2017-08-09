@@ -2,17 +2,18 @@
 <div class="page-container" data-ng-controller="email-controller">
     <div class="email-container">
         <div class="email-directions-container">
-            <div style="text-align: center; padding: 24px">
+            <div style="width: 500px; text-align: center; padding-left: 16px; padding-right: 16px; font-size: 16px">
                 This site sends out emails to notify you of new releases on Spotify. Please enter your email
                 below to be sent a confirmation email. We will not send you any emails besides new release
-                notifications, we promise!
+                notifications and major site updates, we promise!
             </div>
         </div>
         <div class="email-form-container">
-            <form class="email-form">
-                <input class="email-input" placeholder="Enter email" data-ng-model="email">
-                <input class="email-input" placeholder="Confirm email" data-ng-model="confirmEmail">
-                <button id="email-submit" data-ng-click="submit()">Submit</button>
+            <form name="emailform" class="email-form" novalidate data-ng-submit="email-form.$valid && submit()">
+                <input class="form-control email-input" placeholder="Enter email" data-ng-model="email" required>
+                <input class="form-control email-input" placeholder="Confirm email" data-ng-model="confirmEmail" required>
+                <input type="submit" class="btn" id="email-submit" data-ng-click="submit()" value="submit" data-ng-disabled="emailform.$invalid">
+                <div data-ng-show="notMatching">Please check that the emails are matching!</div>
             </form>
         </div>
     </div>
