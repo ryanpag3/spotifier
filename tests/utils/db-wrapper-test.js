@@ -173,4 +173,18 @@ describe('db-wrapper', function () {
             })
     });
 
+    it('setConfirmCode should resolve if the user collection serializes the correct code for the user', function(done) {
+        const confirm_code = '1234';
+        testHelper.insert(sampleData.passUser())
+            .then(function(user) {
+                db.setConfirmCode(user, confirm_code)
+                    .then(function() {
+                        db.getUser(user)
+                            .then(function(user) {
+                                expect(user.email.confirm_code).to.be.equal(confirm_code);
+                                done();
+                            })
+                    })
+            })
+    })
 });

@@ -345,11 +345,19 @@ Db.prototype.confirmEmail = function (user, confirmCode) {
 };
 
 /**
- *
- * @type {Db}
+ * Serializes a confirmation code for the user
+ * @returns {Q.Promise}
  */
 Db.prototype.setConfirmCode = function(user, confirmCode) {
     var deferred = Q.defer();
-}
+    User.update({'_id': user._id}, {'email.confirm_code': confirmCode}, function(err) {
+        if (err) {
+            deferred.reject(err);
+        } else {
+            deferred.resolve();
+        }
+    });
+    return deferred.promise;
+};
 
 module.exports = Db;
