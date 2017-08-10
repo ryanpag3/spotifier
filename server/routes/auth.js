@@ -78,7 +78,7 @@ router.get('/callback',
         // }
 
         // // DEBUGGING
-        // res.redirect('/library');
+        res.redirect('/library');
 });
 
 /**
@@ -114,8 +114,9 @@ router.post('email/delete', function(req, res) {
         })
 });
 
-router.get('email/send-confirmation', function(req, res) {
-    // queue confirmation email job
+router.get('/email/send-confirmation', function(req, res) {
+   var email = new Email();
+   email.sendConfirmationEmail(req.user);
 });
 
 /**
