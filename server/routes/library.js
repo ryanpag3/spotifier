@@ -46,28 +46,35 @@ router.get('/sync', function(req, res) {
 });
 
 router.post('/add', function(req, res) {
-   // todo
-   // handles adding an artist to the users library
     var db = new Db();
-    // add artist for user
-    db.addArtist(req.user, req.body.artist)
-        // on success
+    // refresh a users access token if necessary
+    refreshAccessToken(req)
         .then(function() {
-            console.log('sending success...');
-            res.status(200).send();
+            // query users collection for user information
+            db.getUser(req.user)
+                .then(function(user) {
+                    // add artist
+                    db.addArtist(user, req.body.artist)
+                        .then(function() {
+                            // return success code
+                            res.status(200).send();
+                        })
+                        .catch(function(err) {
+                            // return fail code with error message
+                            return res.status(500).json({
+                                err: err
+                            })
+                        });
+                })
+                .catch(function(err) {
+                    // user does not exist in database, redirect to landing page
+                    req.redirect('/');
+                })
         })
-        // on failure
-        .catch(function(err) {
-            console.log('sending failure...');
-            return res.status(500).json({
-                err: err
-            })
-        });
 });
 
 // todo: handle success and fail cases
 router.post('/remove', function(req, res) {
-    console.log('remove is called.');
     var deferred = Q.defer(),
         db = new Db();
     db.removeArtist(req.user, req.body.artist)

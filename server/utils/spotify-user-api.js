@@ -18,6 +18,7 @@ function Api() {
 
 /** METHODS **/
 
+// todo handle success fail cases of add all artists
 Api.prototype.syncLibrary = function(user) {
     var api = this,
         deferred = Q.defer();
@@ -28,9 +29,6 @@ Api.prototype.syncLibrary = function(user) {
                   .then(function(artists) {
                       var db = new Db();
                       console.log(user.name + '\'s library is being added.');
-                      // for (var i = 0; i < artists.length; i++){
-                      //     console.log(artists[i].name);
-                      // }
                       db.addAllArtists(user, artists);
                       deferred.resolve();
               })
@@ -50,7 +48,8 @@ Api.prototype.syncLibrary = function(user) {
  * The authentication strategy does not handle expiration times for tokens automatically, so we check and see if
  * we have already set an expiration date in milliseconds, or if the expiration time has passed. If the token is
  * still valid, we do not need to call Spotify's api for a new one.
- * @param user
+ * @param user: req.user cookie object
+ * @returns: {Promise}
  */
 Api.prototype.getAccessToken = function (user) {
     var api = this.spotifyApi,
@@ -81,6 +80,11 @@ Api.prototype.getAccessToken = function (user) {
     return deferred.promise;
 };
 
+/**
+ * If the user parameter is not null, we set the api object to user this user's access token.
+ * @param user: req.user object
+ * @returns {Promise}
+ */
 Api.prototype.setAccessToken = function (user) {
     var deferred = Q.defer();
     if (user) {
@@ -105,7 +109,7 @@ Api.prototype.getLibraryArtists = function (user) {
         deferred = Q.defer();
 
 
-    // initializer
+    //  recursive wrapper
     function go() {
         self.setAccessToken(user)
             .then(function() {
@@ -142,6 +146,7 @@ Api.prototype.getLibraryArtists = function (user) {
                         deferred.reject(err); // return error message
                     });
             })
+            // catch get access token error
             .catch(function(err) {
                 console.log(err);
             });
