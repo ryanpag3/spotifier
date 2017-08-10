@@ -17,6 +17,7 @@ var Db = function () {
 /**
  * creates a new user document in the db
  * @param mUser: user object serialized in cookie {name, accessToken, refreshToken}
+ * @returns {Q.Promise|Object} user doc from mongo
  */
 Db.prototype.createUser = function (mUser) {
     var deferred = Q.defer(),
@@ -45,7 +46,7 @@ Db.prototype.createUser = function (mUser) {
 /**
  * queries for user and returns user information
  * @param mUser: user object serialized in cookie {name, accessToken, refreshToken}
- * @returns: {Q.Promise} Promise object with user document information from mongodb
+ * @returns: {Q.Promise|Object} user document information from mongodb
  */
 Db.prototype.getUser = function (mUser) {
     var deferred = Q.defer();
@@ -64,6 +65,7 @@ Db.prototype.getUser = function (mUser) {
  * @param mUser: user object serialized in cookie {name, accessToken, refreshToken}
  * @param artists: array of simple artist objects to retrieve detailed information and
  *                 add to db
+ * @returns {Q.Promise}
  */
 Db.prototype.addAllArtists = function (mUser, artists) {
     var db = this,
@@ -100,6 +102,7 @@ Db.prototype.addAllArtists = function (mUser, artists) {
  * queries for user information and adds artist to user library
  * @param user: user object serialized in cookie {name, accessToken, refreshToken}
  * @param artist: simple artist object {spotifyId, name}
+ * @returns {Q.Promise}
  */
 Db.prototype.addArtist = function (user, artist) {
     var db = this;
@@ -164,6 +167,7 @@ Db.prototype.addArtist = function (user, artist) {
  * database document, if they are valid.
  * @param user: mongodb user document, see models/user for schema information
  * @param artist: mongodb artist document, see models/artist for schema information
+ * @returns {Q.Promise}
  */
 Db.prototype.assignArtist = function (user, artist) {
     var deferred = Q.defer();
@@ -190,6 +194,7 @@ Db.prototype.assignArtist = function (user, artist) {
  * from the artist doc, and finally remove the artist id from the user doc.
  * @param user: mongodb document
  * @param artist: mongodb document
+ * @returns {Q.Promise}
  */
 Db.prototype.removeArtist = function (user, artist) {
     var deferred = Q.defer();
@@ -218,7 +223,7 @@ Db.prototype.removeArtist = function (user, artist) {
 /**
  * retrieves the user's library from the db, if they exist
  * @param mUser: user object serialized in cookie {name, accessToken, refreshToken}
- * @returns: {Q.Promise} Promise object with user library artist information
+ * @returns: {Q.Promise|Array} Promise object with user library artist information
  */
 Db.prototype.getLibrary = function (mUser) {
     var deferred = Q.defer();
@@ -240,44 +245,49 @@ Db.prototype.getLibrary = function (mUser) {
 /**
  * returns boolean whether user exists in mongodb
  * @param mUser: user object serialized in cookie {name, accessToken, refreshToken}
- * @returns: {boolean}
+ * @returns: {Q.Promise|Boolean}
  */
 Db.prototype.userExists = function (mUser) {
+    var deferred = Q.defer();
     User.findOne({'username': mUser.name}, function (err, user) {
         if (err) {
             console.log(err);
         }
-        return user !== null;
-    })
+        deferred.resolve(user !== null);
+    });
+    return deferred.promise
 };
 
 /**
  * returns boolean based on whether the user has an email in the database
  * @param mUser: user object serialized in cooke {name, accessToken, refreshToken}
- * @returns: {boolean}
+ * @returns: {Q.Promise|Boolean}
  */
 Db.prototype.emailExists = function (mUser) {
+    var deferred = Q.defer();
     User.findOne({'username': mUser}, function (err, user) {
         if (err) {
             console.log(err);
         }
-        return user !== null && user.email.address !== null;
-    })
+        deferred.resolve(user !== null && user.email.address !== null);
+    });
+    return deferred.promise;
 };
 
 /**
  * returns boolean based on whether the user has confirmed their email in the database
  * @param mUser: user object serialized in cooke {name, accessToken, refreshToken}
- * @returns {boolean}
+ * @returns {Q.Promise|Boolean}
  */
 Db.prototype.emailConfirmed = function (mUser) {
+    var deferred = Q.defer();
     User.findOne({'username': mUser.name}, function (err, user) {
         if (err) {
             console.log(err);
         }
-        return user !== null && user.email.confirmed === true;
+        deferred.resolve(user !== null && user.email.confirmed === true);
     });
-
+    return deferred.promise;
 };
 
 module.exports = Db;

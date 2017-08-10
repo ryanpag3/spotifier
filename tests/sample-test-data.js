@@ -2,52 +2,61 @@
  * contains sample test cases to use on unit tests
  * @type {[null]}
  */
-// fail single artist
-module.exports.failArtist = function() {
-    return {};
-};
+module.exports = {
 
-// pass single artist
-module.exports.passArtist = function() {
-    return {
-        spotify_id: '123456789',
-        name: 'artist1',
-        recent_release: {
-            id: '1234',
-            title: 'album title',
-            release_date: 'release date',
-            images: []
+    failArtist: function() {
+        return {};
+    },
+
+    passArtist: function() {
+        return {
+            spotify_id: '123456789',
+            name: 'artist1',
+            recent_release: {
+                id: '1234',
+                title: 'album title',
+                release_date: 'release date',
+                images: []
+            }
+        }
+    },
+
+    failArtists: function() {
+        return [{},{},{},{}];
+    },
+
+    passArtists: function() {
+        return [{
+            spotify_id: '123456789',
+            name: 'artist1',
+            recent_release: {
+                id: '1234',
+                title: 'album title',
+                release_date: 'release date',
+                images: []
+            }
+        }]
+    },
+
+    failUser:  function() {
+        return {}
+    },
+
+    // this user will pass creation but fail email checks
+    failEmailUser: function() {
+        return {
+            name: 'emailFailUser'
+        }
+    },
+
+    passUser: function() {
+        return {
+            name: 'user',
+            email: {
+                address: 'myemail@email.com',
+                confirmed: true
+            }
         }
     }
 };
 
-// fail array of artists
-module.exports.failArtists = function() {
-    return [{},{},{},{}];
-};
-
-// pass array of artists
-module.exports.passArtists = function() {
-    return [{
-        spotify_id: '123456789',
-        name: 'artist1',
-        recent_release: {
-            id: '1234',
-            title: 'album title',
-            release_date: 'release date',
-            images: []
-        }
-    }]
-};
-
-// fail single user
-module.exports.failUser = function() {
-    return {}
-};
-
-// pass single user
-module.exports.passUser = function() {
-    return {
-        name: 'user'
-    }
-};
