@@ -50,7 +50,7 @@ Db.prototype.createUser = function (mUser) {
  */
 Db.prototype.getUser = function (mUser) {
     var deferred = Q.defer();
-    User.findOne({'name': mUser.name}, function (err, user) {
+    User.findOne({'_id': mUser._id}, function (err, user) {
         if (user) {
             deferred.resolve(user);
         } else {
@@ -222,12 +222,12 @@ Db.prototype.removeArtist = function (user, artist) {
 
 /**
  * retrieves the user's library from the db, if they exist
- * @param mUser: user object serialized in cookie {name, accessToken, refreshToken}
+ * @param mUser: user object serialized in cookie {_id, name, accessToken, refreshToken}
  * @returns: {Q.Promise|Array} Promise object with user library artist information
  */
 Db.prototype.getLibrary = function (mUser) {
     var deferred = Q.defer();
-    User.findOne({'name': mUser.name}, function (err, user) {
+    User.findOne({'_id': mUser._id}, function (err, user) {
         if (err) {
             deferred.reject(err);
         }
@@ -249,7 +249,7 @@ Db.prototype.getLibrary = function (mUser) {
  */
 Db.prototype.userExists = function (mUser) {
     var deferred = Q.defer();
-    User.findOne({'username': mUser.name}, function (err, user) {
+    User.findOne({'_id': mUser._id}, function (err, user) {
         if (err) {
             console.log(err);
         }
@@ -265,11 +265,11 @@ Db.prototype.userExists = function (mUser) {
  */
 Db.prototype.emailExists = function (mUser) {
     var deferred = Q.defer();
-    User.findOne({'username': mUser}, function (err, user) {
+    User.findOne({'_id': mUser._id}, function (err, user) {
         if (err) {
             console.log(err);
         }
-        deferred.resolve(user !== null && user.email.address !== null);
+        deferred.resolve(user !== undefined && user.email.address !== undefined);
     });
     return deferred.promise;
 };
@@ -281,11 +281,44 @@ Db.prototype.emailExists = function (mUser) {
  */
 Db.prototype.emailConfirmed = function (mUser) {
     var deferred = Q.defer();
-    User.findOne({'username': mUser.name}, function (err, user) {
+    User.findOne({'_id': mUser._id}, function (err, user) {
         if (err) {
             console.log(err);
         }
         deferred.resolve(user !== null && user.email.confirmed === true);
+    });
+    return deferred.promise;
+};
+
+/**
+ * Inserts an email address for the associating user.
+ * @param user
+ * @param email
+ */
+Db.prototype.addEmail = function(user, emailAddress) {
+    var deferred = Q.defer();
+    User.update({'_id': user._id}, {'email': {address: emailAddress, confirmed: false}}, function(err) {
+        if (err) {
+            deferred.reject(err);
+        } else {
+            deferred.resolve();
+        }
+    });
+    return deferred.promise;
+};
+
+/**
+ * Removes an email address for the associated user
+ * @param user
+ */
+Db.prototype.removeEmail = function(user) {
+    var deferred = Q.defer();
+    User.update({'_id': user._id}, {$unset: {'email': 1}}, function(err) {
+        if (err) {
+            deferred.reject(err);
+        } else {
+            deferred.resolve();
+        }
     });
     return deferred.promise;
 };

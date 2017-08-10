@@ -5,7 +5,8 @@ var app = angular.module('spotifier');
 app.factory('authServ', ['$q', '$http',
     function($q, $http) {
         return ({
-            isAuthenticated: isAuthenticated
+            isAuthenticated: isAuthenticated,
+            submitEmail: submitEmail
         });
 
         function isAuthenticated() {
@@ -21,9 +22,20 @@ app.factory('authServ', ['$q', '$http',
             return deferred.promise;
         }
 
-        function submitEmail() {
+        /**
+         * Handles AJAX and passes email address to API endpoint
+         * @param emailAddress
+         */
+        function submitEmail(emailAddress) {
             var deferred = $q.defer();
+            console.log('we here...');
 
-            $http.post('')
+            $http.post('/user/email/add', {emailAddress: emailAddress});
+        //         .then(function(res) {
+        //             // todo
+        //         })
+        //         .catch(function(err) {
+        //             // todo
+        //         })
         }
     }]);

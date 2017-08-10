@@ -12,7 +12,8 @@ var User = new Schema({
     name: {type: String, required: true},
     email: {
         address: String,
-        confirmed: Boolean
+        confirmed: Boolean,
+        confirm_code: String
     },
     saved_artists: [Schema.ObjectId],
     new_releases: [Schema.ObjectId]

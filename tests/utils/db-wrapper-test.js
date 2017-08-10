@@ -123,9 +123,33 @@ describe('db-wrapper', function() {
                         done();
                     });
             })
+    });
+
+    it('addEmail should resolve once an email has been added for a user', function(done) {
+        testHelper.insert(sampleData.failEmailUser())
+            .then(function(user) {
+                db.addEmail(user, 'test@email')
+                    .then(function() {
+                        db.getUser(user)
+                            .then(function(user) {
+                                expect(user.email.address).to.equal('test@email');
+                                done();
+                            })
+                    })
+            });
+    });
+
+    it('deleteEmail should resolve once an email has been removed for a user', function(done) {
+        testHelper.insert(sampleData.passUser())
+            .then(function(user) {
+                db.removeEmail(user)
+                    .then(function() {
+                        db.getUser(user)
+                            .then(function(user) {
+                                expect(user.email).to.equal(undefined);
+                                done();
+                            })
+                    })
+            })
     })
-
-
-
-
 });

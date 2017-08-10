@@ -38,8 +38,30 @@ router.get('/callback',
         var db = new Db();
         // creates new user object in db if it doesn't already exist
         db.createUser(req.user)
-            .then(function() {
-                // todo
+            .then(function(user) {
+                // save the database id in the cookie
+                req.session.passport.user._id = user._id;
+                req.session.save(function(err) {
+                    if (err) {
+                        console.log(err);
+                    }
+                });
+                console.log(user);
+
+                db.emailExists(user)
+                    .then(function(exists) {
+                        console.log(exists);
+                        if (!exists) {
+                            res.redirect('/email');
+                        } else {
+                            db.emailConfirmed(user)
+                                .then(function(confirmed) {
+                                    if(!confirmed) {
+                                        console.log('/redirect to confirmation page')
+                                    }
+                                })
+                        }
+                    })
             })
             .catch(function(err) {
                 // todo
@@ -57,15 +79,21 @@ router.get('/callback',
         //     res.redirect('/library');
         // }
 
-        // DEBUGGING
-        res.redirect('/library');
+        // // DEBUGGING
+        // res.redirect('/library');
 });
 
 /**
  * API endpoint for inserting a user's email into the database.
  * todo
  */
-router.post('email/add', function(req, res) {
+router.post('/email/add', function(req, res) {
+    var db = new Db();
+    console.log(req.body.emailAddress);
+    db.addEmail(req.user, req.body.emailAddress)
+        .then(function() {
+
+        })
 
 });
 
@@ -74,7 +102,7 @@ router.post('email/add', function(req, res) {
  * todo
  */
 router.post('email/delete', function(req, res) {
-
+    //removeEmail
 });
 
 /**
@@ -82,15 +110,19 @@ router.post('email/delete', function(req, res) {
  * todo
  */
 router.post('email/update', function(req, res) {
+    // add email
+});
 
+router.get('email/send-confirmation', function(req, res) {
+    // queue confirmation email job
 });
 
 /**
  * API endpoint for confirming a user's email in the database.
  * todo
  */
-router.post('email/confirm', function(req, res) {
-
+router.get('email/confirm/', function(req, res) {
+    // parse query parameters and validate code
 });
 
 /**
@@ -98,7 +130,11 @@ router.post('email/confirm', function(req, res) {
  * todo
  */
 router.get('email/status', function(req, res) {
-
+    // return status of email
+    // email is either
+    // undefined
+    // defined but not confirmed
+    // defined and confirmed
 });
 
 

@@ -1,36 +1,16 @@
 var app = angular.module('spotifier');
 
-app.controller('email-controller', ['$scope', function($scope) {
-    // todo
+app.controller('email-controller', ['$scope', 'authServ', function($scope, authServ) {
+    $scope.matching = true;
 
-    /**
-     *
-     */
     $scope.submitEmail = function() {
-        // if inputs are not matching
+        // if inputs are matching
         if ($scope.email === $scope.confirmEmail) {
-            $scope.matching = true;
-            // success
+            $scope.matching = true; // hide err msg
+            authServ.submitEmail($scope.email); // submit email to server
         } else {
-            $scope.matching = false;
+            $scope.matching = false; // show err msg
         }
     };
-
-    /** HELPER METHODS **/
-    /**
-     * Validates two inputs to check for equality
-     * @param input1
-     * @param input2
-     * @returns {Boolean}
-     */
-    function inputsMatch(input1, input2){
-        if (input1 === input2) {
-            $scope.matching = true;
-            return true;
-        } else {
-            $scope.matching = false;
-            return false;
-        }
-    }
 
 }]);
