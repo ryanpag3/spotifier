@@ -33,11 +33,9 @@ router.post('/status', function (req, res) {
 });
 
 router.get('/callback',
-    passport.authenticate('spotify', {failureRedirect: '/'}),
-    function(req, res) {
+    passport.authenticate('spotify', {failureRedirect: '/'}), function(req, res) {
         var db = new Db();
-        // creates new user object in db if it doesn't already exist
-        db.createUser(req.user)
+        db.createUser(req.user) // creates new user object in db if it doesn't already exist
             .then(function(user) {
                 // save the database id in the cookie
                 req.session.passport.user._id = user._id;
@@ -46,11 +44,9 @@ router.get('/callback',
                         console.log(err);
                     }
                 });
-                console.log(user);
-
                 db.emailExists(user)
                     .then(function(exists) {
-                        // if user has not entered an email
+                        // if user email does not exist
                         if (!exists) {
                             res.redirect('/email');
                         } else {
@@ -85,33 +81,36 @@ router.get('/callback',
 });
 
 /**
- * API endpoint for inserting a user's email into the database.
+ * API endpoint for inserting/updating a user's email into the database.
  * todo
  */
-router.post('/email/add', function(req, res) {
+router.post('email/add', function(req, res) {
     var db = new Db();
-    console.log(req.body.emailAddress);
     db.addEmail(req.user, req.body.emailAddress)
         .then(function() {
-
+            res.status(200).send();
         })
-
+        .catch(function(err) {
+            return res.status(500).json({
+                err: err
+            })
+        })
 });
 
 /**
  * API endpoint for deleting a user's email from the database.
- * todo
  */
 router.post('email/delete', function(req, res) {
-    //removeEmail
-});
-
-/**
- * API endpoint for updating a user's email in the database.
- * todo
- */
-router.post('email/update', function(req, res) {
-    // add email
+    var db = new Db();
+    db.removeEmail(req.user)
+        .then(function() {
+            res.status(200).send();
+        })
+        .catch(function(err) {
+            return res.status(500).json({
+                err: err
+            })
+        })
 });
 
 router.get('email/send-confirmation', function(req, res) {
