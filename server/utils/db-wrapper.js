@@ -315,6 +315,7 @@ Db.prototype.removeEmail = function(user) {
     var deferred = Q.defer();
     User.update({'_id': user._id}, {$unset: {'email': 1}}, function(err) {
         if (err) {
+            console.log(err);
             deferred.reject(err);
         } else {
             deferred.resolve();
@@ -322,5 +323,33 @@ Db.prototype.removeEmail = function(user) {
     });
     return deferred.promise;
 };
+
+/**
+ * Confirm a user's email address by checking if the confirmation code passed by the client matches
+ * the one in the database.
+ * @param user
+ * @param confirmCode
+ */
+Db.prototype.confirmEmail = function (user, confirmCode) {
+    var deferred = Q.defer();
+    User.findOne({'_id': user._id}, function(err, user) {
+        if (err) {
+            deferred.reject(err);
+        } else if (user.email.confirm_code !== confirmCode) {
+            deferred.reject('confirmation codes do not match!');
+        } else {
+            deferred.resolve();
+        }
+    });
+    return deferred.promise;
+};
+
+/**
+ *
+ * @type {Db}
+ */
+Db.prototype.setConfirmCode = function(user, confirmCode) {
+    var deferred = Q.defer();
+}
 
 module.exports = Db;

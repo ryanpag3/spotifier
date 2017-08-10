@@ -50,12 +50,13 @@ router.get('/callback',
 
                 db.emailExists(user)
                     .then(function(exists) {
-                        console.log(exists);
+                        // if user has not entered an email
                         if (!exists) {
                             res.redirect('/email');
                         } else {
                             db.emailConfirmed(user)
                                 .then(function(confirmed) {
+                                    // if user has not confirmed their email
                                     if(!confirmed) {
                                         console.log('/redirect to confirmation page')
                                     }
