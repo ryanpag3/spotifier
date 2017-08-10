@@ -4,6 +4,7 @@
 var express = require('express'),
     passport = require('passport'),
     Db = require('../utils/db-wrapper.js'),
+    Email = require('../utils/email-handler'),
     router = express.Router();
 
 router.get('/login', passport.authenticate('spotify', {
@@ -135,6 +136,11 @@ router.get('email/status', function(req, res) {
     // undefined
     // defined but not confirmed
     // defined and confirmed
+});
+
+router.get('/email/send', function(req, res) {
+    var email = new Email();
+    email.send();
 });
 
 
