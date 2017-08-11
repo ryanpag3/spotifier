@@ -2,6 +2,7 @@
  * contains sample test cases to use on unit tests
  * @type {[null]}
  */
+var privateConfig = require('../config-private');
 module.exports = {
 
     failArtist: function() {
@@ -38,22 +39,35 @@ module.exports = {
         }]
     },
 
+    // fail all user tests
     failUser:  function() {
         return {}
     },
 
-    // this user will pass creation but fail email checks
+    // pass creation but fail email checks
     failEmailUser: function() {
         return {
             name: 'emailFailUser'
         }
     },
 
+    // pass email created but fail confirmed
+    unconfirmedUser: function() {
+        return {
+            name: 'unconfirmed-user',
+            email: {
+                address: privateConfig.gmail.username,
+                confirmed: false
+            }
+        }
+    },
+
+    // pass all user tests
     passUser: function() {
         return {
             name: 'user',
             email: {
-                address: 'myemail@email.com',
+                address: privateConfig.gmail.username,
                 confirmed: true
             }
         }

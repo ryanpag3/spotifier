@@ -85,7 +85,7 @@ router.get('/callback',
  * API endpoint for inserting/updating a user's email into the database.
  * todo
  */
-router.post('email/add', function(req, res) {
+router.post('/email/add', function(req, res) {
     var db = new Db();
     db.addEmail(req.user, req.body.emailAddress)
         .then(function() {
@@ -101,7 +101,7 @@ router.post('email/add', function(req, res) {
 /**
  * API endpoint for deleting a user's email from the database.
  */
-router.post('email/delete', function(req, res) {
+router.post('/email/delete', function(req, res) {
     var db = new Db();
     db.removeEmail(req.user)
         .then(function() {
@@ -123,15 +123,15 @@ router.get('/email/send-confirmation', function(req, res) {
  * API endpoint for confirming a user's email in the database.
  * todo
  */
-router.get('email/confirm/', function(req, res) {
-    // parse query parameters and validate code
+router.get('/email/confirm', function(req, res) {
+   console.log(req.query);
 });
 
 /**
  * API endpoint for getting a user's email authentication status.
  * todo
  */
-router.get('email/status', function(req, res) {
+router.get('/email/status', function(req, res) {
     // return status of email
     // email is either
     // undefined
