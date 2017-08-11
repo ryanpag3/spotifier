@@ -45,7 +45,10 @@ Email.prototype.sendConfirmationEmail = function (user) {
     db.getUser(user)
         .then(function (user) {
             var confirmCode = generateConfirmCode(configPublic.confirmCodeLength);
-            var query = querystring.stringify({code: generateConfirmCode(configPublic.confirmCodeLength), id: user._id.toString()});
+            var query = querystring.stringify({
+                code: generateConfirmCode(configPublic.confirmCodeLength),
+                id: user._id.toString()
+            });
             db.setConfirmCode(user, confirmCode)
                 .then(function () {
                     var confirmUrl = configPublic.url + '/user/email/confirm?' + query;
@@ -56,14 +59,14 @@ Email.prototype.sendConfirmationEmail = function (user) {
                         html: '<a href="' + confirmUrl + '">' + confirmUrl + '</a>'
                     };
                     email.send(mailOptions)
-                        .then(function(successMsg) {
+                        .then(function (successMsg) {
                             deferred.resolve(successMsg);
                         })
-                        .catch(function(err) { // catch send err
+                        .catch(function (err) { // catch send err
                             deferred.reject(err);
                         })
                 })
-                .catch(function(err) { // catch setConfirmCode err
+                .catch(function (err) { // catch setConfirmCode err
                     deferred.reject(err);
                 })
         })
@@ -77,35 +80,31 @@ Email.prototype.sendConfirmationEmail = function (user) {
  * todo
  * @param query
  */
-Email.prototype.confirm = function(query) {
+Email.prototype.confirm = function (query) {
     var deferred = Q.defer();
-    User.findOne({'_id': query.id}, function(err, user) {
+    User.findOne({'_id': query.id}, function (err, user) {
         // mongo err thrown
         if (err) {
             deferred.reject(err);
         }
         // if user exists
-        if (user !== undefined) {
-            // if user confirm code matches
-            if (user.email.confirm_code === query.code) {
-                User.update({'_id': user._id}, {
-                    email: {
-                        confirmed: true,
-                        $unset: {confirm_code: 1}
-                    }
-                }, function(err) {
-                    if (err) {
-                        deferred.reject(err);
-                    } else {
-                        deferred.resolve();
-                    }
-                })
-            }
-            else {
-                deferred.reject('invalid confirm code');
-            }
-        } else {
-            deferred.reject('user does not exist');
+        // if user confirm code matches
+        if (user.email.confirm_code === query.code) {
+            User.update({'_id': user._id}, {
+                email: {
+                    confirmed: true,
+                    $unset: {confirm_code: 1}
+                }
+            }, function (err) {
+                if (err) {
+                    deferred.reject(err);
+                } else {
+                    deferred.resolve();
+                }
+            })
+        }
+        else {
+            deferred.reject('invalid confirm code');
         }
     });
     return deferred.promise;

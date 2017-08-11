@@ -102,31 +102,4 @@ describe('email-handler tests', function () {
                 console.log(err);
             })
     });
-
-    it('confirm should reject with a \' user does not exist \' error if an invalid user id is passed through the query', function(done) {
-        var db = new Db();
-        var testConfirmCode = '1234',
-            failUserId = 'failcase';
-        testHelper.insert(sampleData.unconfirmedUser())
-            .then(function(user) {
-                // serialize confirm code for user
-                db.setConfirmCode(user, testConfirmCode)
-                    .then(function() {
-                        // generate dummy query
-                        const query = {code: testConfirmCode, id: failUserId};
-                        email.confirm(query)
-                            .catch(function(err) { // catch confirm err
-                                console.log(err);
-                                expect(err).to.equal('user does not exist');
-                                done();
-                            })
-                    })
-                    .catch(function(err) { // catch setConfirmCode err
-                        console.log(err);
-                    })
-            })
-            .catch(function(err) { // catch insert err
-                console.log(err);
-            })
-    })
 });

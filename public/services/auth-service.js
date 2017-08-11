@@ -2,11 +2,12 @@
  * Created by ryan on 7/19/2017.
  */
 var app = angular.module('spotifier');
-app.factory('authServ', ['$q', '$http',
-    function($q, $http) {
+app.factory('authServ', ['$q', '$http', '$location',
+    function($q, $http, $location) {
         return ({
             isAuthenticated: isAuthenticated,
-            submitEmail: submitEmail
+            submitEmail: submitEmail,
+            sendConfirmationEmail: sendConfirmationEmail
         });
 
         function isAuthenticated() {
@@ -30,12 +31,23 @@ app.factory('authServ', ['$q', '$http',
             var deferred = $q.defer();
             console.log('we here...');
 
-            $http.post('/user/email/add', {emailAddress: emailAddress});
-        //         .then(function(res) {
-        //             // todo
-        //         })
-        //         .catch(function(err) {
-        //             // todo
-        //         })
+            $http.post('/user/email/add', {emailAddress: emailAddress})
+                .then(function(res) {
+                    $http.get('/user/email/send-confirmation');
+                    $location.path('/confirm-success');
+                })
+                .catch(function(err) {
+                    console.log(err);
+                })
+        }
+
+        function sendConfirmationEmail() {
+            $http.get('/user/email/send-confirmation')
+                .then(function() {
+                    $location.path('/confirm-pending');
+                })
+                .catch(function(err) {
+                    console.log(err);
+                })
         }
     }]);

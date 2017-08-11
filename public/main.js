@@ -15,6 +15,10 @@ app.config(['$routeProvider', '$locationProvider', 'SpotifyProvider',
             templateUrl: 'partials/email.html',
             restricted: true
         })
+        .when('/confirm-pending', {
+            templateUrl: 'partials/confirm-pending.html',
+            restricted: true
+        })
         .when('/confirm-success', {
             templateUrl: 'partials/confirm-success.html',
             restricted: true
