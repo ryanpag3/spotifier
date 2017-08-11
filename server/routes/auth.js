@@ -57,6 +57,9 @@ router.get('/callback',
                                     // if user has not confirmed their email
                                     if (!confirmed) {
                                         res.redirect('/confirm-pending');
+                                    } else {
+                                        // user has a confirmed email
+                                        res.redirect('/library');
                                     }
                                 })
                         }
@@ -122,12 +125,16 @@ router.get('/email/send-confirmation', function (req, res) {
 router.get('/email/confirm', function (req, res) {
     email.confirm(req.query)
         .then(function () {
+            // successfully confirmed
             res.redirect('/confirm-success');
         })
         .catch(function (err) {
             if (err === 'invalid confirm code') {
+                // invalid code
                 res.redirect('/confirm-failure');
             } else {
+                // internal server error
+                // todo route to a 500 status page
                 return res.status(500).json({
                     err: err
                 })

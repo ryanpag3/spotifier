@@ -44,31 +44,40 @@ Email.prototype.sendConfirmationEmail = function (user) {
         deferred = Q.defer();
     db.getUser(user)
         .then(function (user) {
-            var confirmCode = generateConfirmCode(configPublic.confirmCodeLength);
-            var query = querystring.stringify({
-                code: generateConfirmCode(configPublic.confirmCodeLength),
-                id: user._id.toString()
-            });
-            db.setConfirmCode(user, confirmCode)
-                .then(function () {
-                    var confirmUrl = configPublic.url + '/user/email/confirm?' + query;
-                    var mailOptions = {
-                        from: configPrivate.gmail.username,
-                        to: user.email.address,
-                        subject: 'test confirmation',
-                        html: '<a href="' + confirmUrl + '">' + confirmUrl + '</a>'
-                    };
-                    email.send(mailOptions)
-                        .then(function (successMsg) {
-                            deferred.resolve(successMsg);
-                        })
-                        .catch(function (err) { // catch send err
-                            deferred.reject(err);
-                        })
-                })
-                .catch(function (err) { // catch setConfirmCode err
-                    deferred.reject(err);
-                })
+            if (user.email.confirmed !== true) {
+                var confirmCode = generateConfirmCode(configPublic.confirmCodeLength);
+                var query = querystring.stringify({
+                    code: confirmCode,
+                    id: user._id.toString()
+                });
+                db.setConfirmCode(user, confirmCode)
+                    .then(function () {
+                        var confirmUrl = configPublic.url + '/user/email/confirm?' + query;
+                        var mailOptions = {
+                            from: configPrivate.gmail.username,
+                            to: user.email.address,
+                            subject: 'confirmation',
+                            html: '<a href="' + confirmUrl + '">' + confirmUrl + '</a>'
+                        };
+                        email.send(mailOptions)
+                            .then(function (successMsg) {
+                                deferred.resolve(successMsg);
+                            })
+                            .catch(function (err) { // catch send err
+                                deferred.reject(err);
+                            })
+                    })
+                    .catch(function (err) { // catch setConfirmCode err
+                        deferred.reject(err);
+                    })
+            } else {
+                var mailOptions = {
+                    from: configPrivate.gmail.username,
+                    to: user.email.address,
+                    subject: 'already confirmed',
+                    text: 'this email address has already been confirmed! :)'
+                }
+            }
         })
         .catch(function (err) { // catch getUser err
             deferred.reject(err);
@@ -92,8 +101,9 @@ Email.prototype.confirm = function (query) {
         if (user.email.confirm_code === query.code) {
             User.update({'_id': user._id}, {
                 email: {
+                    address: user.email.address,
                     confirmed: true,
-                    $unset: {confirm_code: 1}
+                    confirm_code: undefined
                 }
             }, function (err) {
                 if (err) {

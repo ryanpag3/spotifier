@@ -21,11 +21,11 @@ app.config(['$routeProvider', '$locationProvider', 'SpotifyProvider',
         })
         .when('/confirm-success', {
             templateUrl: 'partials/confirm-success.html',
-            restricted: true
+            restricted: false
         })
         .when('/confirm-failure', {
             templateUrl: 'partials/confirm-failure.html',
-            restricted: true
+            restricted: false
         })
         .when('/library', {
             templateUrl: 'partials/user-library.html',

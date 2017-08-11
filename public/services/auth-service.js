@@ -28,13 +28,9 @@ app.factory('authServ', ['$q', '$http', '$location',
          * @param emailAddress
          */
         function submitEmail(emailAddress) {
-            var deferred = $q.defer();
-            console.log('we here...');
-
             $http.post('/user/email/add', {emailAddress: emailAddress})
                 .then(function(res) {
-                    $http.get('/user/email/send-confirmation');
-                    $location.path('/confirm-success');
+                   sendConfirmationEmail();
                 })
                 .catch(function(err) {
                     console.log(err);
