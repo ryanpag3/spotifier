@@ -44,18 +44,89 @@ describe('email-handler tests', function () {
     });
 
     it('confirm should resolve if the confirmation code for the specified user is equal to the one in the user doc', function (done) {
+        var db = new Db();
         var testConfirmCode = '1234';
         testHelper.insert(sampleData.unconfirmedUser())
            .then(function(user) {
-               const query = {code: testConfirmCode, id: user._id.toString()};
-               email.confirm(user, query)
+               // serialize confirm code for user
+               db.setConfirmCode(user, testConfirmCode)
                    .then(function() {
-                       db.getUser(user)
-                           .then(function(user) {
-                               expect(user.email.confirmed).to.equal(true);
-                               done();
+                       // generate dummy query
+                       const query = {code: testConfirmCode, id: user._id.toString()};
+                       email.confirm(query)
+                           .then(function() {
+                               db.getUser(user)
+                                   .then(function(user) {
+                                       expect(user.email.confirmed).to.equal(true);
+                                       done();
+                                   })
+                                   .catch(function(err) { // catch getUser err
+                                       console.log(err);
+                                   })
+                           })
+                           .catch(function(err) { // catch confirm err
+                               console.log(err);
                            })
                    })
+                   .catch(function(err) { // catch setConfirmCode err
+                       console.log(err);
+                   })
            })
+            .catch(function(err) { // catch insert err
+                console.log(err);
+            })
     });
+
+    it('confirm should reject with an \'invalid confirm code\' error if an invalid confirmation code is passed through the query', function(done) {
+        var db = new Db();
+        var testConfirmCode = '1234',
+            failConfirmCode = '4321';
+        testHelper.insert(sampleData.unconfirmedUser())
+            .then(function(user) {
+                // serialize confirm code for user
+                db.setConfirmCode(user, testConfirmCode)
+                    .then(function() {
+                        // generate dummy query
+                        const query = {code: failConfirmCode, id: user._id.toString()};
+                        email.confirm(query)
+                            .catch(function(err) { // catch confirm err
+                                expect(err).to.equal('invalid confirm code');
+                                done();
+                            })
+                    })
+                    .catch(function(err) { // catch setConfirmCode err
+                        console.log(err);
+                    })
+            })
+            .catch(function(err) { // catch insert err
+                console.log(err);
+            })
+    });
+
+    it('confirm should reject with a \' user does not exist \' error if an invalid user id is passed through the query', function(done) {
+        var db = new Db();
+        var testConfirmCode = '1234',
+            failUserId = 'failcase';
+        testHelper.insert(sampleData.unconfirmedUser())
+            .then(function(user) {
+                // serialize confirm code for user
+                db.setConfirmCode(user, testConfirmCode)
+                    .then(function() {
+                        // generate dummy query
+                        const query = {code: testConfirmCode, id: failUserId};
+                        email.confirm(query)
+                            .catch(function(err) { // catch confirm err
+                                console.log(err);
+                                expect(err).to.equal('user does not exist');
+                                done();
+                            })
+                    })
+                    .catch(function(err) { // catch setConfirmCode err
+                        console.log(err);
+                    })
+            })
+            .catch(function(err) { // catch insert err
+                console.log(err);
+            })
+    })
 });

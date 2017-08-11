@@ -5,7 +5,6 @@ var app = angular.module('spotifier', ['ngRoute', 'spotify']);
 
 app.config(['$routeProvider', '$locationProvider', 'SpotifyProvider',
     function($routeProvider, $locationProvider, SpotifyProvider) {
-    // todo add routes for each partial
     // todo add ensure authentication route middleware
     $routeProvider
         .when('/', {
@@ -14,6 +13,14 @@ app.config(['$routeProvider', '$locationProvider', 'SpotifyProvider',
         })
         .when('/email', {
             templateUrl: 'partials/email.html',
+            restricted: true
+        })
+        .when('/confirm-success', {
+            templateUrl: 'partials/confirm-success.html',
+            restricted: true
+        })
+        .when('/confirm-failure', {
+            templateUrl: 'partials/confirm-failure.html',
             restricted: true
         })
         .when('/library', {
