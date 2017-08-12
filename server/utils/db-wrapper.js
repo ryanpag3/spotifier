@@ -139,6 +139,7 @@ Db.prototype.addArtist = function (user, artist) {
             // insert into database
             Artist.create(update, function (err, artist) {
                 if (err) {
+                    console.log('artist.create err thrown');
                     deferred.reject(err);
                 } else {
                     // initialize a get details job
@@ -147,7 +148,7 @@ Db.prototype.addArtist = function (user, artist) {
                 // associate user and artist
                 db.assignArtist(user, artist)
                     .catch(function(err) {
-                        deferred.reject(err);
+                        deferred.reject('**ASSIGN ARTIST **' + err);
                     });
                 deferred.resolve();
 

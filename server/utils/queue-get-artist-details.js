@@ -9,39 +9,42 @@ var artistDetailsQueue = new Queue('artist-details'); // todo add prod redis val
 artistDetailsQueue.process(function (job, done) {
     spotifyApiServer.getRecentRelease(job.data.artist)
         .then(function (album) {
-            done(null, album);
+            // parse album results
+            var artist = {
+                spotify_id: job.data.artist.spotify_id,
+                recent_release: {
+                    id: album.id,
+                    title: album.name,
+                    release_date: album.release_date,
+                    images: album.images
+                }
+            };
+            // return updated artist info
+            done(null, artist);
         })
         .catch(function (err) {
+            console.log('********************');
             console.log(job.data.artist);
+            console.log('********************');
             done(new Error(err));
         })
 });
 
 artistDetailsQueue
     .on('error', function (err) {
-        console.log('get artist details job error: ' + err);
+        console.log(err);
     })
     .on('completed', function (job, result) {
         var db = new Db();
-        console.log('successfully retrieved information for: ' + result.artists[0].name);
-        // assign album information once job has been processed
-        var artist = {
-            spotify_id: result.artists[0].id,
-            recent_release: {
-                id: result.id,
-                title: result.name,
-                release_date: result.release_date,
-                images: result.images
-            }
-        };
-        db.updateArtist(artist);
+        db.updateArtist(result);
     });
 
 module.exports = {
     createJob: function (artist) {
-        artistDetailsQueue.add(artist, {
-
-        });
+        if (artist === undefined) {
+            console.log('ARTIST UNDEFINED!!!');
+        }
+        artistDetailsQueue.add(artist);
     },
 
     pause: function () {

@@ -63,7 +63,7 @@ var self = module.exports = {
                         deferred.resolve(data.body);
                     })
                     .catch(function(err) {
-                        deferred.reject(err);
+                        deferred.reject('**GET ALBUM**' + err);
                     })
             })
             .catch(function(err) {
