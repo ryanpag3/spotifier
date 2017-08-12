@@ -163,6 +163,21 @@ Db.prototype.addArtist = function (user, artist) {
 };
 
 /**
+ * queries the artist collection and returns all documents
+ * @returns {Q.Promise<T>}
+ */
+Db.prototype.getAllArtists = function() {
+    var deferred = Q.defer();
+    Artist.find({}, function(err, artists) {
+        if (err) {
+            deferred.reject(err);
+        }
+        deferred.resolve(artists);
+    });
+    return deferred.promise;
+};
+
+/**
  * Associates an artist and a user by serializing their respective id's to their
  * database document, if they are valid.
  * @param user: mongodb user document, see models/user for schema information

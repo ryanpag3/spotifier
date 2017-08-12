@@ -65,12 +65,12 @@ router.get('/callback',
                         }
                     })
             })
-            .catch(function (err) {
+            .catch(function (err) { // create user err catch
                 // todo
             });
 
         // // DEBUGGING
-        // res.redirect('/library');
+        res.redirect('/library');
     });
 
 /**

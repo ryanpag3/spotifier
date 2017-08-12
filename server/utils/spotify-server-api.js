@@ -45,7 +45,6 @@ var self = module.exports = {
                             })
                     })
                     .catch(function (err) {
-                        console.log(artist);
                         deferred.reject('**getArtistAlbums** ' + err);
                     })
             })
@@ -62,6 +61,27 @@ var self = module.exports = {
                 spotifyApi.getAlbum(albumId)
                     .then(function(data) {
                         deferred.resolve(data.body);
+                    })
+                    .catch(function(err) {
+                        deferred.reject(err);
+                    })
+            })
+            .catch(function(err) {
+                deferred.reject(err);
+            });
+        return deferred.promise;
+    },
+
+    getRecentReleaseId: function(artist) {
+        var deferred = Q.defer();
+        self.refreshClientToken()
+            .then(function() {
+                spotifyApi.getArtistAlbums(artist.spotify_id, ({
+                    limit: 1,
+                    offset: 0
+                }))
+                    .then(function(data) {
+                        deferred.resolve(data.body.items[0].id);
                     })
                     .catch(function(err) {
                         deferred.reject(err);

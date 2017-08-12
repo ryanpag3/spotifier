@@ -89,7 +89,7 @@ function getArtistDetails(data, done) {
         })
 }
 
-queue.process('get-artist-details', 2, function(job, done) {
+queue.process('get-artist-details', 1, function(job, done) {
     spotifyApiServer.getRecentRelease(job.data.artist)
         .then(function(album) {
             done(null, album);

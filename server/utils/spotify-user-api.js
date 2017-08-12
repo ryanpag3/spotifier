@@ -134,7 +134,7 @@ Api.prototype.getLibraryArtists = function (user) {
                         offset += ((data.body.total - offset < limit) ? data.body.total - offset : limit);
                         // if offset is behind the end of the track list
                         if (offset < data.body.total - 1) {
-                            setTimeout(go, 0); // run again
+                            setTimeout(go, 50); // run again
                         } else {
                             console.log('artists successfully grabbed with a length of: ' + self.artists.length);
                             deferred.resolve(self.artists); // return array
