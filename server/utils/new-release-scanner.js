@@ -1,6 +1,7 @@
 var CronJob = require('cron').CronJob,
     Artist = require('../models/artist'),
     Db = require('../utils/db-wrapper'),
+    getArtistDetailsQueue = require('./queue-get-artist-details'),
     spotifyApiServer = require('../utils/spotify-server-api');
 
 
@@ -43,6 +44,9 @@ function scan() {
                                     .then(function(album) {
                                         console.log(album.name);
                                     })
+                                    .catch(function(err) {
+                                        console.log(err);
+                                    })
                             } else {
                                 console.log('no recent release found');
                             }
@@ -50,7 +54,7 @@ function scan() {
                     });
                 if (++i < artists.length){
                     // go();
-                    setTimeout(go, 125);
+                    setTimeout(go, 150);
                 } else {
                     console.log('DONE DONE DONE DONE DONE');
                 }
@@ -60,6 +64,7 @@ function scan() {
 
 module.exports = {
     startScanner: function() {
+        // setTimeout(jobQueue.pause, 30000);
         // job.start();
         scan();
     }

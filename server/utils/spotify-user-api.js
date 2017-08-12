@@ -134,7 +134,7 @@ Api.prototype.getLibraryArtists = function (user) {
                         offset += ((data.body.total - offset < limit) ? data.body.total - offset : limit);
                         // if offset is behind the end of the track list
                         if (offset < data.body.total - 1) {
-                            setTimeout(go, 50); // run again
+                            setTimeout(go, 300); // run again
                         } else {
                             console.log('artists successfully grabbed with a length of: ' + self.artists.length);
                             deferred.resolve(self.artists); // return array
@@ -142,8 +142,7 @@ Api.prototype.getLibraryArtists = function (user) {
                     })
                     // catch getMySavedTracks errors
                     .catch(function (err) {
-                        console.log(err);
-                        deferred.reject(err); // return error message
+                        deferred.reject('**GET MY SAVED TRACKS**' + err); // return error message
                     });
             })
             // catch get access token error

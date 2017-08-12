@@ -107,7 +107,7 @@ Db.prototype.addAllArtists = function (mUser, artists) {
 Db.prototype.addArtist = function (user, artist) {
     var db = this;
     var deferred = Q.defer(),
-        jobQueue = require('../utils/job-queue');
+        getArtistDetailsQueue = require('./queue-get-artist-details');
 
     // query for user
     // define query parameters
@@ -120,6 +120,11 @@ Db.prototype.addArtist = function (user, artist) {
                 .catch(function(err) {
                     deferred.reject(err);
                 });
+            // if artist details have not been added
+            if (qArtist.recent_release.id === undefined) {
+                // initialize a get details job
+                getArtistDetailsQueue.createJob({artist: qArtist});
+            }
             deferred.resolve();
         } else {
             // if doesn't exist
@@ -137,17 +142,7 @@ Db.prototype.addArtist = function (user, artist) {
                     deferred.reject(err);
                 } else {
                     // initialize a get details job
-                    jobQueue.createGetArtistDetailsJob({artist: artist}, function (album) {
-                        // assign album information once job has been processed
-                        artist.recent_release = {
-                            id: album.id,
-                            title: album.name,
-                            release_date: album.release_date,
-                            images: album.images
-                        };
-                        // replace temporary artist values once details have been grabbed
-                        artist.save();
-                    });
+                    getArtistDetailsQueue.createJob({artist: artist});
                 }
                 // associate user and artist
                 db.assignArtist(user, artist)
@@ -160,6 +155,49 @@ Db.prototype.addArtist = function (user, artist) {
         }
     });
     return deferred.promise;
+};
+
+/**
+ * Disassociates an artist and a user in mongo. First we query for the user doc, then remove the user id
+ * from the artist doc, and finally remove the artist id from the user doc.
+ * @param user: mongodb document
+ * @param artist: mongodb document
+ * @returns {Q.Promise}
+ */
+Db.prototype.removeArtist = function (user, artist) {
+    var deferred = Q.defer();
+    // query for user information
+    User.findOne({'name': user.name}, function (err, user) {
+        // query for artist information, remove user objectId from tracking array
+        Artist.findOneAndUpdate({'spotify_id': artist.spotify_id}, {$pull: {'users_tracking': user._id}},
+            function (err, artist) {
+                // remove artist ObjectId from user tracking array
+                User.update({'_id': user._id}, {$pull: {'saved_artists': artist._id}},
+                    function (err) {
+                        if (err) {
+                            deferred.reject(err);
+                        } else {
+                            deferred.resolve();
+                        }
+                    });
+                if (err) {
+                    deferred.reject(err);
+                }
+            })
+    });
+    return deferred.promise;
+};
+
+/**
+ * Updates an artist's values in the Artist collection
+ * @param artist: updated schema values
+ */
+Db.prototype.updateArtist = function(artist) {
+    Artist.update({'spotify_id': artist.spotify_id}, artist, function(err) {
+        if (err) {
+            console.log(err);
+        }
+    })
 };
 
 /**
@@ -200,37 +238,6 @@ Db.prototype.assignArtist = function (user, artist) {
                 }
             });
         }
-    });
-    return deferred.promise;
-};
-
-/**
- * Disassociates an artist and a user in mongo. First we query for the user doc, then remove the user id
- * from the artist doc, and finally remove the artist id from the user doc.
- * @param user: mongodb document
- * @param artist: mongodb document
- * @returns {Q.Promise}
- */
-Db.prototype.removeArtist = function (user, artist) {
-    var deferred = Q.defer();
-    // query for user information
-    User.findOne({'name': user.name}, function (err, user) {
-        // query for artist information, remove user objectId from tracking array
-        Artist.findOneAndUpdate({'spotify_id': artist.spotify_id}, {$pull: {'users_tracking': user._id}},
-            function (err, artist) {
-                // remove artist ObjectId from user tracking array
-                User.update({'_id': user._id}, {$pull: {'saved_artists': artist._id}},
-                    function (err) {
-                        if (err) {
-                            deferred.reject(err);
-                        } else {
-                            deferred.resolve();
-                        }
-                    });
-                if (err) {
-                    deferred.reject(err);
-                }
-            })
     });
     return deferred.promise;
 };

@@ -41,7 +41,7 @@ var self = module.exports = {
                                 deferred.resolve(data);
                             })
                             .catch(function(err) {
-                                deferred.reject(err);
+                                deferred.reject('**GET ALBUM INFO**' + err);
                             })
                     })
                     .catch(function (err) {
@@ -49,7 +49,7 @@ var self = module.exports = {
                     })
             })
             .catch(function (err) {
-                deferred.reject(err);
+                deferred.reject('**REFRESH CLIENT TOKEN**' + err);
             });
         return deferred.promise;
     },
@@ -84,7 +84,7 @@ var self = module.exports = {
                         deferred.resolve(data.body.items[0].id);
                     })
                     .catch(function(err) {
-                        deferred.reject(err);
+                        deferred.reject('**GET ARTIST ALBUMS**' + err);
                     })
             })
             .catch(function(err) {

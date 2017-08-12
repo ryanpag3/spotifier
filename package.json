@@ -21,6 +21,7 @@
     "angular-ui-scroll": "^1.6.3",
     "bluebird": "^3.5.0",
     "body-parser": "^1.17.2",
+    "bull": "^3.0.0-rc.5",
     "cookie-parser": "^1.4.3",
     "cron": "^1.2.1",
     "express": "^4.15.3",
