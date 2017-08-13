@@ -3,7 +3,6 @@ var kue = require('kue'),
     SpotifyApiUser = require('./spotify-user-api'),
     spotifyApiServer = require('../utils/spotify-server-api.js');
 
-kue.app.listen(4000);
 
 // create event and specify event handlers
 function syncLibrary(data, done) {

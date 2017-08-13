@@ -1,4 +1,5 @@
 var CronJob = require('cron').CronJob,
+    Q = require('q'),
     Artist = require('../models/artist'),
     Db = require('../utils/db-wrapper'),
     getArtistDetailsQueue = require('./queue-get-artist-details'),
@@ -29,22 +30,24 @@ var CronJob = require('cron').CronJob,
 //     'America/Los_Angeles'); // set time zone
 
 function scan() {
+    var deferred = Q.defer();
     var db = new Db();
     // query for all artists
     db.getAllArtists()
-        .then(function(artists) {
+        .then(function (artists) {
             var i = 0;
             go();
+
             function go() {
                 spotifyApiServer.getRecentReleaseId(artists[i])
-                    .then(function(albumId) {
-                        Artist.findOne({'_id': artists[i]._id}, {'recent_release.id': albumId}, function(err, artist) {
+                    .then(function (albumId) {
+                        Artist.findOne({'_id': artists[i]._id}, {'recent_release.id': albumId}, function (err, artist) {
                             if (artist === null) {
                                 spotifyApiServer.getAlbumInfo(albumId)
-                                    .then(function(album) {
+                                    .then(function (album) {
                                         console.log(album.name);
                                     })
-                                    .catch(function(err) {
+                                    .catch(function (err) {
                                         console.log(err);
                                     })
                             } else {
@@ -52,21 +55,29 @@ function scan() {
                             }
                         })
                     });
-                if (++i < artists.length){
+                if (++i < artists.length) {
                     // go();
                     setTimeout(go, 150);
                 } else {
+                    deferred.resolve();
                     console.log('DONE DONE DONE DONE DONE');
                 }
             }
-        })
+        });
+    return deferred.promise;
 }
 
 module.exports = {
-    startScanner: function() {
-        // setTimeout(jobQueue.pause, 30000);
-        // job.start();
-        scan();
+    startScanner: function () {
+        setTimeout(function () {
+            getArtistDetailsQueue.pause();
+            // job.start();
+            scan()
+                .then(function () {
+                    getArtistDetailsQueue.resume();
+                })
+        }, 30000);
+
     }
 };
 
