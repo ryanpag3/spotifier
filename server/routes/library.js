@@ -9,7 +9,7 @@ var express = require('express'),
     router = express.Router(),
     SpotifyApiUser = require('../utils/spotify-user-api.js'),
     Db = require('../utils/db-wrapper.js'),
-    jobQueue = require('../utils/job-queue.js');
+    syncLibraryJobQueue = require('../utils/queue-sync-user-library.js');
 
 /* handles searching a user's saved artists */
 router.post('/search', function(req, res) {
@@ -32,11 +32,8 @@ router.get('/update', function(req, res) {
  */
 router.get('/sync', function(req, res) {
     refreshAccessToken(req)
-        .then(function(){
-            jobQueue.createSyncLibJob({user: req.user}, function() {
-                // todo job queue callback
-                console.log('sync library job done...');
-            });
+        .then(function() {
+            syncLibraryJobQueue.createJob({user: req.user});
         })
         // catch refresh access token error
         .catch(function(err) {

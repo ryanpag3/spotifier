@@ -124,7 +124,7 @@ module.exports = new Email();
 
 /** HELPER METHODS **/
 function generateConfirmCode(length) {
-    var potential = 'abcdefghijklmnopqrstuvqxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+    var potential = 'abcdefghijklmnopqrstuvwqxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
     var code = '';
     for (var i = 0; i < length; i++) {
         var pos = Math.floor(Math.random() * potential.length);

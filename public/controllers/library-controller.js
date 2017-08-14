@@ -33,7 +33,7 @@ app.controller('library-controller', ['$scope', '$rootScope', '$timeout', 'libra
                 name: args.artist.name,
                 spotify_id: args.artist.spotify_id,
                 recent_release: {
-                    title: 'recent release info pending from Spotify...' // placeholder text matching server
+                    title: 'release info requested from Spotify, pending...' // placeholder text matching server
                 }
             });
         });

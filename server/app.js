@@ -9,7 +9,6 @@ var path = require('path'),
     session = require('express-session'),
     mongoose = require('mongoose');
     mongoose.Promise = require('bluebird');
-var releaseScanner = require('./utils/new-release-scanner');
 /*
     handle middleware
  */
@@ -84,9 +83,6 @@ const setupApp = function(app, express) {
     app.get('*', function(req, res, next) {
        res.sendFile(path.join(__dirname, '../public/index.html'));
     });
-
-    // start new release scanner
-    releaseScanner.startScanner();
 
     // error handlers
     app.use(function(req, res, next) {

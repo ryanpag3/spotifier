@@ -2,7 +2,7 @@ var express = require('express'),
     Q = require('q'),
     router = express.Router(),
     SpotifyApiUser = require('../utils/spotify-user-api.js'),
-    jobQueue = require('../utils/job-queue.js');
+    scanner = require('../utils/new-release-scanner.js');
 
 router.post('/search', function(req, res) {
     var spotifyApiUser = new SpotifyApiUser();
@@ -40,6 +40,11 @@ router.post('/search', function(req, res) {
         .catch(function(err) {
             console.log(err);
         });
+});
+
+router.get('/scan', function(req, res) {
+    scanner.startScan();
+    res.status(200).send();
 });
 
 /** HELPER FUNCTIONS **/

@@ -5,7 +5,8 @@
  */
 var Q = require('q'),
     User = new require('../models/user.js'),
-    Artist = new require('../models/artist.js');
+    Artist = new require('../models/artist.js'),
+    publicConfig = require('../../config-public.js');
 
 /**
  * @constructor
@@ -133,7 +134,7 @@ Db.prototype.addArtist = function (user, artist) {
                 name: artist.name,
                 spotify_id: artist.spotify_id,
                 recent_release: {
-                    title: 'recent release information pending from Spotify'
+                    title: publicConfig.placeholderAlbumTitle
                 }
             };
             // insert into database
@@ -194,10 +195,13 @@ Db.prototype.removeArtist = function (user, artist) {
  * @param artist: updated schema values
  */
 Db.prototype.updateArtist = function(artist) {
-    Artist.update({'spotify_id': artist.spotify_id}, artist, function(err) {
+    Artist.findOneAndUpdate({'spotify_id': artist.spotify_id}, artist, function(err, artist) {
         if (err) {
             console.log(err);
         }
+        // if (artist) {
+        //     console.log(artist.name + ' has been updated.');
+        // }
     })
 };
 
