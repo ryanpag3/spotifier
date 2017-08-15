@@ -1,6 +1,6 @@
 var app = angular.module('spotifier');
 app.factory('libraryService', ['$q', '$http',
-    function($q, $http) {
+    function ($q, $http) {
         return ({
             sync: sync,
             cancelSync: cancelSync,
@@ -13,53 +13,56 @@ app.factory('libraryService', ['$q', '$http',
 
         // initiates a library sync job for the user
         function sync() {
-                var deferred = $q.defer();
-                $http.get('/library/sync')
-                    .then(function(res) {
-                       if (res.status === 200) {
-                           deferred.resolve();
-                       }
-                    });
+            var deferred = $q.defer();
+            $http.get('/library/sync')
+                .then(function (res) {
+                    if (res.status === 200) {
+                        deferred.resolve();
+                    }
+                });
             return deferred.promise;
         }
 
         // removes a library sync job from the queue for a user
         function cancelSync() {
             var deferred = $q.defer();
-                $http.get('/library/cancel-sync', function(req, res) {
-                    if(res.status === 200) {
+            $http.get('/library/cancel-sync')
+                .then(function (res) {
+                    if (res.status === 200) {
                         deferred.resolve();
-                    } else {
-                        deferred.reject('Could not cancel sync job.');
                     }
+                })
+                .catch(function (err) {
+                    deferred.reject(err);
                 });
             return deferred.promise;
         }
 
         // gets an up to date version of the users library
-        function get() {
+        function get () {
             var deferred = $q.defer();
             $http.get('library/update')
-                .then(function(res) {
+                .then(function (res) {
                     if (res.status === 200) {
                         deferred.resolve(res.data.library);
                     }
                 });
             return deferred.promise;
         }
+
         // gets spotify api artist search results from http request
         function searchSpotify(query) {
             var deferred = $q.defer();
             console.log(query);
-            $http.post('/artist/search', ({ query: query }))
-                .then(function(res) {
-                    if (res.status === 200){
+            $http.post('/artist/search', ({query: query}))
+                .then(function (res) {
+                    if (res.status === 200) {
                         deferred.resolve(res.data.result);
                     } else {
                         deferred.reject();
                     }
                 })
-                .catch(function(res) {
+                .catch(function (res) {
                     deferred.reject(res);
                 });
             return deferred.promise;
@@ -76,11 +79,11 @@ app.factory('libraryService', ['$q', '$http',
         function add(artist) {
             var deferred = $q.defer();
             $http.post('/library/add', {artist: artist})
-                .then(function(res) {
+                .then(function (res) {
                     // todo handle success response
                     deferred.resolve();
                 })
-                .catch(function(err) {
+                .catch(function (err) {
                     // todo handle error response
                     deferred.reject();
                 });
@@ -94,10 +97,10 @@ app.factory('libraryService', ['$q', '$http',
         function remove(artist) {
             var deferred = $q.defer();
             $http.post('/library/remove', {artist: artist})
-                .then(function() {
+                .then(function () {
                     deferred.resolve();
                 })
-                .catch(function(err) {
+                .catch(function (err) {
                     deferred.reject(err);
                 });
             return deferred.promise;

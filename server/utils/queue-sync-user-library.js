@@ -16,13 +16,13 @@ syncLibraryQueue
         // todo add console log
     });
 
-syncLibraryQueue.process(3, function(job, done) {
+syncLibraryQueue.process(1, function (job, done) {
     var api = new SpotifyApiUser();
     api.syncLibrary(job.data.user)
-        .then(function() {
+        .then(function () {
             done();
         })
-        .catch(function(err) {
+        .catch(function (err) {
             done(new Error('failed to sync library for user: ' + job.data.user.name + '. Reason: ' + err));
         })
 });
@@ -34,12 +34,12 @@ module.exports = {
      * @param user
      * @returns {Q.Promise<T>}
      */
-    createJob: function(user){
+    createJob: function (user) {
         var deferred = Q.defer();
         syncLibraryQueue.add({user: user}, {
             attempts: 3
         })
-            .then(function(job) {
+            .then(function (job) {
                 var update = {
                     sync_queue: {
                         id: job.jobId,
@@ -47,7 +47,7 @@ module.exports = {
                     }
                 };
                 // add job information to db
-                User.update({'_id': user._id}, update, function(err) {
+                User.update({'_id': user._id}, update, function (err) {
                     if (err) {
                         deferred.reject(err);
                     } else {
@@ -58,16 +58,35 @@ module.exports = {
         return deferred.promise;
     },
 
+    removeJob: function (user) {
+        var deferred = Q.defer();
+        User.findOne({'_id': user._id}, function (err, user) {
+            if (err) {
+                deferred.reject(err);
+            }
+            syncLibraryQueue.getJob(user.sync_queue.id)
+                .then(function (job) {
+                    job.remove()
+                        .then(function () {
+                            console.log(user.name + '\'s job has been removed.');
+                            deferred.resolve();
+                        })
+                        .catch(function(err) {
+                            deferred.reject(err);
+                        });
+                })
+        });
+        return deferred.promise;
+    },
 
-
-    pause: function() {
-        syncLibraryQueue.pause().then(function() {
+    pause: function () {
+        syncLibraryQueue.pause().then(function () {
             console.log('sync library queue is now paused...')
         });
-        },
+    },
 
-    resume: function() {
-        syncLibraryQueue.resume().then(function() {
+    resume: function () {
+        syncLibraryQueue.resume().then(function () {
             console.log('sync library queue is now unpaused...');
         })
 

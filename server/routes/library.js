@@ -47,6 +47,18 @@ router.get('/sync', function(req, res) {
         });
 });
 
+router.get('/cancel-sync', function(req, res) {
+   syncLibraryJobQueue.removeJob(req.user)
+       .then(function() {
+           res.status(200).send();
+       })
+       .catch(function(err) {
+           return res.status(500).json({
+               err: err
+           })
+       })
+});
+
 router.post('/add', function(req, res) {
     var db = new Db();
     // refresh a users access token if necessary

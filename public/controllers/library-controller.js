@@ -25,7 +25,6 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
         $scope.syncLibrary = function () {
             libraryService.sync()
                 .then(function() {
-                    console.log('here?');
                     $scope.syncButtonShown = false;
                     $scope.syncTooltipShown = true;
                     $location.path('/library');
@@ -35,7 +34,12 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
         };
 
         $scope.cancelSyncLibrary = function() {
-            libraryService.cancelSync();
+            libraryService.cancelSync()
+            .then(function() {
+                $scope.syncButtonShown = true;
+                $scope.syncTooltipShown = false;
+            })
+
         };
 
         /**
