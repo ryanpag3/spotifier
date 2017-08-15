@@ -121,7 +121,7 @@ Db.prototype.addArtist = function (user, artist) {
         // if exists
         if (qArtist) {
             db.assignArtist(user, qArtist)
-                .catch(function(err) {
+                .catch(function (err) {
                     deferred.reject(err);
                 });
             // if artist details have not been added
@@ -151,7 +151,7 @@ Db.prototype.addArtist = function (user, artist) {
                 }
                 // associate user and artist
                 db.assignArtist(user, artist)
-                    .catch(function(err) {
+                    .catch(function (err) {
                         deferred.reject('**ASSIGN ARTIST **' + err);
                     });
                 deferred.resolve();
@@ -197,8 +197,9 @@ Db.prototype.removeArtist = function (user, artist) {
  * Updates an artist's values in the Artist collection
  * @param artist: updated schema values
  */
-Db.prototype.updateArtist = function(artist) {
-    Artist.findOneAndUpdate({'spotify_id': artist.spotify_id}, artist, function(err, artist) {
+Db.prototype.updateArtist = function (artist) {
+    Artist.findOneAndUpdate({'spotify_id': artist.spotify_id}, artist, function (err, artist) {
+        console.log(artist);
         if (err) {
             console.log(err);
         }
@@ -212,9 +213,9 @@ Db.prototype.updateArtist = function(artist) {
  * queries the artist collection and returns all documents
  * @returns {Q.Promise<T>}
  */
-Db.prototype.getAllArtists = function() {
+Db.prototype.getAllArtists = function () {
     var deferred = Q.defer();
-    Artist.find({}, function(err, artists) {
+    Artist.find({}, function (err, artists) {
         if (err) {
             deferred.reject(err);
         }
@@ -235,17 +236,18 @@ Db.prototype.assignArtist = function (user, artist) {
     // if artist has not already added user, push id to tracking list
     Artist.update({_id: artist._id}, {$addToSet: {users_tracking: user._id}}, function (err) {
         if (err) {
+            console.log(err);
             deferred.reject(err);
-        } else {
-            // if user is not already tracking artist, push id to tracking list
-            User.update({_id: user._id}, {$addToSet: {saved_artists: artist._id}}, function (err) {
-                if (err) {
-                    deferred.reject(err);
-                } else {
-                    deferred.resolve();
-                }
-            });
         }
+        // if user is not already tracking artist, push id to tracking list
+        User.update({_id: user._id}, {$addToSet: {saved_artists: artist._id}}, function (err) {
+            if (err) {
+                console.log(err);
+                deferred.reject(err);
+            } else {
+                deferred.resolve();
+            }
+        });
     });
     return deferred.promise;
 };
@@ -325,9 +327,9 @@ Db.prototype.emailConfirmed = function (mUser) {
  * @param user
  * @param email
  */
-Db.prototype.addEmail = function(user, emailAddress) {
+Db.prototype.addEmail = function (user, emailAddress) {
     var deferred = Q.defer();
-    User.update({'_id': user._id}, {'email': {address: emailAddress, confirmed: false}}, function(err) {
+    User.update({'_id': user._id}, {'email': {address: emailAddress, confirmed: false}}, function (err) {
         if (err) {
             deferred.reject(err);
         } else {
@@ -341,9 +343,9 @@ Db.prototype.addEmail = function(user, emailAddress) {
  * Removes an email address for the associated user
  * @param user
  */
-Db.prototype.removeEmail = function(user) {
+Db.prototype.removeEmail = function (user) {
     var deferred = Q.defer();
-    User.update({'_id': user._id}, {$unset: {'email': 1}}, function(err) {
+    User.update({'_id': user._id}, {$unset: {'email': 1}}, function (err) {
         if (err) {
             console.log(err);
             deferred.reject(err);
@@ -362,7 +364,7 @@ Db.prototype.removeEmail = function(user) {
  */
 Db.prototype.confirmEmail = function (user, confirmCode) {
     var deferred = Q.defer();
-    User.findOne({'_id': user._id}, function(err, user) {
+    User.findOne({'_id': user._id}, function (err, user) {
         if (err) {
             deferred.reject(err);
         } else if (user.email.confirm_code !== confirmCode) {
@@ -378,9 +380,9 @@ Db.prototype.confirmEmail = function (user, confirmCode) {
  * Serializes a confirmation code for the user
  * @returns {Q.Promise}
  */
-Db.prototype.setConfirmCode = function(user, confirmCode) {
+Db.prototype.setConfirmCode = function (user, confirmCode) {
     var deferred = Q.defer();
-    User.update({'_id': user._id}, {'email.confirm_code': confirmCode}, function(err) {
+    User.update({'_id': user._id}, {'email.confirm_code': confirmCode}, function (err) {
         if (err) {
             deferred.reject(err);
         } else {

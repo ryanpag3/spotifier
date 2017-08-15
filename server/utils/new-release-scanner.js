@@ -57,7 +57,6 @@ function scan() {
                                     console.log('THIS IS A NEW RELEASE!!!!');
                                     spotifyApiServer.getAlbumInfo(albumId)
                                         .then(function (album) {
-                                           // todo NEW RELEASE
                                         })
                                         .catch(function (err) {
                                             console.log(err);

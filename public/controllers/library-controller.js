@@ -108,15 +108,6 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
         }
 
         /**
-         * Adds an artist to the local library instance
-         * @param {Object} artist
-         * @param {String} artist.name: name of the artist
-         */
-        function addArtistLoc(artist) {
-
-        }
-
-        /**
          * Each sort creates a copy of the array parameter sorts it by a specified key value, and returns the result.
          * @param array: library artists
          * @param key: sorting key based on object key types.

@@ -31,8 +31,15 @@ describe('new-release-scanner unit tests', function () {
         })
     });
 
-    it('should update users who are tracking artists with notifications', function(done) {
-
-    })
+    it('should add artist ids of artists with new releases found to user docs', function (done) {
+        this.timeout(6000);
+        testHelper.stageSampleNewReleaseDb()
+            .then(function (users) {
+                for (var i = 0; i < users.length; i++) {
+                    expect(users[i].saved_artists.length).to.be.greaterThan(0);
+                }
+                done();
+            });
+    });
 
 });

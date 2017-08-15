@@ -36,7 +36,7 @@ syncLibraryQueue
             })
     });
 
-syncLibraryQueue.process(1, function (job, done) {
+syncLibraryQueue.process(3, function (job, done) {
     var api = new SpotifyApiUser();
     api.syncLibrary(job.data.user)
         .then(function () {
