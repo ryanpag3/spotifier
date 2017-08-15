@@ -8,7 +8,8 @@ app.factory('libraryService', ['$q', '$http',
             searchSpotify: searchSpotify,
             search: search,
             add: add,
-            remove: remove
+            remove: remove,
+            getSyncStatus: getSyncStatus
         });
 
         // initiates a library sync job for the user
@@ -46,6 +47,20 @@ app.factory('libraryService', ['$q', '$http',
                     if (res.status === 200) {
                         deferred.resolve(res.data.library);
                     }
+                });
+            return deferred.promise;
+        }
+
+        function getSyncStatus() {
+            var deferred = $q.defer();
+            $http.get('/library/sync-status')
+                .then(function(res) {
+                    if(res.status === 200) {
+                        deferred.resolve(res.data.status)
+                    }
+                })
+                .catch(function(err) {
+                   deferred.reject(err);
                 });
             return deferred.promise;
         }

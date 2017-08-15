@@ -19,7 +19,7 @@ var User = new Schema({
     new_releases: [Schema.ObjectId],
     sync_queue: {
         id: Number,
-        enqueued: Boolean
+        status: String
     }
 });
 

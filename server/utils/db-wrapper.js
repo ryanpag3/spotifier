@@ -30,7 +30,10 @@ Db.prototype.createUser = function (mUser) {
         // check if exists
         if (user === null) {
             var user = new User({
-                name: username
+                name: username,
+                sync_queue: {
+                    status: 'not queued'
+                }
             }).save(function (err, user) {
                 if (err) {
                     deferred.reject(err);

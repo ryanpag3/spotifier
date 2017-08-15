@@ -7,13 +7,33 @@ var Queue = require('bull'),
 syncLibraryQueue
     .on('active', function (job, jobPromise) {
         console.log(job.data.user.name + ' started sync library job.')
+        var update = {
+            sync_queue: {
+                status: 'active'
+            }
+        };
+        User.update({'_id': job.data.user._id}, update, function (err) {
+            if (err) {
+                console.log(err);
+            }
+        })
     })
     .on('failed', function (job, err) {
         // todo add console log
     })
     .on('completed', function (job, result) {
         console.log(job.data.user.name + ' finished their sync library job.');
-        // todo add console log
+        var update = {
+            sync_queue: {
+                status: 'not queued'
+            }
+        };
+        User.update({'_id': job.data.user._id}, update,
+            function (err) {
+                if (err) {
+                    console.log(err);
+                }
+            })
     });
 
 syncLibraryQueue.process(1, function (job, done) {
@@ -43,7 +63,7 @@ module.exports = {
                 var update = {
                     sync_queue: {
                         id: job.jobId,
-                        enqueued: true
+                        status: 'enqueued'
                     }
                 };
                 // add job information to db
@@ -71,10 +91,24 @@ module.exports = {
                             console.log(user.name + '\'s job has been removed.');
                             deferred.resolve();
                         })
-                        .catch(function(err) {
+                        .catch(function (err) {
                             deferred.reject(err);
                         });
                 })
+        });
+        return deferred.promise;
+    },
+
+    getJobStatus: function (user) {
+        var deferred = Q.defer();
+        User.findOne({'_id': user._id}, function (err, user) {
+            if (err) {
+                deferred.reject(err);
+            } else if (user === null) {
+                deferred.reject('user does not exist');
+            } else {
+                deferred.resolve(user.sync_queue.status);
+            }
         });
         return deferred.promise;
     },

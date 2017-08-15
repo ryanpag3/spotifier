@@ -5,6 +5,8 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
     function ($scope, $location, $rootScope, $timeout, libraryService) {
 
         $scope.syncButtonShown = true;
+        $scope.enqueued = 'enqueued';
+        $scope.active = 'active';
         /**
          *
          */
@@ -25,8 +27,7 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
         $scope.syncLibrary = function () {
             libraryService.sync()
                 .then(function() {
-                    $scope.syncButtonShown = false;
-                    $scope.syncTooltipShown = true;
+                    $scope.syncStatus = 'enqueued';
                     $location.path('/library');
                 })
             // todo hide sync library button
@@ -36,8 +37,7 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
         $scope.cancelSyncLibrary = function() {
             libraryService.cancelSync()
             .then(function() {
-                $scope.syncButtonShown = true;
-                $scope.syncTooltipShown = false;
+                $scope.syncStatus = 'not queued';
             })
 
         };
@@ -72,6 +72,11 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
         init();
         function init() {
             getLibrary();
+            libraryService.getSyncStatus()
+                .then(function(status) {
+                    $scope.syncStatus = status;
+                })
+
         }
 
         /**

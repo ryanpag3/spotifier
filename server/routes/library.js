@@ -59,6 +59,20 @@ router.get('/cancel-sync', function(req, res) {
        })
 });
 
+router.get('/sync-status', function(req, res) {
+    syncLibraryJobQueue.getJobStatus(req.user)
+        .then(function(status) {
+            return res.status(200).json({
+                status: status
+            })
+        })
+        .catch(function(err) {
+            return res.status(500).json({
+                err: err
+            })
+        })
+});
+
 router.post('/add', function(req, res) {
     var db = new Db();
     // refresh a users access token if necessary

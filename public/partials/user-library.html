@@ -3,11 +3,14 @@
 <div class="page-container" data-ng-controller="library-controller">
     <link rel="stylesheet" type="text/css" href="../css/user-library-style.css">
     <!--USER LIBRARY PARTIAL PAGE-->
-    <div class="sidebar">
-        <button class="btn btn-success" data-ng-click="syncLibrary()" data-ng-show="syncButtonShown">SYNC W/ LIBRARY</button>
-        <div class="sync-queue-tooltip" data-ng-show="syncTooltipShown">
+    <div class="sidebar" data-ng-switch="syncStatus">
+        <button class="btn btn-success" data-ng-click="syncLibrary()" data-ng-switch-default>SYNC W/ LIBRARY</button>
+        <div class="sync-queue-tooltip" data-ng-switch-when="enqueued">
             <div>BLAH BLAH BLAH YOURE IN A QUEUE</div>
             <button class="fa fa-times" data-ng-click="cancelSyncLibrary()"></button>
+        </div>
+        <div class="sync-queue-tooltip active-sync" data-ng-switch-when="active">
+            <div>YOUR LIBRARY IS CURRENTLY BEING SYNCED</div>
         </div>
     </div>
 
