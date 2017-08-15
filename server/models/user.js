@@ -18,7 +18,7 @@ var User = new Schema({
     saved_artists: [Schema.ObjectId],
     new_releases: [Schema.ObjectId],
     sync_queue: {
-        id: String,
+        id: Number,
         enqueued: Boolean
     }
 });

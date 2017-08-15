@@ -1,4 +1,6 @@
 var Queue = require('bull'),
+    Q = require('q'),
+    User = require('../models/user.js'),
     syncLibraryQueue = new Queue('sync-library'),
     SpotifyApiUser = require('./spotify-user-api.js');
 
@@ -26,15 +28,42 @@ syncLibraryQueue.process(3, function(job, done) {
 });
 
 module.exports = {
+    /**
+     * add sync library job for a user and serializes job information to database if they want to
+     * remove themselves from the queue later.
+     * @param user
+     * @returns {Q.Promise<T>}
+     */
     createJob: function(user){
-        syncLibraryQueue.add(user, {
+        var deferred = Q.defer();
+        syncLibraryQueue.add({user: user}, {
             attempts: 3
-        });
+        })
+            .then(function(job) {
+                var update = {
+                    sync_queue: {
+                        id: job.jobId,
+                        enqueued: true
+                    }
+                };
+                // add job information to db
+                User.update({'_id': user._id}, update, function(err) {
+                    if (err) {
+                        deferred.reject(err);
+                    } else {
+                        deferred.resolve();
+                    }
+                })
+            });
+        return deferred.promise;
     },
 
+
+
     pause: function() {
-        syncLibraryQueue.pause();
-        console.log('sync library queue is now paused...')
+        syncLibraryQueue.pause().then(function() {
+            console.log('sync library queue is now paused...')
+        });
         },
 
     resume: function() {

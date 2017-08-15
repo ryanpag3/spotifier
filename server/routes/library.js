@@ -33,7 +33,12 @@ router.get('/update', function(req, res) {
 router.get('/sync', function(req, res) {
     refreshAccessToken(req)
         .then(function() {
-            syncLibraryJobQueue.createJob({user: req.user});
+            syncLibraryJobQueue.createJob(req.user)
+                .catch(function(err) {
+                    return res.status(500).json({
+                        err: err
+                        })
+                });
             res.status(200).send();
         })
         // catch refresh access token error
