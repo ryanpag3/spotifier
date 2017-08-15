@@ -34,12 +34,12 @@ router.get('/sync', function(req, res) {
     refreshAccessToken(req)
         .then(function() {
             syncLibraryJobQueue.createJob({user: req.user});
+            res.status(200).send();
         })
         // catch refresh access token error
         .catch(function(err) {
             console.log(err);
         });
-    res.redirect('/library');
 });
 
 router.post('/add', function(req, res) {

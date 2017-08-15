@@ -3,6 +3,7 @@ app.factory('libraryService', ['$q', '$http',
     function($q, $http) {
         return ({
             sync: sync,
+            cancelSync: cancelSync,
             get: get,
             searchSpotify: searchSpotify,
             search: search,
@@ -13,13 +14,28 @@ app.factory('libraryService', ['$q', '$http',
         // initiates a library sync job for the user
         function sync() {
                 var deferred = $q.defer();
-                $http.get('/library/sync', function(req, res) {
-                    if (res.status === 200) {
+                $http.get('/library/sync')
+                    .then(function(res) {
+                       if (res.status === 200) {
+                           deferred.resolve();
+                       }
+                    });
+            return deferred.promise;
+        }
+
+        // removes a library sync job from the queue for a user
+        function cancelSync() {
+            var deferred = $q.defer();
+                $http.get('/library/cancel-sync', function(req, res) {
+                    if(res.status === 200) {
                         deferred.resolve();
+                    } else {
+                        deferred.reject('Could not cancel sync job.');
                     }
                 });
             return deferred.promise;
         }
+
         // gets an up to date version of the users library
         function get() {
             var deferred = $q.defer();

@@ -36,46 +36,45 @@ function scan() {
     // query for all artists
     db.getAllArtists()
         .then(function (artists) {
+            // if empty
+            if (artists.length === 0) {
+                console.log('artist list empty?');
+                deferred.resolve();
+            }
 
-            var artist = artists[i];
-            console.log(artist.name);
-            spotifyApiServer.getRecentReleaseId(artist)
-                .then(function (albumId) {
-                    Artist.findOne(
-                        {
-                            $and: [
-                                {'_id': artist._id},
-                                {'recent_release.id': {$ne: true}},
-                                {'recent_release.id': albumId}
-                            ]
-                        }, function (err, artist) {
-                            if (artist === null) {
-                                spotifyApiServer.getAlbumInfo(albumId)
-                                    .then(function (album) {
-                                        console.log('got album details for ' + artist.name);
-                                    })
-                                    .catch(function (err) {
-                                        console.log(err);
-                                    })
-                            }
-                        });
+            var i = 0;
+            function processArtist() {
+                var mArtist = artists[i];
+                console.log(i + '. ' + mArtist.name);
+                spotifyApiServer.getRecentReleaseId(mArtist)
+                    .then(function (albumId) {
+                        if (i === 20) {
+                            albumId = '1234';
+                        }
+                        Artist.findOne(
+                            {'_id': mArtist._id}, function (err, artist) {
+                                if (artist.recent_release.id !== albumId && artist.recent_release.id !== undefined) {
+                                    console.log('THIS IS A NEW RELEASE!!!!');
+                                    spotifyApiServer.getAlbumInfo(albumId)
+                                        .then(function (album) {
+                                           // todo NEW RELEASE
+                                        })
+                                        .catch(function (err) {
+                                            console.log(err);
+                                        })
+                                }
+                            });
 
-                });
-            //
-            // var i = 0;
-            // go();
-            //
-            // function go() {
-            //     console.log('checking ' + artists[i].name);
-            //     var artist = artists[i];
-            //
-            //     if (++i < artists.length) {
-            //         setTimeout(go, 150);
-            //     } else {
-            //         deferred.resolve();
-            //         console.log('DONE DONE DONE DONE DONE');
-            //     }
-            // }
+                    });
+                if (++i < artists.length-1) {
+                    setTimeout(processArtist, 150);
+                } else {
+                    console.log('finished checking for new releases!');
+                    deferred.resolve();
+                }
+            }
+            // start recursive call
+            processArtist();
         });
     return deferred.promise;
 }
@@ -86,8 +85,11 @@ module.exports = {
         getArtistDetailsQueue.pause();
         scan()
             .then(function () {
-                syncLibraryQueue.unpause();
-                getArtistDetailsQueue.unpause();
+                syncLibraryQueue.resume();
+                getArtistDetailsQueue.resume();
+            })
+            .catch(function(err) {
+                console.log(err);
             })
     }
 };

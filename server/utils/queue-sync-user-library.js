@@ -37,8 +37,10 @@ module.exports = {
         console.log('sync library queue is now paused...')
         },
 
-    unpause: function() {
-        syncLibraryQueue.unpause();
-        console.log('sync library queue is now unpaused...');
+    resume: function() {
+        syncLibraryQueue.resume().then(function() {
+            console.log('sync library queue is now unpaused...');
+        })
+
     }
 };

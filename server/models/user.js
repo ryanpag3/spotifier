@@ -16,7 +16,11 @@ var User = new Schema({
         confirm_code: String
     },
     saved_artists: [Schema.ObjectId],
-    new_releases: [Schema.ObjectId]
+    new_releases: [Schema.ObjectId],
+    sync_queue: {
+        id: String,
+        enqueued: Boolean
+    }
 });
 
 module.exports = mongoose.model('users', User);

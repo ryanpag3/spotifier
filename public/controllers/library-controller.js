@@ -1,9 +1,10 @@
 "use strict";
 
 var app = angular.module('spotifier');
-app.controller('library-controller', ['$scope', '$rootScope', '$timeout', 'libraryService',
-    function ($scope, $rootScope, $timeout, libraryService) {
+app.controller('library-controller', ['$scope', '$location', '$rootScope', '$timeout', 'libraryService',
+    function ($scope, $location, $rootScope, $timeout, libraryService) {
 
+        $scope.syncButtonShown = true;
         /**
          *
          */
@@ -22,7 +23,19 @@ app.controller('library-controller', ['$scope', '$rootScope', '$timeout', 'libra
          * ng-click handler for calling a library sync
          */
         $scope.syncLibrary = function () {
-            libraryService.sync();
+            libraryService.sync()
+                .then(function() {
+                    console.log('here?');
+                    $scope.syncButtonShown = false;
+                    $scope.syncTooltipShown = true;
+                    $location.path('/library');
+                })
+            // todo hide sync library button
+            // todo show enqueued display window
+        };
+
+        $scope.cancelSyncLibrary = function() {
+            libraryService.cancelSync();
         };
 
         /**

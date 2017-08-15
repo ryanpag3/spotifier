@@ -47,6 +47,7 @@ artistDetailsQueue
     .on('completed', function (job, result) {
         var db = new Db();
         db.updateArtist(result);
+        console.log('artist details gotten.')
     });
 
 
@@ -63,7 +64,7 @@ module.exports = {
         })
     },
 
-    unpause: function () {
+    resume: function () {
         artistDetailsQueue.resume().then(function () {
             console.log('get artist details queue has been resume...');
         })

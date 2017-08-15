@@ -3,7 +3,14 @@
 <div class="page-container" data-ng-controller="library-controller">
     <link rel="stylesheet" type="text/css" href="../css/user-library-style.css">
     <!--USER LIBRARY PARTIAL PAGE-->
-    <a class="btn btn-success" href="/library/sync" target="_self">SYNC W/ LIBRARY</a>
+    <div class="sidebar">
+        <button class="btn btn-success" data-ng-click="syncLibrary()" data-ng-show="syncButtonShown">SYNC W/ LIBRARY</button>
+        <div class="sync-queue-tooltip" data-ng-show="syncTooltipShown">
+            <div>BLAH BLAH BLAH YOURE IN A QUEUE</div>
+            <button class="fa fa-times" data-ng-click="cancelSync()"></button>
+        </div>
+    </div>
+
     <div class="library-container container-fluid col-xs-9">
         <div>
             <div data-ng-repeat="artist in library" class="artist-container .container">
