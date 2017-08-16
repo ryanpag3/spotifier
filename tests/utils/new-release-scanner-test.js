@@ -48,7 +48,7 @@ describe('new-release-scanner unit tests', function () {
                                 }
                                 done();
                             })
-                        }, 0);
+                        }, 5000);
                     })
                     .catch(function(err) {
                         console.log(err);

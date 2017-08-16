@@ -2,6 +2,7 @@ var nodemailer = require('nodemailer'),
     querystring = require('querystring'),
     Q = require('q'),
     User = require('../models/user'),
+    Artist = require('../models/artist'),
     Db = require('../utils/db-wrapper'),
     configPrivate = require('../../config-private'),
     configPublic = require('../../config-public');
@@ -43,11 +44,61 @@ Email.prototype.send = function (options) {
  * the associated users new_release fields, and repeats until there
  * are no more new_release fields not null.
  */
-Email.prototype.sendNewReleaseEmails = function() {
-    // query for users with new_release field not empty
-    User.find({'new_releases': {$ne: []}}, function(err, users) {
-        console.log('test' + users);
-    })
+Email.prototype.sendNewReleaseEmails = function () {
+    var self = this;
+
+    sendNewReleaseBatch();
+    function sendNewReleaseBatch() {
+        // query for users with new_release field not empty
+        User.find({'new_releases': {$ne: []}}, function (err, users) {
+            if (users.length > 0) { // if users still have new_releases pending
+                var master = users[0]; // master is the user we will query for all matching artist patterns with
+                console.log(master.name);
+                User.find({
+                    'new_releases': {
+                        $all: master.new_releases,
+                        $size: master.new_releases.length
+                    }
+                }, function (err, users) {
+                    var addresses = [];
+                    // build the 'to' option
+                    for (var i = 0; i < users.length; i++) {
+                        addresses.push(users[i].email.address);
+                    }
+                    // grab artist info
+                    Artist.find({'_id': {$in: master.new_releases}}, function (err, artists) {
+                        var mailOptions = {
+                            from: configPrivate.gmail.username,
+                            to: addresses,
+                            subject: 'new release found!',
+                            text: JSON.stringify(artists, null, 4)
+                        };
+                        self.send(mailOptions)
+                            .then(function () {
+                                // remove new_release data from users who we just sent email to
+                                User.updateMany({
+                                        'new_releases': {
+                                                $all: master.new_releases,
+                                                $size: master.new_releases.length
+                                        }
+                                    },
+                                    {$set: {'new_releases': []}}, function (err) {
+                                        if (err) {
+                                            // todo turn into debug statement
+                                            console.log(err);
+                                        }
+                                        User.find({}, function(err, users) {
+                                            console.log(users);
+                                        });
+                                        sendNewReleaseBatch(); // process next release batch and send
+                                    });
+
+                            });
+                    });
+                })
+            }
+        })
+    }
 };
 
 /**

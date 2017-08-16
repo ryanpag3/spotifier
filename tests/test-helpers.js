@@ -44,6 +44,7 @@ module.exports = {
                         } else {
                             db.assignArtist(user, finalArtists[0]);
                             db.assignArtist(user, finalArtists[1]);
+                            // db.assignArtist(user, finalArtists[2]);
                             db.assignArtist(user2, finalArtists[0]);
                             db.assignArtist(user2, finalArtists[2]);
                             db.assignArtist(user2, finalArtists[3]);
@@ -51,7 +52,7 @@ module.exports = {
                                 User.find({}, function(err, users) {
                                     deferred.resolve(users);
                                 });
-                            }, 0);
+                            }, 50); // give a bit of a buffer to allow for db serialization
                         }
                     });
                 }
