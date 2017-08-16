@@ -121,7 +121,7 @@ module.exports = {
 
     resume: function () {
         syncLibraryQueue.resume().then(function () {
-            console.log('sync library queue is now unpaused...');
+            console.log('sync library queue is now resumed...');
         })
 
     }

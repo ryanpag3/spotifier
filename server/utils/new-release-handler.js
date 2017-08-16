@@ -4,7 +4,8 @@ var CronJob = require('cron').CronJob,
     Db = require('../utils/db-wrapper'),
     getArtistDetailsQueue = require('./queue-get-artist-details'),
     syncLibraryQueue = require('./queue-sync-user-library'),
-    spotifyApiServer = require('../utils/spotify-server-api');
+    spotifyApiServer = require('../utils/spotify-server-api'),
+    emailHandler = require('../utils/email-handler');
 
 
 /**
@@ -45,32 +46,41 @@ function scan() {
             var i = 0;
             function processArtist() {
                 var mArtist = artists[i];
-                console.log(i + '. ' + mArtist.name);
+                // request recent release id from spotify
                 spotifyApiServer.getRecentReleaseId(mArtist)
                     .then(function (albumId) {
-                        if (i === 20) {
-                            albumId = '1234';
-                        }
+                        // query for artist in db
                         Artist.findOne(
                             {'_id': mArtist._id}, function (err, artist) {
+                                // if recent release id does not match db id and recent release id exists
                                 if (artist.recent_release.id !== albumId && artist.recent_release.id !== undefined) {
-                                    console.log('THIS IS A NEW RELEASE!!!!');
+                                    // get details on new release
                                     spotifyApiServer.getAlbumInfo(albumId)
                                         .then(function (album) {
+                                            // update artist recent release in db
+                                            artist.recent_release = {
+                                                id: album.id,
+                                                title: album.name,
+                                                release_date: album.release_date
+                                            };
+                                            artist.save();
+                                            // push new release notification to all users tracking artist
+                                            db.artistNewReleaseFound(artist);
                                         })
                                         .catch(function (err) {
+                                            // todo turn into debug report
                                             console.log(err);
                                         })
                                 }
                             });
 
+                        if (i++ < artists.length-1) {
+                            setTimeout(processArtist, 150);
+                        } else {
+                            console.log('finished checking for new releases!');
+                            deferred.resolve();
+                        }
                     });
-                if (++i < artists.length-1) {
-                    setTimeout(processArtist, 150);
-                } else {
-                    console.log('finished checking for new releases!');
-                    deferred.resolve();
-                }
             }
             // start recursive call
             processArtist();
@@ -80,16 +90,24 @@ function scan() {
 
 module.exports = {
     startScan: function () {
+        var deferred = Q.defer();
+        // pause job queues
         syncLibraryQueue.pause();
         getArtistDetailsQueue.pause();
+        // scan for new releases
         scan()
             .then(function () {
+                // send new release emails
+                emailHandler.sendNewReleaseEmails();
+                // resume job queues
                 syncLibraryQueue.resume();
                 getArtistDetailsQueue.resume();
+                deferred.resolve();
             })
             .catch(function(err) {
-                console.log(err);
-            })
+                deferred.reject(err);
+            });
+        return deferred.promise;
     }
 };
 

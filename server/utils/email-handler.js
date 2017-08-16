@@ -34,6 +34,23 @@ Email.prototype.send = function (options) {
 };
 
 /**
+ * This is called after the new release scanner finishes processing
+ * the artists in the artist collection, adding new_release flags to
+ * users tracking artists with new releases. It selects the first user
+ * of the user list with a new_release field not null, and queries for
+ * all users with that same combination of elements. Builds a email body
+ * based on those artists that they track, sends the email, and clears
+ * the associated users new_release fields, and repeats until there
+ * are no more new_release fields not null.
+ */
+Email.prototype.sendNewReleaseEmails = function() {
+    // query for users with new_release field not empty
+    User.find({'new_releases': {$ne: []}}, function(err, users) {
+        console.log('test' + users);
+    })
+};
+
+/**
  * todo
  * @param user
  * @returns {Q.Promise<T>}

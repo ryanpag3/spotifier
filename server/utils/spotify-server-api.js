@@ -53,40 +53,7 @@ var self = module.exports = {
             });
         return deferred.promise;
     },
-    // USED FOR TESTING PURPOSES ONLY
-    getSecondRecentRelease: function (artist) {
-        var deferred = Q.defer();
-        // ensure fresh token
-        self.refreshClientToken()
-            .then(function () {
-                // retrieve most recent release
-                spotifyApi.getArtistAlbums(artist.spotify_id, ({
-                    limit: 9,
-                    offset: 0
-                }))
-                    .then(function (data) {
-                        var i = 0;
-                        // skip international releases to find next new album
-                        while (data.body.items[0].name === data.body.items[i].name){
-                           i++;
-                        }
-                        self.getAlbumInfo(data.body.items[i].id)
-                            .then(function(data) {
-                                deferred.resolve(data);
-                            })
-                            .catch(function(err) {
-                                deferred.reject('**GET ALBUM INFO**' + err);
-                            })
-                    })
-                    .catch(function (err) {
-                        deferred.reject('**getArtistAlbums** ' + err);
-                    })
-            })
-            .catch(function (err) {
-                deferred.reject('**REFRESH CLIENT TOKEN**' + err);
-            });
-        return deferred.promise;
-    },
+
     getAlbumInfo: function(albumId) {
         var deferred = Q.defer();
         self.refreshClientToken()
@@ -124,7 +91,42 @@ var self = module.exports = {
                 deferred.reject(err);
             });
         return deferred.promise;
-    }
+    },
+
+    // USED FOR TESTING PURPOSES ONLY
+    // getSecondRecentRelease: function (artist) {
+    //     var deferred = Q.defer();
+    //     // ensure fresh token
+    //     self.refreshClientToken()
+    //         .then(function () {
+    //             // retrieve most recent release
+    //             spotifyApi.getArtistAlbums(artist.spotify_id, ({
+    //                 limit: 9,
+    //                 offset: 0
+    //             }))
+    //                 .then(function (data) {
+    //                     var i = 0;
+    //                     // skip international releases to find next new album
+    //                     while (data.body.items[0].name === data.body.items[i].name){
+    //                         i++;
+    //                     }
+    //                     self.getAlbumInfo(data.body.items[i].id)
+    //                         .then(function(data) {
+    //                             deferred.resolve(data);
+    //                         })
+    //                         .catch(function(err) {
+    //                             deferred.reject('**GET ALBUM INFO**' + err);
+    //                         })
+    //                 })
+    //                 .catch(function (err) {
+    //                     deferred.reject('**getArtistAlbums** ' + err);
+    //                 })
+    //         })
+    //         .catch(function (err) {
+    //             deferred.reject('**REFRESH CLIENT TOKEN**' + err);
+    //         });
+    //     return deferred.promise;
+    // }
 };
 
 

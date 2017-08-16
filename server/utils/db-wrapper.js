@@ -103,6 +103,21 @@ Db.prototype.addAllArtists = function (mUser, artists) {
 };
 
 /**
+ * queries the artist collection and returns all documents
+ * @returns {Q.Promise<T>}
+ */
+Db.prototype.getAllArtists = function () {
+    var deferred = Q.defer();
+    Artist.find({}, function (err, artists) {
+        if (err) {
+            deferred.reject(err);
+        }
+        deferred.resolve(artists);
+    });
+    return deferred.promise;
+};
+
+/**
  * queries for user information and adds artist to user library
  * @param user: user object serialized in cookie {name, accessToken, refreshToken}
  * @param artist: simple artist object {spotifyId, name}
@@ -210,21 +225,6 @@ Db.prototype.updateArtist = function (artist) {
 };
 
 /**
- * queries the artist collection and returns all documents
- * @returns {Q.Promise<T>}
- */
-Db.prototype.getAllArtists = function () {
-    var deferred = Q.defer();
-    Artist.find({}, function (err, artists) {
-        if (err) {
-            deferred.reject(err);
-        }
-        deferred.resolve(artists);
-    });
-    return deferred.promise;
-};
-
-/**
  * Associates an artist and a user by serializing their respective id's to their
  * database document, if they are valid.
  * @param user: mongodb user document, see models/user for schema information
@@ -250,6 +250,22 @@ Db.prototype.assignArtist = function (user, artist) {
         });
     });
     return deferred.promise;
+};
+
+/**
+ * When the new release scanner finds a new release for an artist, it calls this so that all users
+ * who are tracking an artist will have this artist pushed to their new_release field. Once the new
+ * release scanner finishes processing all artists, the new_release field will be used to build email
+ * notifications.
+ * @param artist: mongodb document for an artist
+ */
+Db.prototype.artistNewReleaseFound = function (artist) {
+    User.updateMany({'_id': {$in: artist.users_tracking}}, {$addToSet: {'new_releases': artist._id}}, function (err) {
+        if (err) {
+            // todo turn into debug report
+            console.log(err);
+        }
+    })
 };
 
 /**

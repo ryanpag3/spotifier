@@ -66,7 +66,7 @@ module.exports = {
 
     resume: function () {
         artistDetailsQueue.resume().then(function () {
-            console.log('get artist details queue has been resume...');
+            console.log('get artist details queue has been resumed...');
         })
     }
 };

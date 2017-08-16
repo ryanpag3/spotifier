@@ -9,7 +9,8 @@ var expect = require('chai').expect,
     Db = require('../../server/utils/db-wrapper'),
     testHelper = require('../test-helpers'),
     sampleData = require('../sample-test-data'),
-    spotifyApiServer = require('../../server/utils/spotify-server-api');
+    spotifyApiServer = require('../../server/utils/spotify-server-api'),
+    releaseScanner = require('../../server/utils/new-release-handler.js');
 mongoose.Promise = require('bluebird');
 
 mongoose.connect('mongodb://localhost/spotifier_test', {
@@ -32,6 +33,27 @@ describe('new-release-scanner unit tests', function () {
     });
 
     it('should update users who are tracking artists with notifications', function(done) {
+        this.timeout(10000);
+        testHelper.stageSampleNewReleaseDb()
+            .then(function(users) {
+                releaseScanner.startScan()
+                    .then(function() {
+                        setTimeout(function() {
+                            User.find({}, function(err, users) {
+                                if (err) {
+                                    expect(err).to.be.undefined;
+                                }
+                                for(var i = 0; i < users.length; i++) {
+                                    expect(users[i].new_releases.length).to.be.greaterThan(0);
+                                }
+                                done();
+                            })
+                        }, 0);
+                    })
+                    .catch(function(err) {
+                        console.log(err);
+                    });
+            });
 
     })
 

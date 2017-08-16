@@ -40,7 +40,7 @@ module.exports = {
                         }
                         finalArtists.push(artist);
                         if (i++ < artists.length - 1) {
-                            setTimeout(run, 1000);
+                            setTimeout(run, 0);
                         } else {
                             db.assignArtist(user, finalArtists[0]);
                             db.assignArtist(user, finalArtists[1]);
@@ -51,7 +51,7 @@ module.exports = {
                                 User.find({}, function(err, users) {
                                     deferred.resolve(users);
                                 });
-                            }, 500);
+                            }, 0);
                         }
                     });
                 }

@@ -16,7 +16,7 @@ mongoose.connect('mongodb://localhost/spotifier_test', {
     useMongoClient: true
 });
 
-describe('new-release-scanner unit tests', function () {
+describe('test-helper unit tests', function () {
     // before each unit test
     beforeEach(function (done) {
         done();
