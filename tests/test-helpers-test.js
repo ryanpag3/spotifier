@@ -3,13 +3,13 @@ var expect = require('chai').expect,
     mongoose = require('mongoose'),
     sinon = require('sinon'),
     fs = require('fs'),
-    User = require('../../server/models/user'),
-    Artist = require('../../server/models/artist'),
-    email = require('../../server/utils/email-handler'),
-    Db = require('../../server/utils/db-wrapper'),
-    testHelper = require('../test-helpers'),
-    sampleData = require('../sample-test-data'),
-    spotifyApiServer = require('../../server/utils/spotify-server-api');
+    User = require('../server/models/user'),
+    Artist = require('../server/models/artist'),
+    email = require('../server/utils/email-handler'),
+    Db = require('../server/utils/db-wrapper'),
+    testHelper = require('./test-helpers'),
+    sampleData = require('./sample-test-data'),
+    spotifyApiServer = require('../server/utils/spotify-server-api');
 mongoose.Promise = require('bluebird');
 
 mongoose.connect('mongodb://localhost/spotifier_test', {
@@ -41,5 +41,23 @@ describe('test-helper unit tests', function () {
                 done();
             });
     });
+
+    it('should grab all artists released in the past two weeks and insert them into a file', function(done) {
+        this.timeout(500000);
+        testHelper.getArtists()
+            .then(function(releases) {
+                expect(releases).to.not.be.undefined;
+                done();
+            })
+    })
+
+    it('should insert n number of artists at random to the artist db', function(done) {
+        this.timeout(300000);
+        testHelper.addRandomArtists(9999)
+            .then(function(res) {
+                console.log(res);
+                done();
+            })
+    })
 
 });
