@@ -5,20 +5,37 @@ var app = angular.module('spotifier');
 app.factory('authServ', ['$q', '$http', '$location',
     function($q, $http, $location) {
         return ({
-            isAuthenticated: isAuthenticated,
+            getStatus: getStatus,
+            getEmailStatus: getEmailStatus,
             submitEmail: submitEmail,
             sendConfirmationEmail: sendConfirmationEmail
         });
 
-        function isAuthenticated() {
+        /**
+         * handles AJAX call and response to determine user authentication status
+         * @returns {Q.Promise<Boolean>}
+         */
+        function getStatus() {
             var deferred = $q.defer();
-
             $http.get('/user/status')
                 .then(function(res) {
-                    deferred.resolve(res.data);
+                    deferred.resolve(res.data.isAuthenticated);
                 })
-                .catch(function(err) {
-                    deferred.reject(err);
+                .catch(function(res) {
+                    deferred.reject(res.data.err);
+                });
+            return deferred.promise;
+        }
+
+        function getEmailStatus() {
+            var deferred = $q.defer();
+            $http.get('/user/email/status')
+                .then(function(res) {
+                    deferred.resolve(res.data.isConfirmed);
+                })
+                .catch(function(res) {
+                    console.log(res);
+                    deferred.resolve(res.data.err);
                 });
             return deferred.promise;
         }

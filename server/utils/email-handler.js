@@ -49,6 +49,7 @@ Email.prototype.sendNewReleaseEmails = function () {
     var deferred = Q.defer();
 
     sendNewReleaseBatch();
+
     function sendNewReleaseBatch() {
         // query for users with new_release field not empty
         User.find({'new_releases': {$ne: []}}, function (err, users) {
@@ -90,8 +91,8 @@ Email.prototype.sendNewReleaseEmails = function () {
                                 // remove new_release data from users who we just sent email to
                                 User.updateMany({
                                         'new_releases': {
-                                                $all: master.new_releases,
-                                                $size: master.new_releases.length
+                                            $all: master.new_releases,
+                                            $size: master.new_releases.length
                                         }
                                     },
                                     {$set: {'new_releases': []}}, function (err) {
@@ -104,9 +105,9 @@ Email.prototype.sendNewReleaseEmails = function () {
                                     });
 
                             })
-                            .catch(function(err) {
+                            .catch(function (err) {
                                 console.log(err);
-                                setTimeout(function() {
+                                setTimeout(function () {
                                     sendNewReleaseBatch();
                                 }, 120000);
                             });
@@ -117,6 +118,7 @@ Email.prototype.sendNewReleaseEmails = function () {
             }
         });
     }
+
     return deferred.promise;
 };
 
@@ -184,25 +186,41 @@ Email.prototype.confirm = function (query) {
             deferred.reject(err);
         }
         // if user exists
-        // if user confirm code matches
-        if (user.email.confirm_code === query.code) {
-            User.update({'_id': user._id}, {
-                email: {
-                    address: user.email.address,
-                    confirmed: true,
-                    confirm_code: undefined
-                }
-            }, function (err) {
-                if (err) {
-                    deferred.reject(err);
-                } else {
-                    deferred.resolve();
-                }
-            })
+        if (user) {
+            // if user confirm code matches
+            if (user.email.confirm_code === query.code) {
+                User.update({'_id': user._id}, {
+                    email: {
+                        address: user.email.address,
+                        confirmed: true,
+                        confirm_code: undefined
+                    }
+                }, function (err) {
+                    if (err) {
+                        deferred.reject(err);
+                    } else {
+                        deferred.resolve();
+                    }
+                })
+            }
+            else {
+                deferred.reject('invalid confirm code');
+            }
+        } else {
+            deferred.reject('user not found!');
         }
-        else {
-            deferred.reject('invalid confirm code');
+    });
+    return deferred.promise;
+};
+
+Email.prototype.getStatus = function (user) {
+    var deferred = Q.defer();
+    User.findOne({'_id': user._id}, function (err, user) {
+        if (err) {
+            deferred.reject(err);
         }
+        console.log(user.email.confirmed);
+        deferred.resolve(user.email.confirmed);
     });
     return deferred.promise;
 };
