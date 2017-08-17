@@ -1,3 +1,4 @@
 node_modules/
 .idea/
 config-private.js
+utils/cache/cached-new-releases.txt

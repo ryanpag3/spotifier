@@ -109,7 +109,8 @@ var self = module.exports = {
         var query = 'tag:new';
         var checkDate = new Date();
         checkDate.setDate(checkDate.getDate() - 1); // 24 hours
-        var cachedReleases = fs.readFileSync(path.join(__dirname, './cache/cached-new-releases.txt'), 'utf-8');
+        var p = path.join(__dirname, './cache/cached-new-releases.txt');
+        var cachedReleases = fs.existsSync(p) ? fs.readFileSync(p, 'utf-8') : '';
         if (cachedReleases) {
             cachedReleases = JSON.parse(cachedReleases);
         } else {
@@ -149,7 +150,7 @@ var self = module.exports = {
                                     run();
                                 } else {
                                     cachedReleases.releases = releases;
-                                    fs.writeFile(path.join(__dirname, './cache/cached-new-releases.txt'), JSON.stringify(cachedReleases, null, 4), 'utf-8');
+                                    fs.writeFile(path.join(__dirname, './cache/cached-new-releases.txt'), JSON.stringify(cachedReleases, null, 4), {flag: 'wx'}, 'utf-8');
                                     deferred.resolve(releases);
                                 }
                             })
