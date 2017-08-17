@@ -37,17 +37,7 @@ app.controller('index-controller', ['$scope', '$rootScope', 'libraryService',
             }
         };
 
-        $scope.add = function (artist) {
-            console.log(artist);
-            libraryService.add(artist)
-                .then(function () {
-                    // todo put placeholder album info into config file
-                    $scope.$broadcast('add-artist', {artist: artist});
-                })
-                .catch(function () {
-                    // todo handle service error response
-                })
-        };
+
 
 
         /** JQUERY **/

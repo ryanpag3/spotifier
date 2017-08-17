@@ -2,6 +2,27 @@
 
 <div class="page-container" data-ng-controller="library-controller">
     <link rel="stylesheet" type="text/css" href="../css/user-library-style.css">
+    <header>
+        <h1>Spotifier</h1>
+        <div class="search">
+            <form data-ng-submit="search(artistName)">
+                <input id="spotify-search" class="search-bar" placeholder="search for artists" data-ng-model="artistName">
+            </form>
+            <div class="search-results" data-ng-cloak data-ng-show="resultBoxShown">
+                <i id="result-spinner" class="fa fa-refresh fa-spin" data-ng-show="resultSpinnerShown"></i>
+                <div class="result" data-ng-repeat="artist in results" data-ng-show="resultsShown">
+                    <button class="result-add" data-ng-click="add(artist)"><i class="fa fa-align-center fa-plus fa-2x"></i></button>
+                    <div class="result-name"><div style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden">{{artist.name}}</div></div>
+                    <div class="result-pic" data-ng-style="{'background-image' : 'url(' + artist.url + ')'}"></div>
+                </div>
+            </div>
+        </div>
+
+        <div style="position: absolute; right: 0; top: 0">
+            <a href="/user/logout" target="_self" class="btn btn-primary btn-login">logout</a>
+        </div>
+
+    </header>
     <!--USER LIBRARY PARTIAL PAGE-->
     <div class="sidebar" data-ng-switch="syncStatus">
         <button class="btn btn-success" data-ng-click="syncLibrary()" data-ng-switch-default>SYNC W/ LIBRARY</button>

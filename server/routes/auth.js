@@ -18,7 +18,7 @@ router.get('/login', passport.authenticate('spotify', {
 
 router.get('/logout', function (req, res) {
     req.logout();
-    res.redirect('/login');
+    res.redirect('/');
 });
 
 router.get('/status', function (req, res) {

@@ -4,56 +4,13 @@ var app = angular.module('spotifier');
 app.controller('library-controller', ['$scope', '$location', '$rootScope', '$timeout', 'libraryService',
     function ($scope, $location, $rootScope, $timeout, libraryService) {
 
+        var prevQuery;
         $scope.syncButtonShown = true;
         $scope.enqueued = 'enqueued';
         $scope.active = 'active';
-        /**
-         *
-         */
-        $scope.removeArtist = function(artist) {
-            console.log(artist);
-            libraryService.remove(artist)
-                .then(function() {
-                    removeArtistLoc(artist);
-                })
-                .catch(function(err) {
-                    console.log(err);
-                })
-        };
-
-        /**
-         * ng-click handler for calling a library sync
-         */
-        $scope.syncLibrary = function () {
-            libraryService.sync()
-                .then(function() {
-                    $scope.syncStatus = 'enqueued';
-                    $location.path('/library');
-                })
-            // todo hide sync library button
-            // todo show enqueued display window
-        };
-
-        $scope.cancelSyncLibrary = function() {
-            libraryService.cancelSync()
-            .then(function() {
-                $scope.syncStatus = 'not queued';
-            })
-
-        };
-
-        /**
-         * Event listener that is called from outside library scope to update library UI
-         */
-        $scope.$on('add-artist', function (event, args) {
-            $scope.library.push({
-                name: args.artist.name,
-                spotify_id: args.artist.spotify_id,
-                recent_release: {
-                    title: 'release info requested from Spotify, pending...' // placeholder text matching server
-                }
-            });
-        });
+        $scope.results = null;
+        $scope.resultBoxShown = false;
+        $scope.resultsShown = false;
 
         // sort by date added
         $scope.library = [];
@@ -69,15 +26,121 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
         $scope.libraryDateDescending = [];
 
 
-        init();
+        /**
+         * initialization code for this controller
+         */
         function init() {
-            getLibrary();
-            libraryService.getSyncStatus()
-                .then(function(status) {
+            getLibrary(); // request library
+            libraryService.getSyncStatus() // request sync job status
+                .then(function (status) {
                     $scope.syncStatus = status;
                 })
-
         }
+        init(); // run initialization code
+
+        /**
+         * caller method for search form
+         * parses the query to eliminate unnecessary white space. If the query matches the previous
+         * query and it is not empty, shows cached results. If the query is not the same as the
+         * previous and not empty, calls the libraryService search function which handles the AJAX
+         * call to the API.
+         **/
+        $scope.search = function (query) {
+            $scope.resultBoxShown = true;
+            $scope.resultsShown = false;
+            $scope.resultSpinnerShown = true;
+
+            // trim query
+            var mQuery = query.trim();
+            // if not same as previous and not empty
+            if (mQuery === prevQuery && mQuery !== '') {
+                $scope.resultSpinnerShown = false;
+                // display previous results
+                $scope.resultsShown = true;
+            }
+            // if not empty
+            else if (mQuery !== '') {
+                libraryService.searchSpotify(mQuery)
+                    .then(function (res) {
+                        prevQuery = mQuery;
+                        $scope.results = res;
+                        $scope.resultSpinnerShown = false;
+                        $scope.resultsShown = true;
+                    })
+                    .catch(function (err) {
+
+                    });
+                $(function () {
+                    $('#spotify-search').blur();
+                })
+            }
+        };
+
+        /**
+         * ng-click handler for adding an artist to a user library. Calls the library service which
+         * handles the AJAX call to the server, and on success calls pushArtistToLibrary which pushes
+         * a local instance of an artist object to the library.
+         * @param artist
+         */
+        $scope.add = function (artist) {
+            console.log(artist);
+            libraryService.add(artist)
+                .then(function () {
+                    pushArtistToLibrary(artist);
+                })
+                .catch(function () {
+                    // todo handle service error response
+                })
+        };
+
+        /**
+         * Pushes an artist to the library when the add request is sent to the server
+         * to allow for instant UI updates.
+         */
+        function pushArtistToLibrary(artist) {
+            $scope.library.push({
+                name: artist.name,
+                spotify_id: artist.spotify_id,
+                recent_release: {
+                    title: 'release info requested from Spotify, pending...' // placeholder text matching server
+                }
+            });
+        };
+
+        /**
+         * ng-click function fof removing an artist for a user
+         */
+        $scope.removeArtist = function (artist) {
+            console.log(artist);
+            libraryService.remove(artist)
+                .then(function () {
+                    removeArtistLoc(artist);
+                })
+                .catch(function (err) {
+                    console.log(err);
+                })
+        };
+
+        /**
+         * ng-click handler for calling a library sync
+         */
+        $scope.syncLibrary = function () {
+            libraryService.sync()
+                .then(function () {
+                    $scope.syncStatus = 'enqueued';
+                    $location.path('/library');
+                })
+        };
+
+        /**
+         * ng-click handler for removing a user from the sync job queue
+         */
+        $scope.cancelSyncLibrary = function () {
+            libraryService.cancelSync()
+                .then(function () {
+                    $scope.syncStatus = 'not queued';
+                })
+        };
 
         /**
          * Get's a user's library and sets $scope variables based on various sorting keys.
@@ -85,25 +148,25 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
         function getLibrary() {
             libraryService.get()
                 .then(function (library) {
-                        $scope.library = library;
-                        // $scope.libraryArtistAscending = sortBy(library, 'name');
-                        // $scope.libraryArtistDescending = (sortBy(library, 'name')).reverse();
-                        // $scope.libraryTitleAscending = sortBy(library, 'title');
-                        // $scope.libraryTitleDescending = (sortBy(library, 'title')).reverse();
-                        // $scope.libraryDateAscending = sortBy(library, 'date');
-                        // $scope.libraryDateDescending = (sortBy(library, 'date')).reverse();
-
+                    $scope.library = library;
+                    // $scope.libraryArtistAscending = sortBy(library, 'name');
+                    // $scope.libraryArtistDescending = (sortBy(library, 'name')).reverse();
+                    // $scope.libraryTitleAscending = sortBy(library, 'title');
+                    // $scope.libraryTitleDescending = (sortBy(library, 'title')).reverse();
+                    // $scope.libraryDateAscending = sortBy(library, 'date');
+                    // $scope.libraryDateDescending = (sortBy(library, 'date')).reverse();
                 });
         }
 
         /********** HELPER FUNCTIONS **********/
-
         /**
          * Removes an artist from the local library instance.
          * @param {Object} artist
          */
         function removeArtistLoc(artist) {
-            var index = $scope.library.map(function(e) {return e._id}).indexOf(artist._id);
+            var index = $scope.library.map(function (e) {
+                return e._id
+            }).indexOf(artist._id);
             $scope.library.splice(index, 1);
         }
 
@@ -155,6 +218,17 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
                     });
             }
         }
-    }
-]);
+
+        /** JQUERY **/
+        // todo convert to a directive
+        // handle clicking outside search results
+        $(document).mouseup(function (e) {
+            var container = $(".search");
+            // if the target of the click isn't the container nor a descendant of the container
+            if (!container.is(e.target) && container.has(e.target).length === 0) {
+                $scope.resultBoxShown = false;
+                $scope.$apply();
+            }
+        });
+}]);
 
