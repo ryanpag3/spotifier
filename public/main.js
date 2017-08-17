@@ -9,33 +9,42 @@ app.config(['$routeProvider', '$locationProvider', 'SpotifyProvider',
     $routeProvider
         .when('/', {
             templateUrl: 'partials/landing.html',
-            restricted: false
+            access: {restricted: false}
         })
         .when('/email', {
             templateUrl: 'partials/email.html',
-            restricted: true
+            access: {restricted: true}
         })
         .when('/confirm-pending', {
             templateUrl: 'partials/confirm-pending.html',
-            restricted: true
+            access: {restricted: true}
         })
         .when('/confirm-success', {
             templateUrl: 'partials/confirm-success.html',
-            restricted: false
+            access: {restricted: false}
         })
         .when('/confirm-failure', {
             templateUrl: 'partials/confirm-failure.html',
-            restricted: false
+            access: {restricted: false}
         })
         .when('/library', {
             templateUrl: 'partials/user-library.html',
-            restricted: true
+            access: {restricted: true}
         });
 
     $locationProvider.html5Mode(true);
     SpotifyProvider.setClientId('180cc653f1f24ae9864d5d718d68f3c6');
 }]);
 
-app.run(function($http, $rootScope, $location) {
-
+app.run(function($http, $rootScope, $location, $route, authServ) {
+    $rootScope.$on('$routeChangeStart',
+        function(event, next, current) {
+            authServ.getStatus()
+                .then(function(authenticated) {
+                    if (next.access.restricted && !authenticated) {
+                        $location.path('/');
+                        $route.reload();
+                    }
+                })
+        })
 });

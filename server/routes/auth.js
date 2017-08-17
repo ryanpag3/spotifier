@@ -21,10 +21,9 @@ router.get('/logout', function (req, res) {
     res.redirect('/login');
 });
 
-router.post('/status', function (req, res) {
+router.get('/status', function (req, res) {
     if (!req.isAuthenticated()) {
-        // return forbidden
-        return res.status(401).json({
+        return res.status(200).json({
             isAuthenticated: false
         })
     }
@@ -70,7 +69,7 @@ router.get('/callback',
             });
 
         // // DEBUGGING
-        res.redirect('/library');
+        // res.redirect('/library');
     });
 
 /**
@@ -129,16 +128,7 @@ router.get('/email/confirm', function (req, res) {
             res.redirect('/confirm-success');
         })
         .catch(function (err) {
-            if (err === 'invalid confirm code') {
-                // invalid code
-                res.redirect('/confirm-failure');
-            } else {
-                // internal server error
-                // todo route to a 500 status page
-                return res.status(500).json({
-                    err: err
-                })
-            }
+            res.redirect('/confirm-failure');
         })
 });
 
@@ -147,11 +137,17 @@ router.get('/email/confirm', function (req, res) {
  * todo
  */
 router.get('/email/status', function (req, res) {
-    // return status of email
-    // email is either
-    // undefined
-    // defined but not confirmed
-    // defined and confirmed
+    email.getStatus(req.user)
+        .then(function (confirmed) {
+            return res.status(200).json({
+                isConfirmed: confirmed
+            })
+        })
+        .catch(function (err) {
+            return res.status(500).json({
+                err: err
+            })
+        })
 });
 
 
