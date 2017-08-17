@@ -217,7 +217,6 @@ Db.prototype.removeArtist = function (user, artist) {
  */
 Db.prototype.updateArtist = function (artist) {
     Artist.findOneAndUpdate({'spotify_id': artist.spotify_id}, artist, function (err, artist) {
-        console.log(artist);
         if (err) {
             console.log(err);
         }
