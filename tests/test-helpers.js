@@ -63,8 +63,10 @@ module.exports = {
         var deferred = Q.defer();
         var date = new Date();
         date.setDate(date.getDate() - 1); // move date back 24 hours
-        // check recent release cache time
-        var artistCache = fs.readFileSync(path.join(__dirname,'./artist-release-cache.txt'), 'utf-8');
+        var p = path.join(__dirname, './artist-release-cache.txt');
+        // read file if exists, otherwise define
+        var artistCache = fs.existsSync(p) ? fs.readFileSync(p, 'utf-8') : '';
+        // this might be redundant to above
         if (artistCache) {
             artistCache = JSON.parse(artistCache);
         } else {
@@ -75,7 +77,8 @@ module.exports = {
             spotifyServerApi.getNewReleases()
                 .then(function (releases) {
                     artistCache.releases = releases;
-                    fs.writeFile('./artist-release-cache.txt', JSON.stringify(artistCache, null, 4), function (err) {
+                    // write file, create if doesnt exist
+                    fs.writeFile(p, JSON.stringify(artistCache, null, 4), {flag: 'wx'} ,function (err) {
                         if (err) {
                             console.log(err);
                         } else {
