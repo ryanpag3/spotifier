@@ -1,8 +1,8 @@
 <link type="text/css" rel="stylesheet" href="../css/confirm-pending-style.css">
-<div class="page-container" data-ng-controller="email-controller">
+<div class="page-container" data-ng-controller="confirm-pending-controller">
     CONFIRMATION SENT YO
     WANNA RESEND? PRESS DIS SHIT
-    <button data-ng-click="resendConfirmation()">SEND AGAIN YO</button>
-    <button data-ng-click="reenterEmail()">ENTER EMAIL AGAIN YO</button>
+    <button data-ng-click="resendConfirmation()" data-ng-controller="email-controller">SEND AGAIN YO</button>
+    <button data-ng-click="reenterEmail()" data-ng-controller="email-controller">ENTER EMAIL AGAIN YO</button>
     IF YOU HAVE ALREADY CONFIRMED YOUR EMAIL, REFRESH PAGE OR PRESS HOME BUTTON TOP LEFT
 </div>

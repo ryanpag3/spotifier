@@ -31,6 +31,9 @@ Db.prototype.createUser = function (mUser) {
         if (user === null) {
             var user = new User({
                 name: username,
+                email: {
+                    confirmed: false
+                },
                 sync_queue: {
                     status: 'not queued'
                 }
