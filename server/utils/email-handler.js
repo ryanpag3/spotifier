@@ -52,6 +52,10 @@ Email.prototype.sendNewReleaseEmails = function () {
     function sendNewReleaseBatch() {
         // query for users with new_release field not empty
         User.find({'new_releases': {$ne: []}}, function (err, users) {
+            console.log(users.length);
+            if (err) {
+                console.log(err);
+            }
             if (users && users.length > 0) { // if users still have new_releases pending
                 var master = users[0]; // master is the user we will query for all matching artist patterns with
                 console.log(master.name);
@@ -95,6 +99,7 @@ Email.prototype.sendNewReleaseEmails = function () {
                                             // todo turn into debug statement
                                             console.log(err);
                                         }
+                                        console.log('run');
                                         sendNewReleaseBatch(); // process next release batch and send
                                     });
 
@@ -111,8 +116,8 @@ Email.prototype.sendNewReleaseEmails = function () {
                 deferred.resolve();
             }
         });
-        return deferred.promise;
     }
+    return deferred.promise;
 };
 
 /**

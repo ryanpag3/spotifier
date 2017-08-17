@@ -82,6 +82,7 @@ module.exports = {
                     // send new release emails
                     emailHandler.sendNewReleaseEmails()
                         .then(function() {
+                            console.log('EMAIL SERVICE RESOLVED');
                             deferred.resolve();
                         });
                 } else {

@@ -109,19 +109,14 @@ var self = module.exports = {
         var query = 'tag:new';
         var checkDate = new Date();
         checkDate.setDate(checkDate.getDate() - 1); // 24 hours
-        console.log(path.join(__dirname, './cache/cached-new-releases.txt'));
         var cachedReleases = fs.readFileSync(path.join(__dirname, './cache/cached-new-releases.txt'), 'utf-8');
-        console.log(cachedReleases);
         if (cachedReleases) {
-            console.log('we here??');
             cachedReleases = JSON.parse(cachedReleases);
         } else {
-            console.log('we here???');
             cachedReleases = {};
         }
         // if syncDate has not been set or syncDate is older than 24 hours from this point
         if (!cachedReleases.syncDate || cachedReleases.syncDate < checkDate){
-            console.log('we here?');
             cachedReleases.syncDate = new Date();
             self.refreshClientToken()
                 .then(function () {

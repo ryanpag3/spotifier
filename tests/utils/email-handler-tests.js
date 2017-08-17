@@ -106,7 +106,7 @@ describe('email-handler tests', function () {
 
     it('should resolve after all users have been notified of their new releases', function(done) {
         this.timeout(60000 * 120); // staging the database takes a little while
-        testHelper.stageSampleNewReleaseDb(100, 100, 5000)
+        testHelper.stageSampleNewReleaseDb(2, 5, 20)
             .then(function() {
                 releaseScanner.startScan(true)
                     .then(function() {
