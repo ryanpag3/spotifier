@@ -46,20 +46,25 @@ Email.prototype.send = function (options) {
  */
 Email.prototype.sendNewReleaseEmails = function () {
     var self = this;
+    var deferred = Q.defer();
 
     sendNewReleaseBatch();
     function sendNewReleaseBatch() {
         // query for users with new_release field not empty
         User.find({'new_releases': {$ne: []}}, function (err, users) {
-            if (users.length > 0) { // if users still have new_releases pending
+            if (users && users.length > 0) { // if users still have new_releases pending
                 var master = users[0]; // master is the user we will query for all matching artist patterns with
                 console.log(master.name);
+                console.log(users.length);
                 User.find({
                     'new_releases': {
                         $all: master.new_releases,
                         $size: master.new_releases.length
                     }
                 }, function (err, users) {
+                    if (err) {
+                        console.log(err);
+                    }
                     var addresses = [];
                     // build the 'to' option
                     for (var i = 0; i < users.length; i++) {
@@ -67,6 +72,9 @@ Email.prototype.sendNewReleaseEmails = function () {
                     }
                     // grab artist info
                     Artist.find({'_id': {$in: master.new_releases}}, function (err, artists) {
+                        if (err) {
+                            console.log(err);
+                        }
                         var mailOptions = {
                             from: configPrivate.gmail.username,
                             to: addresses,
@@ -87,17 +95,23 @@ Email.prototype.sendNewReleaseEmails = function () {
                                             // todo turn into debug statement
                                             console.log(err);
                                         }
-                                        User.find({}, function(err, users) {
-                                            console.log(users);
-                                        });
                                         sendNewReleaseBatch(); // process next release batch and send
                                     });
 
+                            })
+                            .catch(function(err) {
+                                console.log(err);
+                                setTimeout(function() {
+                                    sendNewReleaseBatch();
+                                }, 120000);
                             });
                     });
                 })
+            } else {
+                deferred.resolve();
             }
-        })
+        });
+        return deferred.promise;
     }
 };
 

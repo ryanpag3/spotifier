@@ -36,7 +36,9 @@ describe('spotify-server-api unit tests', function () {
         this.timeout(300000);
         spotifyApiServer.getNewReleases()
             .then(function(releases) {
-                console.log(releases.length);
+                for (var i = 0; i < releases.length; i++) {
+                    console.log(releases[i].name);
+                }
                 done();
             })
     })

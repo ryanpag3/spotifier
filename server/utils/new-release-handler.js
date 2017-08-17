@@ -36,77 +36,37 @@ function scan() {
     var db = new Db();
     spotifyApiServer.getNewReleases()
         .then(function(releases) {
-            // iterate through releases in past two weeks
-            for (var i = 0; i < releases.length; i++) {
-                // query for artist with matching spotify id
-                // and an album releases id that doesnt match
+            var i = 0;
+            run();
+            function run() {
                 Artist.findOne({
                     'spotify_id': releases[i].spotify_id,
                     'recent_release.id': {$nin: [releases[i].recent_release.id, null]}
                 }, function(err, artist) {
+                    if (err) {
+                        console.log(err); // todo turn into debug report
+                    }
                     if (artist !== null) {
                         console.log('new release found!');
+                        console.log(artist.name);
+                        artist.recent_release = releases[i].recent_release;
+                        artist.save();
+                        db.artistNewReleaseFound(artist);
+                    }
+                    if (++i < releases.length) {
+                        run();
+                    } else {
+                        console.log('done processing new releases!');
+                        deferred.resolve();
                     }
                 })
             }
         });
-    // query for all artists
-    // db.getAllArtists()
-    //     .then(function (artists) {
-    //         // if empty
-    //         if (artists.length === 0) {
-    //             console.log('artist list empty?');
-    //             deferred.resolve();
-    //         }
-    //
-    //         var i = 0;
-    //         function processArtist() {
-    //             var mArtist = artists[i];
-    //             // request recent release id from spotify
-    //             spotifyApiServer.getRecentReleaseId(mArtist)
-    //                 .then(function (albumId) {
-    //                     // query for artist in db
-    //                     Artist.findOne(
-    //                         {'_id': mArtist._id}, function (err, artist) {
-    //                             // if recent release id does not match db id and recent release id exists
-    //                             if (artist.recent_release.id !== albumId && artist.recent_release.id !== undefined) {
-    //                                 // get details on new release
-    //                                 spotifyApiServer.getAlbumInfo(albumId)
-    //                                     .then(function (album) {
-    //                                         // update artist recent release in db
-    //                                         artist.recent_release = {
-    //                                             id: album.id,
-    //                                             title: album.name,
-    //                                             release_date: album.release_date
-    //                                         };
-    //                                         artist.save();
-    //                                         // push new release notification to all users tracking artist
-    //                                         db.artistNewReleaseFound(artist);
-    //                                     })
-    //                                     .catch(function (err) {
-    //                                         // todo turn into debug report
-    //                                         console.log(err);
-    //                                     })
-    //                             }
-    //                         });
-    //
-    //                     if (i++ < artists.length-1) {
-    //                         setTimeout(processArtist, 150);
-    //                     } else {
-    //                         console.log('finished checking for new releases!');
-    //                         deferred.resolve();
-    //                     }
-    //                 });
-    //         }
-    //         // start recursive call
-    //         processArtist();
-    //     });
-    deferred.resolve();
     return deferred.promise;
 }
 
 module.exports = {
-    startScan: function () {
+    startScan: function (sendEmails) {
         var deferred = Q.defer();
         // pause job queues
         syncLibraryQueue.pause();
@@ -114,12 +74,19 @@ module.exports = {
         // scan for new releases
         scan()
             .then(function () {
-                // send new release emails
-                emailHandler.sendNewReleaseEmails();
                 // resume job queues
                 syncLibraryQueue.resume();
                 getArtistDetailsQueue.resume();
-                deferred.resolve();
+
+                if (sendEmails){
+                    // send new release emails
+                    emailHandler.sendNewReleaseEmails()
+                        .then(function() {
+                            deferred.resolve();
+                        });
+                } else {
+                    deferred.resolve();
+                }
             })
             .catch(function(err) {
                 deferred.reject(err);

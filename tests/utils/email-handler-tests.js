@@ -4,6 +4,7 @@ var expect = require('chai').expect,
     User = require('../../server/models/user'),
     Artist = require('../../server/models/artist'),
     email = require('../../server/utils/email-handler'),
+    releaseScanner = require('../../server/utils/new-release-handler'),
     Db = require('../../server/utils/db-wrapper'),
     testHelper = require('../test-helpers'),
     sampleData = require('../sample-test-data');
@@ -102,4 +103,15 @@ describe('email-handler tests', function () {
                 console.log(err);
             })
     });
+
+    it('should resolve after all users have been notified of their new releases', function(done) {
+        this.timeout(60000 * 120); // staging the database takes a little while
+        testHelper.stageSampleNewReleaseDb(100, 100, 5000)
+            .then(function() {
+                releaseScanner.startScan(true)
+                    .then(function() {
+                        done();
+                    })
+            })
+    })
 });

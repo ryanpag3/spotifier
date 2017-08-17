@@ -1,6 +1,8 @@
 /** This file handles all the client authenticated calls to the spotify api. **/
 var SpotifyApi = require('spotify-web-api-node'),
     Q = require('q'),
+    fs = require('fs'),
+    path = require('path'),
     credentials = {
         clientId: '5c3f5262d39e44ec999a8a0a9babac3e',
         clientSecret: 'a0d232e3a1844de785777c20944f2618'
@@ -103,52 +105,77 @@ var self = module.exports = {
     getNewReleases: function () {
         var deferred = Q.defer();
         var releases = [];
+        var artistAdded = {};
         var query = 'tag:new';
-        self.refreshClientToken()
-            .then(function () {
-                run();
-                var offset = 0;
+        var checkDate = new Date();
+        checkDate.setDate(checkDate.getDate() - 1); // 24 hours
+        console.log(path.join(__dirname, './cache/cached-new-releases.txt'));
+        var cachedReleases = fs.readFileSync(path.join(__dirname, './cache/cached-new-releases.txt'), 'utf-8');
+        console.log(cachedReleases);
+        if (cachedReleases) {
+            console.log('we here??');
+            cachedReleases = JSON.parse(cachedReleases);
+        } else {
+            console.log('we here???');
+            cachedReleases = {};
+        }
+        // if syncDate has not been set or syncDate is older than 24 hours from this point
+        if (!cachedReleases.syncDate || cachedReleases.syncDate < checkDate){
+            console.log('we here?');
+            cachedReleases.syncDate = new Date();
+            self.refreshClientToken()
+                .then(function () {
+                    run();
+                    var offset = 0;
 
-                function run() {
-
-                    spotifyApi.searchAlbums(query, {
-                        limit: 50,
-                        offset: offset
-                    })
-                        .then(function (data) {
-                            console.log(offset + '/' + data.body.albums.total);
-                            for (var i = 0; i < data.body.albums.items.length; i++) {
-                                var album = {
-                                    spotify_id: data.body.albums.items[i].artists[0].id,
-                                    name: data.body.albums.items[i].artists[0].name,
-                                    recent_release: {
-                                        id: data.body.albums.items[i].id,
-                                        title: data.body.albums.items[i].name
+                    function run() {
+                        spotifyApi.searchAlbums(query, {
+                            limit: 50,
+                            offset: offset
+                        })
+                            .then(function (data) {
+                                console.log(offset + '/' + data.body.albums.total);
+                                for (var i = 0; i < data.body.albums.items.length; i++) {
+                                    var album = {
+                                        spotify_id: data.body.albums.items[i].artists[0].id,
+                                        name: data.body.albums.items[i].artists[0].name,
+                                        recent_release: {
+                                            id: data.body.albums.items[i].id,
+                                            title: data.body.albums.items[i].name
+                                        }
+                                    };
+                                    if (!artistAdded[album.name]){
+                                        artistAdded[album.name] = true;
+                                        releases.push(album);
                                     }
-                                };
-                                // console.log(album);
-                                releases.push(album);
-                            }
-                            offset = offset + 50;
-                            if (offset < data.body.albums.total) {
+                                }
+                                offset = offset + 50;
+                                if (offset < data.body.albums.total) {
+                                    run();
+                                } else {
+                                    cachedReleases.releases = releases;
+                                    fs.writeFile(path.join(__dirname, './cache/cached-new-releases.txt'), JSON.stringify(cachedReleases, null, 4), 'utf-8');
+                                    deferred.resolve(releases);
+                                }
+                            })
+                            .catch(function (err) {
+                                console.log(err);
                                 run();
-                            } else {
-                                deferred.resolve(releases);
-                            }
-                        })
-                        .catch(function (err) {
-                            console.log(err);
-                            run();
-                        })
-                }
-            })
-            .catch(function (err) {
-                console.log(err);
-            });
+                            })
+                    }
+                })
+                .catch(function (err) {
+                    console.log(err);
+                });
+        } else {
+            deferred.resolve(cachedReleases.releases);
+        }
+
         return deferred.promise;
     },
 
     // USED FOR TESTING PURPOSES ONLY
+    // DUPLICATE CODE DUE TO MAINTAINING PROD METHOD READABILITY
     getSecondRecentRelease: function (artist) {
         var deferred = Q.defer();
         // ensure fresh token

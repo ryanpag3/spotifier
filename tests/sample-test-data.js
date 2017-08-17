@@ -2,7 +2,9 @@
  * contains sample test cases to use on unit tests
  * @type {[null]}
  */
-var privateConfig = require('../config-private');
+var privateConfig = require('../config-private'),
+    moniker = require('moniker'),
+    potNames = moniker.generator([moniker.noun]);
 module.exports = {
 
     failArtist: function () {
@@ -12,7 +14,7 @@ module.exports = {
     passArtist: function () {
         return {
             spotify_id: '123456789',
-            name: 'artist1',
+            name: 'passArtist',
             recent_release: {
                 id: '1234',
                 title: 'album title',
@@ -29,7 +31,7 @@ module.exports = {
     passArtists: function () {
         return [{
             spotify_id: '123456789',
-            name: 'artist1',
+            name: 'passArtists',
             recent_release: {
                 id: '1234',
                 title: 'album title',
@@ -106,7 +108,7 @@ module.exports = {
     // pass all user tests
     passUser: function () {
         return {
-            name: 'user',
+            name: potNames.choose(),
             email: {
                 address: privateConfig.gmail.username,
                 confirmed: true
@@ -117,7 +119,7 @@ module.exports = {
     // pass all user tests and check for multiple email functionality
     passUser2: function() {
       return {
-          name: 'user2',
+          name: potNames.choose(),
           email: {
               address: privateConfig.gmail2.username,
               confirmed: true
