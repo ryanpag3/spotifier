@@ -68,7 +68,6 @@ app.factory('libraryService', ['$q', '$http',
         // gets spotify api artist search results from http request
         function searchSpotify(query) {
             var deferred = $q.defer();
-            console.log(query);
             $http.post('/artist/search', ({query: query}))
                 .then(function (res) {
                     if (res.status === 200) {

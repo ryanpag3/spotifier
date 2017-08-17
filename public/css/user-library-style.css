@@ -1,5 +1,18 @@
+header {
+    position: relative;
+    background-color: black;
+    width: 100%;
+    height: 50px;
+}
+
+h1 {
+    float: left;
+    color: white;
+    margin: 0;
+}
+
 .page-container {
-    height: calc(100vh - 50px);
+    height: 100vh;
     width: 100%;
     background-color: lightblue;
 }
@@ -7,7 +20,7 @@
 .library-container {
     overflow-y: scroll;
     margin: 0 auto;
-    height: 100%;
+    height: calc(100vh - 50px);
     background-color: darkgrey;
 }
 
@@ -44,16 +57,83 @@
     vertical-align: middle;
 }
 
+.btn-login {
+    width: 80px;
+    margin: 8px;
+}
+
 .sidebar {
     float: right
+}
+
+.search {
+    position: absolute;
+    width: 250px;
+    z-index: 5;
+    margin-left: 130px;
+}
+
+.search-bar {
+    width: 100%;
+    min-width: 200px;
+    margin-top: 10px;
+    margin-left: 10px;
+    float: left;
+}
+
+.search-results {
+    height: 236px;
+    width: 100%;
+    margin-left: 10px;
+    background-color: #484d46;
+    float: left;
+    overflow: auto;
+}
+
+.result {
+    display: flex;
+    height: 42px;
+    width: 242px;
+    margin: 4px;
+}
+
+.result-add {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 42px;
+    height: 42px;
+    color: white;
+    background: transparent;
+    border: none;
+}
+
+.result-name {
+    display: flex;
+    flex-direction: column;
+    width: 158px;
+    min-width: 0;
+    justify-content: center;
+    vertical-align: middle;
+    padding-left: 4px;
+    /*padding-right: 8px;*/
+    font-size: 14px;
+    color: #bdc5ba;
+    overflow: hidden;
+}
+
+.result-pic {
+    border-radius: 42px;
+    width: 42px;
+    height: 42px;
+    background-color: lightgray;
+    background-position: center;
+    background-size: cover;
 }
 
 #artist-name {
     overflow: hidden;
 
-}
-
-#artist-release {
 }
 
 #artist-release-art {
@@ -70,5 +150,12 @@
 
 }
 
-#artist-release-date {
+#result-spinner {
+    font-size: 24px;
+    margin: auto;
+    color: grey;
+}
+
+#h {
+    background-color: black;
 }

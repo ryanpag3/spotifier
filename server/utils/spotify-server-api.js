@@ -110,12 +110,11 @@ var self = module.exports = {
         var checkDate = new Date();
         checkDate.setDate(checkDate.getDate() - 1); // 24 hours
         var p = path.join(__dirname, './cache/cached-new-releases.txt');
-        var cachedReleases = fs.existsSync(p) ? fs.readFileSync(p, 'utf-8') : '';
-        if (cachedReleases) {
-            cachedReleases = JSON.parse(cachedReleases);
-        } else {
-            cachedReleases = {};
-        }
+        var cachedReleases = fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf-8')) : {};
+
+        // if (cachedReleases) {
+        //     cachedReleases = JSON.parse(cachedReleases);
+        // }
         // if syncDate has not been set or syncDate is older than 24 hours from this point
         if (!cachedReleases.syncDate || cachedReleases.syncDate < checkDate){
             cachedReleases.syncDate = new Date();
