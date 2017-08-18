@@ -1,7 +1,7 @@
 /**
  * Created by ryan on 7/18/2017.
  */
-var app = angular.module('spotifier', ['ngRoute', 'spotify']);
+var app = angular.module('spotifier', ['ngRoute', 'spotify', 'ui.grid', 'ui.grid.autoResize']);
 
 app.config(['$routeProvider', '$locationProvider', 'SpotifyProvider',
     function ($routeProvider, $locationProvider, SpotifyProvider) {
