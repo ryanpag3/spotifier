@@ -5,6 +5,7 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
     function ($scope, $location, $rootScope, $timeout, libraryService) {
 
         var prevQuery;
+        var srcLibrary = [];
         $scope.syncButtonShown = true;
         $scope.enqueued = 'enqueued';
         $scope.active = 'active';
@@ -36,6 +37,7 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
                     $scope.syncStatus = status;
                 })
         }
+
         init(); // run initialization code
 
         /**
@@ -148,7 +150,8 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
         function getLibrary() {
             libraryService.get()
                 .then(function (library) {
-                    $scope.library = library;
+                    srcLibrary = library;
+                    pushToLibrary(srcLibrary);
                     // $scope.libraryArtistAscending = sortBy(library, 'name');
                     // $scope.libraryArtistDescending = (sortBy(library, 'name')).reverse();
                     // $scope.libraryTitleAscending = sortBy(library, 'title');
@@ -156,6 +159,16 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
                     // $scope.libraryDateAscending = sortBy(library, 'date');
                     // $scope.libraryDateDescending = (sortBy(library, 'date')).reverse();
                 });
+        }
+
+        function pushToLibrary(items) {
+            var item = items.shift();
+            if (item) {
+                $timeout(function() {
+                    $scope.library.push(item);
+                    pushToLibrary(items);
+                }, 10);
+            }
         }
 
         /********** HELPER FUNCTIONS **********/
@@ -230,5 +243,5 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
                 $scope.$apply();
             }
         });
-}]);
+    }]);
 
