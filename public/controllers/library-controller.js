@@ -150,8 +150,21 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
         function getLibrary() {
             libraryService.get()
                 .then(function (library) {
-                    srcLibrary = library;
-                    pushToLibrary(srcLibrary);
+                    // solution for this found @
+                    // https://stackoverflow.com/a/38317754/7977846
+                    var libraryChunks = chunk(library, 25);
+                    $scope.library = libraryChunks[0];
+                    var delay = 100;
+                    angular.forEach(libraryChunks, function(value, index) {
+                        delay += 100;
+
+                        // skip the first chuck
+                        if( index > 0 ) {
+                            $timeout(function() {
+                                Array.prototype.push.apply($scope.library,value);
+                            }, delay);
+                        }
+                    });
                     // $scope.libraryArtistAscending = sortBy(library, 'name');
                     // $scope.libraryArtistDescending = (sortBy(library, 'name')).reverse();
                     // $scope.libraryTitleAscending = sortBy(library, 'title');
@@ -159,16 +172,6 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
                     // $scope.libraryDateAscending = sortBy(library, 'date');
                     // $scope.libraryDateDescending = (sortBy(library, 'date')).reverse();
                 });
-        }
-
-        function pushToLibrary(items) {
-            var item = items.shift();
-            if (item) {
-                $timeout(function() {
-                    $scope.library.push(item);
-                    pushToLibrary(items);
-                }, 10);
-            }
         }
 
         /********** HELPER FUNCTIONS **********/
@@ -181,6 +184,16 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
                 return e._id
             }).indexOf(artist._id);
             $scope.library.splice(index, 1);
+        }
+
+        function chunk (arr, len) {
+            var chunks = [],
+                i = 0,
+                n = arr.length;
+            while (i < n) {
+                chunks.push(arr.slice(i, i += len));
+            }
+            return chunks;
         }
 
         /**
