@@ -26,8 +26,8 @@
         </div>
 
     </div>
-    <div class="container-fluid">
-        <div class="row">
+    <div class="container-fluid" style="height: calc( 100% - 50px )">
+        <div class="row" style="height: 100%">
             <div class="sidebar col-md-2" data-ng-switch="syncStatus">
                 <button class="btn btn-success" data-ng-click="syncLibrary()" data-ng-switch-default>SYNC W/ LIBRARY</button>
                 <div class="sync-queue-tooltip" data-ng-switch-when="enqueued">
@@ -40,7 +40,7 @@
             </div>
 
             <div class="library-container container-fluid col-md-8 col-xs-11">
-                <div ui-grid="{data: library}" class="" ui-grid-auto-resize></div>
+                <div class="grid" ui-grid="gridOptions"></div>
 
                 <!--<div data-ng-repeat="artist in library track by $index" class="artist-container .container">-->
                     <!--<div class="toggle-container">-->

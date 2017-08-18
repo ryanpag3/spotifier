@@ -26,7 +26,9 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
         $scope.libraryDateAscending = [];
         $scope.libraryDateDescending = [];
 
-        $scope.gridOptions = {};
+        $scope.gridOptions = {
+            excessRows: 6
+        };
 
         /**
          * initialization code for this controller
@@ -151,7 +153,7 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
         function getLibrary() {
             libraryService.get()
                 .then(function (library) {
-                    $scope.library = library;
+                    $scope.gridOptions.data = library;
                     // solution for this found @
                     // https://stackoverflow.com/a/38317754/7977846
                     // var libraryChunks = chunk(library, 25);

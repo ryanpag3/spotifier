@@ -24,7 +24,8 @@ h1 {
 
 .library-container {
     /*height: calc(100vh - 50px);*/
-    height: calc(100vh - 50px);
+    /*height: calc(100vh - 50px);*/
+    height: 100%;
     background-color: darkgrey;
 }
 
@@ -134,9 +135,8 @@ h1 {
     background-size: cover;
 }
 
-.libraryGrid {
-    width: 100%;
-    height: 100%;
+.grid {
+    height: 100% !important;
 }
 
 #artist-name {
