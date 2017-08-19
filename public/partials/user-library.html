@@ -1,18 +1,21 @@
-
-
 <div class="page-container" data-ng-controller="library-controller">
     <link rel="stylesheet" type="text/css" href="../css/user-library-style.css">
-    <header>
+    <div id="header">
         <h1>Spotifier</h1>
         <div class="search">
             <form data-ng-submit="search(artistName)">
-                <input id="spotify-search" class="search-bar" placeholder="search for artists" data-ng-model="artistName">
+                <input id="spotify-search" class="search-bar" placeholder="search for artists"
+                       data-ng-model="artistName">
             </form>
             <div class="search-results" data-ng-cloak data-ng-show="resultBoxShown">
                 <i id="result-spinner" class="fa fa-refresh fa-spin" data-ng-show="resultSpinnerShown"></i>
                 <div class="result" data-ng-repeat="artist in results" data-ng-show="resultsShown">
-                    <button class="result-add" data-ng-click="add(artist)"><i class="fa fa-align-center fa-plus fa-2x"></i></button>
-                    <div class="result-name"><div style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden">{{artist.name}}</div></div>
+                    <button class="result-add" data-ng-click="add(artist)"><i
+                            class="fa fa-align-center fa-plus fa-2x"></i></button>
+                    <div class="result-name">
+                        <div style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden">{{artist.name}}
+                        </div>
+                    </div>
                     <div class="result-pic" data-ng-style="{'background-image' : 'url(' + artist.url + ')'}"></div>
                 </div>
             </div>
@@ -22,32 +25,45 @@
             <a href="/user/logout" target="_self" class="btn btn-primary btn-login">logout</a>
         </div>
 
-    </header>
-    <!--USER LIBRARY PARTIAL PAGE-->
-    <div class="sidebar" data-ng-switch="syncStatus">
-        <button class="btn btn-success" data-ng-click="syncLibrary()" data-ng-switch-default>SYNC W/ LIBRARY</button>
-        <div class="sync-queue-tooltip" data-ng-switch-when="enqueued">
-            <div>BLAH BLAH BLAH YOURE IN A QUEUE</div>
-            <button class="fa fa-times" data-ng-click="cancelSyncLibrary()"></button>
-        </div>
-        <div class="sync-queue-tooltip active-sync" data-ng-switch-when="active">
-            <div>YOUR LIBRARY IS CURRENTLY BEING SYNCED</div>
+    </div>
+    <div class="container-fluid" style="height: calc( 100% - 50px )">
+        <div class="row" style="height: 100%">
+            <div class="sidebar col-md-2" data-ng-switch="syncStatus">
+                <button class="btn btn-success" data-ng-click="syncLibrary()" data-ng-switch-default>SYNC W/ LIBRARY</button>
+                <div class="sync-queue-tooltip" data-ng-switch-when="enqueued">
+                    <div>BLAH BLAH BLAH YOURE IN A QUEUE</div>
+                    <button class="fa fa-times" data-ng-click="cancelSyncLibrary()"></button>
+                </div>
+                <div class="sync-queue-tooltip active-sync" data-ng-switch-when="active">
+                    <div>YOUR LIBRARY IS CURRENTLY BEING SYNCED</div>
+                </div>
+            </div>
+
+            <div class="library-container container-fluid col-md-8 col-xs-11">
+                <div class="grid" ui-grid="gridOptions"></div>
+
+                <!--<div data-ng-repeat="artist in library track by $index" class="artist-container .container">-->
+                    <!--<div class="toggle-container">-->
+                        <!--<button data-ng-click="removeArtist(artist)" class="toggle-button fa fa-check fa-2x"></button>-->
+                    <!--</div>-->
+                    <!--<div style="height: 100%; width: 95%; float: left;">-->
+                        <!--<div id="artist-name" class="artist-element col-xs-4">{{artist.name}}</div>-->
+                        <!--<div id="artist-release" class="artist-element col-xs-8">-->
+                            <!--<div data-ng-style="{'background-image' : 'url(' + artist.recent_release.images[2].url + ')'}"-->
+                                 <!--id="artist-release-art" class="artist-element col-xs-1"></div>-->
+                            <!--<div id="artist-release-title" class="artist-element col-xs-8">{{artist.recent_release.title}}-->
+                            <!--</div>-->
+                            <!--<div id="artist-release-date" class="artist-element col-xs-3">-->
+                                <!--{{artist.recent_release.release_date}}-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+            </div>
         </div>
     </div>
 
-    <div class="library-container container-fluid col-xs-9">
-            <div data-ng-repeat="artist in library" class="artist-container .container">
-                <div class="toggle-container"><button data-ng-click="removeArtist(artist)" class="toggle-button fa fa-check fa-2x"></button></div>
-                <div style="height: 100%; width: 95%; float: left;">
-                    <div id="artist-name" class="artist-element col-xs-4">{{artist.name}}</div>
-                    <div id="artist-release" class="artist-element col-xs-8">
-                        <div data-ng-style="{'background-image' : 'url(' + artist.recent_release.images[2].url + ')'}" id="artist-release-art" class="artist-element col-xs-1"></div>
-                        <div id="artist-release-title" class="artist-element col-xs-8">{{artist.recent_release.title}}</div>
-                        <div id="artist-release-date" class="artist-element col-xs-3">{{artist.recent_release.release_date}}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+
 </div>
 
 

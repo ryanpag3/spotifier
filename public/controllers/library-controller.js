@@ -26,6 +26,24 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
         $scope.libraryDateAscending = [];
         $scope.libraryDateDescending = [];
 
+        $scope.gridOptions = {
+            columnDefs: [
+                {field: 'name', displayName: 'Artist'},
+                {
+                    name: 'art',
+                    displayName: '',
+                    cellTemplate: '<div data-ng-style="{\'background-image\' : \'url(\' + row.entity.recent_release.images[2].url + \')\'}"\n' +
+                    'id="artist-release-art" class="artist-element col-xs-1"></div>',
+                    width: 50, enableSorting: false,
+                    enableHiding: false
+                },
+                {field: 'recent_release.title', displayName: 'Recent Release'},
+                {field: 'recent_release.release_date', displayName: 'Date', width: 120}
+            ],
+            excessRows: 25,
+            rowHeight: 45,
+            enableColumnMenus: false
+        };
 
         /**
          * initialization code for this controller
@@ -150,21 +168,22 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
         function getLibrary() {
             libraryService.get()
                 .then(function (library) {
+                    $scope.gridOptions.data = library;
                     // solution for this found @
                     // https://stackoverflow.com/a/38317754/7977846
-                    var libraryChunks = chunk(library, 25);
-                    $scope.library = libraryChunks[0];
-                    var delay = 100;
-                    angular.forEach(libraryChunks, function(value, index) {
-                        delay += 100;
-
-                        // skip the first chuck
-                        if( index > 0 ) {
-                            $timeout(function() {
-                                Array.prototype.push.apply($scope.library,value);
-                            }, delay);
-                        }
-                    });
+                    // var libraryChunks = chunk(library, 25);
+                    // $scope.library = libraryChunks[0];
+                    // var delay = 100;
+                    // angular.forEach(libraryChunks, function(value, index) {
+                    //     delay += 100;
+                    //
+                    //     // skip the first chuck
+                    //     if( index > 0 ) {
+                    //         $timeout(function() {
+                    //             Array.prototype.push.apply($scope.library,value);
+                    //         }, delay);
+                    //     }
+                    // });
                     // $scope.libraryArtistAscending = sortBy(library, 'name');
                     // $scope.libraryArtistDescending = (sortBy(library, 'name')).reverse();
                     // $scope.libraryTitleAscending = sortBy(library, 'title');
@@ -186,7 +205,7 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
             $scope.library.splice(index, 1);
         }
 
-        function chunk (arr, len) {
+        function chunk(arr, len) {
             var chunks = [],
                 i = 0,
                 n = arr.length;
