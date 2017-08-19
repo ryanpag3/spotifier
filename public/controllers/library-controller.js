@@ -25,9 +25,15 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
         // sort by release date
         $scope.libraryDateAscending = [];
         $scope.libraryDateDescending = [];
-
+        // define ui-grid api options
         $scope.gridOptions = {
             columnDefs: [
+                {
+                    name: 'removeButton',
+                    displayName: '',
+                    cellTemplate: '<button data-ng-click="grid.appScope.removeArtist(row.entity)" class="toggle-button fa fa-check fa-2x"></button>',
+                    width: 40
+                },
                 {field: 'name', displayName: 'Artist'},
                 {
                     name: 'art',
@@ -118,7 +124,7 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
          * to allow for instant UI updates.
          */
         function pushArtistToLibrary(artist) {
-            $scope.library.push({
+            $scope.gridOptions.data.push({
                 name: artist.name,
                 spotify_id: artist.spotify_id,
                 recent_release: {
@@ -131,7 +137,6 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
          * ng-click function fof removing an artist for a user
          */
         $scope.removeArtist = function (artist) {
-            console.log(artist);
             libraryService.remove(artist)
                 .then(function () {
                     removeArtistLoc(artist);
@@ -199,10 +204,10 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
          * @param {Object} artist
          */
         function removeArtistLoc(artist) {
-            var index = $scope.library.map(function (e) {
+            var index = $scope.gridOptions.data.map(function (e) {
                 return e._id
             }).indexOf(artist._id);
-            $scope.library.splice(index, 1);
+            $scope.gridOptions.data.splice(index, 1);
         }
 
         function chunk(arr, len) {
