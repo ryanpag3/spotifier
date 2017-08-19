@@ -136,7 +136,7 @@ h1 {
 }
 
 .grid {
-    height: 100% !important;
+    height: calc(100vh - 5px) !important;
 }
 
 #artist-name {

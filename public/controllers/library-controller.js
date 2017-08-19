@@ -27,7 +27,22 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
         $scope.libraryDateDescending = [];
 
         $scope.gridOptions = {
-            excessRows: 6
+            columnDefs: [
+                {field: 'name', displayName: 'Artist'},
+                {
+                    name: 'art',
+                    displayName: '',
+                    cellTemplate: '<div data-ng-style="{\'background-image\' : \'url(\' + row.entity.recent_release.images[2].url + \')\'}"\n' +
+                    'id="artist-release-art" class="artist-element col-xs-1"></div>',
+                    width: 50, enableSorting: false,
+                    enableHiding: false
+                },
+                {field: 'recent_release.title', displayName: 'Recent Release'},
+                {field: 'recent_release.release_date', displayName: 'Date', width: 120}
+            ],
+            excessRows: 25,
+            rowHeight: 45,
+            enableColumnMenus: false
         };
 
         /**
@@ -190,7 +205,7 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
             $scope.library.splice(index, 1);
         }
 
-        function chunk (arr, len) {
+        function chunk(arr, len) {
             var chunks = [],
                 i = 0,
                 n = arr.length;
