@@ -174,27 +174,6 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
             libraryService.get()
                 .then(function (library) {
                     $scope.gridOptions.data = library;
-                    // solution for this found @
-                    // https://stackoverflow.com/a/38317754/7977846
-                    // var libraryChunks = chunk(library, 25);
-                    // $scope.library = libraryChunks[0];
-                    // var delay = 100;
-                    // angular.forEach(libraryChunks, function(value, index) {
-                    //     delay += 100;
-                    //
-                    //     // skip the first chuck
-                    //     if( index > 0 ) {
-                    //         $timeout(function() {
-                    //             Array.prototype.push.apply($scope.library,value);
-                    //         }, delay);
-                    //     }
-                    // });
-                    // $scope.libraryArtistAscending = sortBy(library, 'name');
-                    // $scope.libraryArtistDescending = (sortBy(library, 'name')).reverse();
-                    // $scope.libraryTitleAscending = sortBy(library, 'title');
-                    // $scope.libraryTitleDescending = (sortBy(library, 'title')).reverse();
-                    // $scope.libraryDateAscending = sortBy(library, 'date');
-                    // $scope.libraryDateDescending = (sortBy(library, 'date')).reverse();
                 });
         }
 
