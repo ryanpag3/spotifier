@@ -1,8 +1,8 @@
 "use strict";
 
 var app = angular.module('spotifier');
-app.controller('library-controller', ['$scope', '$location', '$rootScope', '$timeout', 'libraryService',
-    function ($scope, $location, $rootScope, $timeout, libraryService) {
+app.controller('library-controller', ['$scope', '$location', '$rootScope', '$timeout', '$window', 'libraryService',
+    function ($scope, $location, $rootScope, $timeout, $window, libraryService) {
 
         var prevQuery;
         var srcLibrary = [];
@@ -13,18 +13,6 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
         $scope.resultBoxShown = false;
         $scope.resultsShown = false;
 
-        // sort by date added
-        $scope.library = [];
-        $scope.libraryReversed = [];
-        // sort by artist
-        $scope.libraryArtistAscending = [];
-        $scope.libraryArtistDescending = [];
-        // sort by release title
-        $scope.libraryTitleAscending = [];
-        $scope.libraryTitleDescending = [];
-        // sort by release date
-        $scope.libraryDateAscending = [];
-        $scope.libraryDateDescending = [];
         // define ui-grid api options
         $scope.gridOptions = {
             columnDefs: [
@@ -34,17 +22,18 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
                     cellTemplate: '<button data-ng-click="grid.appScope.removeArtist(row.entity)" class="toggle-button fa fa-check fa-2x"></button>',
                     width: 40
                 },
-                {field: 'name', displayName: 'Artist'},
                 {
                     name: 'art',
                     displayName: '',
                     cellTemplate: '<div data-ng-style="{\'background-image\' : \'url(\' + row.entity.recent_release.images[2].url + \')\'}"\n' +
-                    'id="artist-release-art" class="artist-element col-xs-1"></div>',
+                    'id="artist-release-art" class="artist-element"></div>',
                     width: 50, enableSorting: false,
-                    enableHiding: false
+                    enableHiding: false,
+                    cellClass: 'grid-artist-column'
                 },
-                {field: 'recent_release.title', displayName: 'Recent Release'},
-                {field: 'recent_release.release_date', displayName: 'Date', width: 120}
+                {field: 'name', displayName: 'Artist', minWidth: 150, width: 300, cellClass:'grid-center-text-vert'},
+                {field: 'recent_release.title', displayName: 'Recent Release Title', cellClass:'grid-center-text-vert'},
+                {field: 'recent_release.release_date', displayName: 'Date', width: 100, minWidth: 100, cellClass:'grid-center-text-vert'}
             ],
             excessRows: 25,
             rowHeight: 45,
@@ -247,6 +236,13 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
                     });
             }
         }
+
+        /**
+         * Window resize listener. Used for hiding ui-grid columns at certain window lengths.
+         */
+        angular.element($window).on('resize', function() {
+            console.log($window.innerWidth);
+        });
 
         /** JQUERY **/
         // todo convert to a directive

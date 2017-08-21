@@ -2,9 +2,9 @@
     <link rel="stylesheet" type="text/css" href="../css/user-library-style.css">
     <div id="header">
         <h1>Spotifier</h1>
-        <div class="search">
-            <form data-ng-submit="search(artistName)">
-                <input id="spotify-search" class="search-bar" placeholder="search for artists"
+        <div class="search container">
+            <form class="form-group" data-ng-submit="search(artistName)">
+                <input id="spotify-search" class="form-control search-bar" placeholder="search for artists on Spotify"
                        data-ng-model="artistName">
             </form>
             <div class="search-results" data-ng-cloak data-ng-show="resultBoxShown">
@@ -22,12 +22,12 @@
         </div>
 
         <div style="position: absolute; right: 0; top: 0">
-            <a href="/user/logout" target="_self" class="btn btn-primary btn-login">logout</a>
+            <a href="/user/logout" target="_self" class="menu-button">logout</a>
         </div>
 
     </div>
-    <div class="container-fluid" style="height: calc( 100% - 50px )">
-        <div class="row" style="height: 100%">
+    <div class="container-fluid">
+        <div class="row">
             <div class="sidebar col-md-2" data-ng-switch="syncStatus">
                 <button class="btn btn-success" data-ng-click="syncLibrary()" data-ng-switch-default>SYNC W/ LIBRARY</button>
                 <div class="sync-queue-tooltip" data-ng-switch-when="enqueued">
