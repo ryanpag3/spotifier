@@ -11,11 +11,6 @@ var express = require('express'),
     Db = require('../utils/db-wrapper.js'),
     syncLibraryJobQueue = require('../utils/queue-sync-user-library.js');
 
-/* handles searching a user's saved artists */
-router.post('/search', function(req, res) {
-   // TODO
-});
-
 router.get('/update', function(req, res) {
     var db = new Db();
     db.getLibrary(req.user)

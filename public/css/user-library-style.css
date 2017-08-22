@@ -2,20 +2,6 @@ p {
 
 }
 
-#header {
-    position: relative;
-    background-color: #4c4e4a;
-    width: 100%;
-    height: 75px;
-}
-
-#logo {
-    float: left;
-    color: white;
-    margin-top: 16px;
-    margin-left: 20px;
-}
-
 .col-centered {
     float: none;
     margin: 0 auto;
@@ -24,8 +10,11 @@ p {
 .page-container {
     height: 100vh;
     width: 100%;
-    min-width: 1040px;
     background-color: #c5c7c3;
+}
+
+.body-container {
+    height: calc(100vh - 75px)
 }
 
 .library-container {
@@ -59,12 +48,21 @@ p {
     justify-content: center;
 }
 
-.toggle-button {
+.fa-btn {
     background: transparent;
     border: none;
     outline: none;
     line-height: inherit;
+}
+
+.added-button {
     vertical-align: middle;
+    margin: 0 auto;
+    color: #4c4e4a;
+}
+
+.remove-button {
+    margin: 3px;
 }
 
 .btn-login {
@@ -91,7 +89,7 @@ p {
     position: absolute;
     height: 236px;
     width: 90%;
-    margin-left: 0px;
+    margin-left: 2px;
     background-color: #484d46;
     overflow: auto;
     z-index: 5;
@@ -100,7 +98,7 @@ p {
 .result {
     display: flex;
     height: 42px;
-    width: 242px;
+    width: 98%;
     margin: 4px;
 }
 
@@ -118,8 +116,7 @@ p {
 .result-name {
     display: flex;
     flex-direction: column;
-    width: 158px;
-    min-width: 0;
+    flex-grow: 1;
     justify-content: center;
     vertical-align: middle;
     padding-left: 4px;
@@ -202,7 +199,6 @@ p {
     width: 100%;
     max-width: 200px;
     font-size: 9pt;
-    background-color: #1dab4f;
 }
 
 
@@ -212,6 +208,7 @@ p {
     width: 100%;
     text-align: center;
     margin-top: 10px;
+    font-size: 18pt;
 }
 
 .tooltip-line {
@@ -226,6 +223,31 @@ p {
     background: transparent;
     border: none;
     color: white;
+}
+
+.menu-button {
+    color: white;
+    text-decoration: none !important;
+    margin: 16px;
+
+}
+
+.menu-button:hover {
+    color: #1dab4f;
+}
+
+#header {
+    position: relative;
+    background-color: #4c4e4a;
+    width: 100%;
+    height: 75px;
+}
+
+#logo {
+    float: left;
+    color: white;
+    margin-top: 16px;
+    margin-left: 20px;
 }
 
 #artist-name {
@@ -247,6 +269,14 @@ p {
 
 }
 
+#spinner-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
 #result-spinner {
     font-size: 24px;
     margin: auto;
@@ -257,11 +287,22 @@ p {
     background-color: black;
 }
 
+#help-btn {
+    float: right;
+    color: black;
+    text-decoration: none !important;
+}
+
+#help-btn:hover {
+    color: #1dab4f;
+}
+
 #instructions-tooltip-text {
     max-height: 100%;
     text-align: center;
     font-size: 10pt;
     margin: 10px;
+    margin-bottom: 15px;
     color: #c2c4c0;
 }
 

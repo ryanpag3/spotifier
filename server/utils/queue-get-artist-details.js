@@ -14,7 +14,6 @@ var artistDetailsQueue = new Queue('artist-details'); // todo add prod redis val
 artistDetailsQueue.process(2, function (job, done) {
     spotifyApiServer.getRecentRelease(job.data.artist)
         .then(function (album) {
-            // parse album results
             var artist = {
                 spotify_id: job.data.artist.spotify_id,
                 recent_release: {
