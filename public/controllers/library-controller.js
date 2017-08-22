@@ -1,11 +1,13 @@
 "use strict";
 
 var app = angular.module('spotifier');
-app.controller('library-controller', ['$scope', '$location', '$rootScope', '$timeout', 'libraryService',
-    function ($scope, $location, $rootScope, $timeout, libraryService) {
+app.controller('library-controller', ['$scope', '$location', '$rootScope',
+    '$timeout', '$window', '$filter', 'libraryService',
+    function ($scope, $location, $rootScope, $timeout, $window, $filter, libraryService) {
 
         var prevQuery;
         var srcLibrary = [];
+        $scope.data = [];
         $scope.syncButtonShown = true;
         $scope.enqueued = 'enqueued';
         $scope.active = 'active';
@@ -13,18 +15,6 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
         $scope.resultBoxShown = false;
         $scope.resultsShown = false;
 
-        // sort by date added
-        $scope.library = [];
-        $scope.libraryReversed = [];
-        // sort by artist
-        $scope.libraryArtistAscending = [];
-        $scope.libraryArtistDescending = [];
-        // sort by release title
-        $scope.libraryTitleAscending = [];
-        $scope.libraryTitleDescending = [];
-        // sort by release date
-        $scope.libraryDateAscending = [];
-        $scope.libraryDateDescending = [];
         // define ui-grid api options
         $scope.gridOptions = {
             columnDefs: [
@@ -34,17 +24,18 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
                     cellTemplate: '<button data-ng-click="grid.appScope.removeArtist(row.entity)" class="toggle-button fa fa-check fa-2x"></button>',
                     width: 40
                 },
-                {field: 'name', displayName: 'Artist'},
                 {
                     name: 'art',
                     displayName: '',
                     cellTemplate: '<div data-ng-style="{\'background-image\' : \'url(\' + row.entity.recent_release.images[2].url + \')\'}"\n' +
-                    'id="artist-release-art" class="artist-element col-xs-1"></div>',
+                    'id="artist-release-art" class="artist-element"></div>',
                     width: 50, enableSorting: false,
-                    enableHiding: false
+                    enableHiding: false,
+                    cellClass: 'grid-artist-column'
                 },
-                {field: 'recent_release.title', displayName: 'Recent Release'},
-                {field: 'recent_release.release_date', displayName: 'Date', width: 120}
+                {field: 'name', displayName: 'Artist', minWidth: 150, width: 300, cellClass:'grid-center-text-vert'},
+                {field: 'recent_release.title', displayName: 'Recent Release Title', cellClass:'grid-center-text-vert'},
+                {field: 'recent_release.release_date', displayName: 'Date', width: 100, minWidth: 100, cellClass:'grid-center-text-vert'}
             ],
             excessRows: 25,
             rowHeight: 45,
@@ -100,6 +91,21 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
                     $('#spotify-search').blur();
                 })
             }
+        };
+
+        /**
+         * Solution for this found @:
+         * https://stackoverflow.com/questions/26232723/angularjs-ui-grid-filter-from-text-input-field
+         * ui-grid does not have a native global filter so what we do is apply our own filter to the data
+         * on ng-change based on the source which we define by $scope.data and then the filter key, which in
+         * this case is the ng-model for the search bar, $scope.artistName.
+         *
+         * another possible solution: http://plnkr.co/edit/ZjsDQ8dp9XWELAOGvyBw?p=preview
+         * but has a limitation to one column used as the search key
+         * possible todo: rename search bar variable to properly represent new search scope
+         */
+        $scope.filterGrid = function() {
+            $scope.gridOptions.data = $filter('filter')($scope.data, $scope.artistName);
         };
 
         /**
@@ -173,6 +179,7 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
         function getLibrary() {
             libraryService.get()
                 .then(function (library) {
+                    $scope.data = library;
                     $scope.gridOptions.data = library;
                 });
         }
@@ -247,6 +254,13 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
                     });
             }
         }
+
+        /**
+         * Window resize listener. Used for hiding ui-grid columns at certain window lengths.
+         */
+        angular.element($window).on('resize', function() {
+            console.log($window.innerWidth);
+        });
 
         /** JQUERY **/
         // todo convert to a directive

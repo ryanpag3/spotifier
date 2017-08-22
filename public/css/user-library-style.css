@@ -1,14 +1,19 @@
-#header {
-    position: relative;
-    background-color: black;
-    width: 100%;
-    height: 50px;
+p {
+
 }
 
-h1 {
+#header {
+    position: relative;
+    background-color: #4c4e4a;
+    width: 100%;
+    height: 75px;
+}
+
+#logo {
     float: left;
     color: white;
-    margin: 0;
+    margin-top: 16px;
+    margin-left: 20px;
 }
 
 .col-centered {
@@ -19,14 +24,14 @@ h1 {
 .page-container {
     height: 100vh;
     width: 100%;
-    background-color: lightblue;
+    min-width: 1040px;
+    background-color: #c5c7c3;
 }
 
 .library-container {
-    /*height: calc(100vh - 50px);*/
-    /*height: calc(100vh - 50px);*/
-    height: 100%;
-    background-color: darkgrey;
+    background-color: white;
+    padding-left: 0;
+    padding-right: 0;
 }
 
 .artist-container {
@@ -67,31 +72,29 @@ h1 {
     margin: 8px;
 }
 
-.sidebar {
-}
-
 .search {
-    position: absolute;
-    width: 250px;
+    position: relative;
+    width: 350px;
     z-index: 5;
-    margin-left: 130px;
+    margin: 0 auto;
+    vertical-align: middle;
 }
 
 .search-bar {
     width: 100%;
     min-width: 200px;
-    margin-top: 10px;
-    margin-left: 10px;
-    float: left;
+    margin-top: 18px;
+    margin-bottom: -10px;
 }
 
 .search-results {
+    position: absolute;
     height: 236px;
-    width: 100%;
-    margin-left: 10px;
+    width: 90%;
+    margin-left: 0px;
     background-color: #484d46;
-    float: left;
     overflow: auto;
+    z-index: 5;
 }
 
 .result {
@@ -136,7 +139,93 @@ h1 {
 }
 
 .grid {
-    height: calc(100vh - 5px) !important;
+    height: calc(100vh - 80px) !important;
+    min-width: 400px;
+}
+
+.grid-center-text-vert {
+    line-height: 37px;
+    vertical-align: middle;
+}
+
+.ui-grid {
+    color: #181818;
+}
+
+.ui-grid-viewport {
+    height: calc(100vh - 108px) !important;
+}
+
+.grid-artist-column {
+    background-color: #8c8c8c;
+}
+
+.left-sidebar-container {
+    height: 300px;
+
+}
+
+.sidebar {
+    width: 100%;
+    height: 100%;
+    background-color: #4c4e4a;
+    margin: 0 auto;
+    margin-top: 10px;
+}
+
+.sync-queue-tooltip {
+    width: 90%;
+    height: 90%;
+    margin: 0 auto;
+}
+
+.sync-queue-tooltip-text {
+    display: inline-block;
+    width: 95%;
+    max-width: 300px;
+    height: 60%;
+    text-align: center;
+    margin: 0 auto;
+    margin-top: 10px;
+    color: #c2c4c0;
+    font-size: 10pt;
+}
+
+.sync-queue-tooltip-nav {
+    display: flex;
+    height: 20%;
+    align-items: center;
+    justify-content: center;
+}
+
+.sync-queue-tooltip-btn {
+    width: 100%;
+    max-width: 200px;
+    font-size: 9pt;
+    background-color: #1dab4f;
+}
+
+
+.tooltip-title {
+    display: inline-block;
+    color: white;
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.tooltip-line {
+    width: 90%;
+    margin: 0 auto;
+    border-color: #1dab4f;
+}
+
+.close-window-btn {
+    position: absolute;
+    right: 15px;
+    background: transparent;
+    border: none;
+    color: white;
 }
 
 #artist-name {
@@ -146,8 +235,8 @@ h1 {
 
 #artist-release-art {
     background-size: contain;
-    width: 30px;
-    height: 30px;
+    width: 35px;
+    height: 35px;
     margin: 5px;
 }
 
@@ -167,3 +256,13 @@ h1 {
 #h {
     background-color: black;
 }
+
+#instructions-tooltip-text {
+    max-height: 100%;
+    text-align: center;
+    font-size: 10pt;
+    margin: 10px;
+    color: #c2c4c0;
+}
+
+
