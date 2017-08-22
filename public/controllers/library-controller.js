@@ -1,11 +1,13 @@
 "use strict";
 
 var app = angular.module('spotifier');
-app.controller('library-controller', ['$scope', '$location', '$rootScope', '$timeout', '$window', 'libraryService',
-    function ($scope, $location, $rootScope, $timeout, $window, libraryService) {
+app.controller('library-controller', ['$scope', '$location', '$rootScope',
+    '$timeout', '$window', '$filter', 'libraryService',
+    function ($scope, $location, $rootScope, $timeout, $window, $filter, libraryService) {
 
         var prevQuery;
         var srcLibrary = [];
+        $scope.data = [];
         $scope.syncButtonShown = true;
         $scope.enqueued = 'enqueued';
         $scope.active = 'active';
@@ -92,6 +94,21 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
         };
 
         /**
+         * Solution for this found @:
+         * https://stackoverflow.com/questions/26232723/angularjs-ui-grid-filter-from-text-input-field
+         * ui-grid does not have a native global filter so what we do is apply our own filter to the data
+         * on ng-change based on the source which we define by $scope.data and then the filter key, which in
+         * this case is the ng-model for the search bar, $scope.artistName.
+         *
+         * another possible solution: http://plnkr.co/edit/ZjsDQ8dp9XWELAOGvyBw?p=preview
+         * but has a limitation to one column used as the search key
+         * possible todo: rename search bar variable to properly represent new search scope
+         */
+        $scope.filterGrid = function() {
+            $scope.gridOptions.data = $filter('filter')($scope.data, $scope.artistName);
+        };
+
+        /**
          * ng-click handler for adding an artist to a user library. Calls the library service which
          * handles the AJAX call to the server, and on success calls pushArtistToLibrary which pushes
          * a local instance of an artist object to the library.
@@ -162,6 +179,7 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope', '$tim
         function getLibrary() {
             libraryService.get()
                 .then(function (library) {
+                    $scope.data = library;
                     $scope.gridOptions.data = library;
                 });
         }
