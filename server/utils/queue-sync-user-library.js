@@ -86,14 +86,16 @@ module.exports = {
             }
             syncLibraryQueue.getJob(user.sync_queue.id)
                 .then(function (job) {
-                    job.remove()
-                        .then(function () {
-                            console.log(user.name + '\'s job has been removed.');
-                            deferred.resolve();
-                        })
-                        .catch(function (err) {
-                            deferred.reject(err);
-                        });
+                    if (job) {
+                        job.remove()
+                            .then(function () {
+                                console.log(user.name + '\'s job has been removed.');
+                                deferred.resolve();
+                            })
+                            .catch(function (err) {
+                                deferred.reject(err);
+                            });
+                    }
                 })
         });
         return deferred.promise;

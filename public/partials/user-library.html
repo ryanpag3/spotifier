@@ -1,17 +1,30 @@
 <div class="page-container" data-ng-controller="library-controller">
     <link rel="stylesheet" type="text/css" href="../css/user-library-style.css">
     <div id="header">
-        <h1 id="logo">spotifier<span style="color: #1dab4f">.io</span></h1>
+        <h1 id="logo" class="hidden-xs">spotifier<span style="color: #1dab4f">.io</span></h1>
         <div class="search container">
             <form class="form-group" data-ng-submit="search(artistName)">
                 <input id="search" class="form-control search-bar" placeholder="search..."
-                       data-ng-change="filterGrid()" data-ng-model="artistName" title="look up artists on spotify and add them to your library to be notified of new releases.">
+                       data-ng-change="filterGrid()"
+                       data-ng-model="artistName"
+                       title="look up artists on spotify and add them to your library to be notified of new releases."
+                        autocomplete="off">
             </form>
             <div class="search-results" data-ng-cloak data-ng-show="resultBoxShown">
-                <i id="result-spinner" class="fa fa-refresh fa-spin" data-ng-show="resultSpinnerShown"></i>
+                <div id="spinner-container" data-ng-show="resultSpinnerShown">
+                    <i id="result-spinner" class="fa fa-refresh fa-spin"></i>
+                </div>
                 <div class="result" data-ng-repeat="artist in results" data-ng-show="resultsShown">
-                    <button class="result-add" data-ng-click="add(artist)"><i
-                            class="fa fa-align-center fa-plus fa-2x"></i></button>
+                    <button class="result-add" data-ng-click="add(artist); artist.artistAdded = true" data-ng-show="!artist.artistAdded">
+                        <i class="fa fa-align-center fa-plus fa-2x"></i>
+                    </button>
+                    <button class="result-add"
+                            data-ng-click="removeArtist(artist); artist.artistAdded = false"
+                            data-ng-show="artist.artistAdded"
+                            data-ng-mouseenter="hover=true"
+                            data-ng-mouseleave="hover=false">
+                        <i data-ng-class="hover ? 'fa fa-times fa-2x' : 'fa fa-check fa-2x'"></i>
+                    </button>
                     <div class="result-name">
                         <div style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden">{{artist.name}}
                         </div>
@@ -27,10 +40,10 @@
 
     </div>
     <div class="body-container container-fluid">
-        <div class="row">
-            <div class="left-sidebar-container col-xs-2" >
+        <div class="row" style="height: 100%">
+            <div class="left-sidebar-container col-md-3 col-lg-2 hidden-xs hidden-sm" >
                 <div class="sidebar" data-ng-switch="syncStatus">
-                    <h2 class="tooltip-title">Sync Status</h2>
+                    <h2 class="tooltip-title">Sync Library</h2>
                     <hr class="tooltip-line">
                     <div class="sync-queue-tooltip" data-ng-switch-default>
                         <div class="sync-queue-tooltip-text">
@@ -56,12 +69,17 @@
                     </div>
                 </div>
             </div>
-            <div class="library-container col-xs-8">
+            <div class="library-container col-xs-12 col-sm-12 col-md-6 col-lg-8">
                 <div class="grid" ui-grid="gridOptions"></div>
             </div>
-            <div class="right-sidebar-container col-xs-2">
-                <div class="sidebar">
-                    <button class="close-window-btn fa fa-times" title="hide these instructions"></button>
+            <div class="right-sidebar-container col-md-3 col-lg-2 hidden-xs hidden-sm">
+                <a id="help-btn" href="#"
+                   data-ng-click="showInstructions = true"
+                   data-ng-show="!showInstructions">need help?</a>
+                <div class="sidebar" data-ng-show="showInstructions">
+                    <button class="close-window-btn fa fa-times"
+                            title="hide these instructions"
+                            data-ng-click="showInstructions = false"></button>
                     <h2 class="tooltip-title">Instructions</h2>
                     <hr class="tooltip-line">
                     <div id="instructions-tooltip-text">
@@ -75,12 +93,7 @@
                         </p>
                         <p>
                             When an artist releases new music on Spotify, spotifier.io will send an email with the release
-                            information and a link to open spotify and check it out.</p>
-                        <p>
-                            We only send out emails for confirming
-                            email addresses, notifying of major site updates, and of course new releases. If you would like
-                            to remove yourself from our email list, please feel free to click <span style="color: #1dab4f">unsubscribe</span> at the bottom of any email we send. Note, you will not be able to use our site
-                            without a confirmed email address.
+                            information and a link to open spotify and check it out.
                         </p>
                     </div>
                 </div>

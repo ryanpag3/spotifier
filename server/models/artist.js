@@ -14,6 +14,7 @@ var Artist = new Schema({
         id: String,
         title: String,
         release_date: String,
+        display_date: String,
         images: []
     }, required: true},
     users_tracking: [Schema.ObjectId]
