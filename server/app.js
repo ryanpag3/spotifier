@@ -7,6 +7,7 @@ var path = require('path'),
     passport = require('passport'),
     SpotifyStrategy = require('passport-spotify').Strategy,
     session = require('express-session'),
+    MongoStore = require('connect-mongo')(session),
     mongoose = require('mongoose');
     mongoose.Promise = require('bluebird');
 /*
@@ -57,7 +58,10 @@ const setupApp = function(app, express, socket) {
     app.use(session({
         secret: 'spotifier secret',
         resave: false,
-        saveUninitialized: false
+        saveUninitialized: false,
+        store: new MongoStore({
+            mongooseConnection: mongoose.connection
+        })
     }));
 
     // initialize passport

@@ -2,11 +2,15 @@
 
 var app = angular.module('spotifier');
 app.controller('library-controller', ['$scope', '$location', '$rootScope',
-    '$timeout', '$window', '$filter', 'libraryService', 'socket',
-    function ($scope, $location, $rootScope, $timeout, $window, $filter, libraryService, socket) {
+    '$timeout', '$window', '$filter', 'libraryService', 'authService', 'socket',
+    function ($scope, $location, $rootScope, $timeout, $window, $filter, libraryService, authService, socket) {
 
-        socket.on('test', function() {
-            alert('test run!')
+        socket.on('sync started', function() {
+            alert('sync started!')
+        });
+
+        socket.on('sync completed', function() {
+            alert('sync completed!')
         });
 
         var prevQuery;
@@ -58,6 +62,7 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
          * initialization code for this controller
          */
         function init() {
+            authService.serializeSessionUser();
             getLibrary(); // request library
             libraryService.getSyncStatus() // request sync job status
                 .then(function (status) {

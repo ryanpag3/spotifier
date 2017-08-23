@@ -14,8 +14,6 @@ var express = require('express'),
 
 router.get('/update', function(req, res) {
     // debugging
-    var socket = req.app.get('socketio');
-    socket.io.emit('test');
     var db = new Db();
     db.getLibrary(req.user)
         .then(function(library) {
@@ -30,9 +28,10 @@ router.get('/update', function(req, res) {
  * for the client.
  */
 router.get('/sync', function(req, res) {
+    var socketUtil = req.app.get('socketio');
     refreshAccessToken(req)
         .then(function() {
-            syncLibraryJobQueue.createJob(req.user)
+            syncLibraryJobQueue.createJob(req.user, socketUtil)
                 .catch(function(err) {
                     return res.status(500).json({
                         err: err

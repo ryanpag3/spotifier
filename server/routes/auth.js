@@ -21,6 +21,22 @@ router.get('/logout', function (req, res) {
     res.redirect('/');
 });
 
+router.get('/get', function(req, res) {
+    if (req.user) {
+        var user = {
+            _id: req.user._id,
+            name: req.user.name
+        };
+        return res.status(200).json({
+            user: user
+        })
+    } else {
+        return res.status(500).json({
+            err: 'user not found!'
+        })
+    }
+});
+
 router.get('/status', function (req, res) {
     if (!req.isAuthenticated()) {
         return res.status(200).json({

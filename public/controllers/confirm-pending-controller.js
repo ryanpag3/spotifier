@@ -1,9 +1,9 @@
 var app = angular.module('spotifier');
-app.controller('confirm-pending-controller', ['$scope', '$location', '$route', 'authServ',
-    function($scope, $location, $route, authServ) {
+app.controller('confirm-pending-controller', ['$scope', '$location', '$route', 'authService',
+    function($scope, $location, $route, authService) {
     onLoad();
     function onLoad() {
-        authServ.getEmailStatus()
+        authService.getEmailStatus()
             .then(function(confirmed) {
                 if (confirmed) {
                     $location.path('/library');

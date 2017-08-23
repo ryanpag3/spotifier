@@ -3,10 +3,12 @@ var Queue = require('bull'),
     User = require('../models/user.js'),
     syncLibraryQueue = new Queue('sync-library'),
     SpotifyApiUser = require('./spotify-user-api.js');
+var socketUtil; // assigned on job creation, need to use global namespace to allow event listener usage
 
 syncLibraryQueue
     .on('active', function (job, jobPromise) {
-        console.log(job.data.user.name + ' started sync library job.')
+        socketUtil.io.emit('sync started');
+        console.log(job.data.user.name + ' started sync library job.');
         var update = {
             sync_queue: {
                 status: 'active'
@@ -22,6 +24,7 @@ syncLibraryQueue
         // todo add console log
     })
     .on('completed', function (job, result) {
+        socketUtil.io.emit('sync completed');
         console.log(job.data.user.name + ' finished their sync library job.');
         var update = {
             sync_queue: {
@@ -52,10 +55,13 @@ module.exports = {
      * add sync library job for a user and serializes job information to database if they want to
      * remove themselves from the queue later.
      * @param user
+     * @param mSocketUtil: this is the socket utility object that we use to emit events to the client
+     * on job status change.
      * @returns {Q.Promise<T>}
      */
-    createJob: function (user) {
+    createJob: function (user, mSocketUtil) {
         var deferred = Q.defer();
+        socketUtil = mSocketUtil;
         syncLibraryQueue.add({user: user}, {
             attempts: 3
         })
