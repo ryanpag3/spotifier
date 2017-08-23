@@ -95,6 +95,8 @@ module.exports = {
                             .catch(function (err) {
                                 deferred.reject(err);
                             });
+                    } else {
+                        deferred.reject('Job is currently being processed.');
                     }
                 })
         });

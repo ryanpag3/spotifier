@@ -5,6 +5,7 @@
  */
 
 var express = require('express'),
+    passport = require('passport'),
     Q = require('q'),
     router = express.Router(),
     SpotifyApiUser = require('../utils/spotify-user-api.js'),
@@ -12,6 +13,9 @@ var express = require('express'),
     syncLibraryJobQueue = require('../utils/queue-sync-user-library.js');
 
 router.get('/update', function(req, res) {
+    // debugging
+    var socket = req.app.get('socketio');
+    socket.io.emit('test');
     var db = new Db();
     db.getLibrary(req.user)
         .then(function(library) {

@@ -12,7 +12,7 @@ var path = require('path'),
 /*
     handle middleware
  */
-const setupApp = function(app, express) {
+const setupApp = function(app, express, socket) {
     var redirectUri = 'http://localhost:3000/user/callback',
         clientSecret = 'a0d232e3a1844de785777c20944f2618',
         clientID = '5c3f5262d39e44ec999a8a0a9babac3e';

@@ -2,8 +2,12 @@
 
 var app = angular.module('spotifier');
 app.controller('library-controller', ['$scope', '$location', '$rootScope',
-    '$timeout', '$window', '$filter', 'libraryService',
-    function ($scope, $location, $rootScope, $timeout, $window, $filter, libraryService) {
+    '$timeout', '$window', '$filter', 'libraryService', 'socket',
+    function ($scope, $location, $rootScope, $timeout, $window, $filter, libraryService, socket) {
+
+        socket.on('test', function() {
+            alert('test run!')
+        });
 
         var prevQuery;
         $scope.data = [];
@@ -156,7 +160,7 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
                     name: artist.name,
                     spotify_id: artist.spotify_id,
                     recent_release: {
-                        title: 'release info requested from Spotify, pending...' // placeholder text matching server
+                        title: 'waiting on info from Spotify...' // placeholder text matching server
                     }
                 });
             }
@@ -194,6 +198,14 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
             libraryService.cancelSync()
                 .then(function () {
                     $scope.syncStatus = 'not queued';
+                })
+                .catch(function(res) {
+                    if (res.data.err === 'Job is currently being processed.') {
+                        $scope.syncStatus = 'active';
+                        alert('We are unable to cancel your sync library job for the following reason: \n' + res.data.err + ' \n\nWe apologize for any inconvenience this may cause.');
+                    } else {
+                        console.log(res.data.err);
+                    }
                 })
         };
 

@@ -2,6 +2,6 @@ var config = {};
 
 config.url = 'http://localhost:3000';
 config.confirmCodeLength = 16;
-config.placeholderAlbumTitle = 'information requested from Spotify, pending...';
+config.placeholderAlbumTitle = 'waiting on info from Spotify...';
 
 module.exports = config;
