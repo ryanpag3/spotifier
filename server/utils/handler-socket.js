@@ -20,12 +20,15 @@ function Socket(io) {
  * @param status
  */
 Socket.prototype.alertSyncQueueStatusChange = function (user, status) {
-    this.users[user._id].emit('sync-status-change', status);
-
+    if (this.users[user._id]){
+        this.users[user._id].emit('sync-status-change', status);
+    }
 };
 
 Socket.prototype.alertLibraryAdded = function (user, library) {
-    this.users[user._id].emit('library-added', library);
+    if (this.users[user._id]){
+        this.users[user._id].emit('library-added', library);
+    }
 };
 
 /**
