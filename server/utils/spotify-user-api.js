@@ -181,7 +181,7 @@ Api.prototype.getLibraryArtists = function (user) {
  * @param query
  */
 Api.prototype.searchArtists = function (user, query) {
-    const limit = 5;
+    const limit = 8;
     var deferred = Q.defer(),
         api = this.spotifyApi,
         offset = 0,

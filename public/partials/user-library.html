@@ -10,7 +10,7 @@
                        title="look up artists on spotify and add them to your library to be notified of new releases."
                         autocomplete="off">
             </form>
-            <div class="search-results" data-ng-cloak data-ng-show="resultBoxShown">
+            <div class="search-results shadow" data-ng-cloak data-ng-show="resultBoxShown">
                 <div id="spinner-container" data-ng-show="resultSpinnerShown">
                     <i id="result-spinner" class="fa fa-refresh fa-spin"></i>
                 </div>
@@ -42,7 +42,7 @@
     <div class="body-container container-fluid">
         <div class="row" style="height: 100%">
             <div class="left-sidebar-container col-md-3 col-lg-2 hidden-xs hidden-sm" >
-                <div class="sidebar" data-ng-switch="syncStatus">
+                <div class="sidebar shadow" data-ng-switch="syncStatus">
                     <h2 class="tooltip-title">Sync Library</h2>
                     <hr class="tooltip-line">
                     <div class="sync-queue-tooltip" data-ng-switch-default>
@@ -70,13 +70,14 @@
                 </div>
             </div>
             <div class="library-container col-xs-12 col-sm-12 col-md-6 col-lg-8">
+                <span id="library-hint">To get started, enter the Sync Library queue or search for artists above.</span>
                 <div class="grid" ui-grid="gridOptions"></div>
             </div>
             <div class="right-sidebar-container col-md-3 col-lg-2 hidden-xs hidden-sm">
                 <a id="help-btn" href="#"
                    data-ng-click="showInstructions = true"
                    data-ng-show="!showInstructions">need help?</a>
-                <div class="sidebar" data-ng-show="showInstructions">
+                <div class="sidebar shadow" data-ng-show="showInstructions">
                     <button class="close-window-btn fa fa-times"
                             title="hide these instructions"
                             data-ng-click="showInstructions = false"></button>

@@ -284,13 +284,15 @@ Db.prototype.getLibrary = function (mUser) {
         if (err) {
             deferred.reject(err);
         }
-        var artistIds = user.saved_artists;
-        Artist.find({'_id': artistIds}, function (err, artists) {
-            if (err) {
-                deferred.reject(err);
-            }
-            deferred.resolve(artists);
-        })
+        if (user) {
+            var artistIds = user.saved_artists;
+            Artist.find({'_id': artistIds}, function (err, artists) {
+                if (err) {
+                    deferred.reject(err);
+                }
+                deferred.resolve(artists);
+            })
+        }
     });
     return deferred.promise;
 };
