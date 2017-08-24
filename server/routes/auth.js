@@ -3,8 +3,8 @@
  */
 var express = require('express'),
     passport = require('passport'),
-    Db = require('../utils/db-wrapper.js'),
-    email = require('../utils/email-handler'),
+    Db = require('../utils/handler-db.js'),
+    email = require('../utils/handler-email'),
     router = express.Router();
 
 router.get('/login', passport.authenticate('spotify', {
@@ -85,7 +85,7 @@ router.get('/callback',
             });
 
         // // DEBUGGING
-        // res.redirect('/library');
+        res.redirect('/library');
     });
 
 /**

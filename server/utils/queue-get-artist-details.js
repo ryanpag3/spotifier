@@ -3,7 +3,8 @@ var Queue = require('bull'),
     cluster = require('cluster'),
     path = require('path'),
     spotifyApiServer = require('../utils/spotify-server-api'),
-    Db = require('../utils/db-wrapper');
+    Db = require('./handler-db');
+var socketUtil;
 
 var artistDetailsQueue = new Queue('artist-details'); // todo add prod redis values
 
@@ -14,16 +15,25 @@ var artistDetailsQueue = new Queue('artist-details'); // todo add prod redis val
 artistDetailsQueue.process(2, function (job, done) {
     spotifyApiServer.getRecentRelease(job.data.artist)
         .then(function (album) {
-            var artist = {
-                spotify_id: job.data.artist.spotify_id,
-                recent_release: {
-                    id: album.id,
-                    title: album.name,
-                    release_date: album.release_date,
-                    images: album.images
+            var artist;
+            if (album) {
+                artist = {
+                    spotify_id: job.data.artist.spotify_id,
+                    recent_release: {
+                        id: album.id,
+                        title: album.name,
+                        release_date: album.release_date,
+                        images: album.images
+                    }
+                };
+            } else {
+                artist = {
+                    spotify_id: job.data.artist.spotify_id,
+                    recent_release: {
+                        title: 'No albums currently on Spotify'
+                    }
                 }
-            };
-
+            }
             // return updated artist info
             done(null, artist);
         })
@@ -44,6 +54,7 @@ artistDetailsQueue
         console.log('get artist details job failed, restarting...');
     })
     .on('completed', function (job, result) {
+        socketUtil.alertArtistDetailsChange(result);
         var db = new Db();
         db.updateArtist(result);
         console.log('artist details gotten.')
@@ -67,5 +78,13 @@ module.exports = {
         artistDetailsQueue.resume().then(function () {
             console.log('get artist details queue has been resumed...');
         })
+    },
+
+    /**
+     * this is run on startup to expose the socket utility to the queue service
+     * @param mSocketUtil
+     */
+    setSocketUtil: function(mSocketUtil) {
+        socketUtil = mSocketUtil;
     }
 };

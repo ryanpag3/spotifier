@@ -5,12 +5,12 @@ var express = require('express'),
     app = express(),
     server = require('http').createServer(app),
     io = require('socket.io')(server),
-    Socket = require('./utils/socket'),
+    Socket = require('./utils/handler-socket'),
     socket = new Socket(io);
     app.set('socketio', socket);
 
 
-require('./app.js')(app, express); // expose middleware/setup application
+require('./app.js')(app, express, socket); // expose middleware/setup application
 
 
 server.listen(3000, function () {

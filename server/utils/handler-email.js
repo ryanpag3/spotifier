@@ -3,7 +3,7 @@ var nodemailer = require('nodemailer'),
     Q = require('q'),
     User = require('../models/user'),
     Artist = require('../models/artist'),
-    Db = require('../utils/db-wrapper'),
+    Db = require('./handler-db'),
     configPrivate = require('../../config-private'),
     configPublic = require('../../config-public');
 

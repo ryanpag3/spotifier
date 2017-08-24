@@ -7,7 +7,7 @@ var socketUtil; // assigned on job creation, need to use global namespace to all
 
 syncLibraryQueue
     .on('active', function (job, jobPromise) {
-        socketUtil.io.emit('sync started');
+        socketUtil.alertSyncQueueStatusChange(job.data.user, 'active');
         console.log(job.data.user.name + ' started sync library job.');
         var update = {
             sync_queue: {
@@ -21,10 +21,21 @@ syncLibraryQueue
         })
     })
     .on('failed', function (job, err) {
-        // todo add console log
+        // clear user queue status just in case of fatal err
+        var update = {
+            sync_queue: {
+                status: 'not queued'
+            }
+        };
+        User.update({'_id': job.data.user._id}, update,
+            function (err) {
+                if (err) {
+                    console.log(err);
+                }
+            })
     })
     .on('completed', function (job, result) {
-        socketUtil.io.emit('sync completed');
+        socketUtil.alertSyncQueueStatusChange(job.data.user, 'completed');
         console.log(job.data.user.name + ' finished their sync library job.');
         var update = {
             sync_queue: {
@@ -41,7 +52,7 @@ syncLibraryQueue
 
 syncLibraryQueue.process(3, function (job, done) {
     var api = new SpotifyApiUser();
-    api.syncLibrary(job.data.user)
+    api.syncLibrary(job.data.user, socketUtil)
         .then(function () {
             done();
         })
@@ -59,9 +70,8 @@ module.exports = {
      * on job status change.
      * @returns {Q.Promise<T>}
      */
-    createJob: function (user, mSocketUtil) {
+    createJob: function (user) {
         var deferred = Q.defer();
-        socketUtil = mSocketUtil;
         syncLibraryQueue.add({user: user}, {
             attempts: 3
         })
@@ -134,5 +144,13 @@ module.exports = {
             console.log('sync library queue is now resumed...');
         })
 
+    },
+
+    /**
+     * this is run on startup to expose the socket utility to the queue service
+     * @param mSocketUtil
+     */
+    setSocketUtil: function(mSocketUtil) {
+        socketUtil = mSocketUtil;
     }
 };

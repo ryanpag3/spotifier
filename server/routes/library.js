@@ -9,7 +9,7 @@ var express = require('express'),
     Q = require('q'),
     router = express.Router(),
     SpotifyApiUser = require('../utils/spotify-user-api.js'),
-    Db = require('../utils/db-wrapper.js'),
+    Db = require('../utils/handler-db.js'),
     syncLibraryJobQueue = require('../utils/queue-sync-user-library.js');
 
 router.get('/update', function(req, res) {
@@ -28,10 +28,9 @@ router.get('/update', function(req, res) {
  * for the client.
  */
 router.get('/sync', function(req, res) {
-    var socketUtil = req.app.get('socketio');
     refreshAccessToken(req)
         .then(function() {
-            syncLibraryJobQueue.createJob(req.user, socketUtil)
+            syncLibraryJobQueue.createJob(req.user)
                 .catch(function(err) {
                     return res.status(500).json({
                         err: err
@@ -72,6 +71,7 @@ router.get('/sync-status', function(req, res) {
 });
 
 router.post('/add', function(req, res) {
+    var socketUtil = req.app.get('socketio');
     var db = new Db();
     // refresh a users access token if necessary
     refreshAccessToken(req)
@@ -80,7 +80,7 @@ router.post('/add', function(req, res) {
             db.getUser(req.user)
                 .then(function(user) {
                     // add artist
-                    db.addArtist(user, req.body.artist)
+                    db.addArtist(user, req.body.artist, socketUtil)
                         .then(function() {
                             // return success code
                             res.status(200).send();

@@ -3,7 +3,7 @@
  */
 var app = angular.module('spotifier');
 app.factory('authService', ['$q', '$http', '$location',
-    function($q, $http, $location) {
+    function ($q, $http, $location) {
         return ({
             serializeSessionUser: serializeSessionUser,
             getStatus: getStatus,
@@ -19,10 +19,11 @@ app.factory('authService', ['$q', '$http', '$location',
         function serializeSessionUser() {
             var deferred = $q.defer();
             $http.get('/user/get')
-                .then(function(res) {
-                    sessionStorage.setItem('user', res.data.user);
+                .then(function (res) {
+                    sessionStorage.setItem('user', JSON.stringify(res.data.user));
+                    deferred.resolve();
                 })
-                .catch(function(res) {
+                .catch(function (res) {
                     deferred.reject(res.data.err);
                 });
             return deferred.promise;
@@ -35,10 +36,10 @@ app.factory('authService', ['$q', '$http', '$location',
         function getStatus() {
             var deferred = $q.defer();
             $http.get('/user/status')
-                .then(function(res) {
+                .then(function (res) {
                     deferred.resolve(res.data.isAuthenticated);
                 })
-                .catch(function(res) {
+                .catch(function (res) {
                     deferred.reject(res.data.err);
                 });
             return deferred.promise;
@@ -47,10 +48,10 @@ app.factory('authService', ['$q', '$http', '$location',
         function getEmailStatus() {
             var deferred = $q.defer();
             $http.get('/user/email/status')
-                .then(function(res) {
+                .then(function (res) {
                     deferred.resolve(res.data.isConfirmed);
                 })
-                .catch(function(res) {
+                .catch(function (res) {
                     console.log(res);
                     deferred.resolve(res.data.err);
                 });
@@ -63,20 +64,20 @@ app.factory('authService', ['$q', '$http', '$location',
          */
         function submitEmail(emailAddress) {
             $http.post('/user/email/add', {emailAddress: emailAddress})
-                .then(function(res) {
-                   sendConfirmationEmail();
+                .then(function (res) {
+                    sendConfirmationEmail();
                 })
-                .catch(function(err) {
+                .catch(function (err) {
                     console.log(err);
                 })
         }
 
         function sendConfirmationEmail() {
             $http.get('/user/email/send-confirmation')
-                .then(function() {
+                .then(function () {
                     $location.path('/confirm-pending');
                 })
-                .catch(function(err) {
+                .catch(function (err) {
                     console.log(err);
                 })
         }
