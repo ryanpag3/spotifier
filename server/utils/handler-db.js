@@ -68,40 +68,37 @@ Db.prototype.getUser = function (mUser) {
 };
 
 /**
- * queries for user information and adds all artists in array
- * @param mUser: user object serialized in cookie {name, accessToken, refreshToken}
+ * Runs a recursive call to add all artists. We use this technique to add artists in
+ * order to preserve the natural order of a user's library. A typical for-loop would cause
+ * an async shuffle of a user's artist at little-to-no performance improvement.
+ * @param user: user object serialized in cookie {name, accessToken, refreshToken}
  * @param artists: array of simple artist objects to retrieve detailed information and
  *                 add to db
+ * @param socketUtil: this is the socket utility object used by the artist details queue
+ * to alert clients when an artist details job has been found. We pass it to addArtist
+ * which handles job creation for that particular queue.
  * @returns {Q.Promise}
  */
-Db.prototype.addAllArtists = function (mUser, artists) {
+Db.prototype.addAllArtists = function (user, artists, socketUtil) {
     var db = this,
         i = this._addIndex,
         deferred = Q.defer();
 
-    this.getUser(mUser)
-        .then(function (user) {
-            go(); // start recursive call
-
-            function go() {
-                // add artist
-                db.addArtist(user, artists[i++])
-                    .then(function () {
-                        if (i < artists.length) {
-                            setTimeout(go, 0);
-                        } else {
-                            deferred.resolve(); // end of artist array reached, resolve
-                        }
-                    })
-                    .catch(function (err) {
-                        deferred.reject(err); // add artist threw error, reject
-                    });
-            }
-        })
-        .catch(function (err) {
-            // add user threw error, reject
-            deferred.reject(err);
-        });
+    go(); // start recursive call
+    function go() {
+        // add artist
+        db.addArtist(user, artists[i++], socketUtil)
+            .then(function () {
+                if (i < artists.length) {
+                    setTimeout(go, 0);
+                } else {
+                    deferred.resolve(); // end of artist array reached, resolve
+                }
+            })
+            .catch(function (err) {
+                deferred.reject(err); // add artist threw error, reject
+            });
+    }
     return deferred.promise;
 };
 
@@ -124,9 +121,12 @@ Db.prototype.getAllArtists = function () {
  * queries for user information and adds artist to user library
  * @param user: user object serialized in cookie {name, accessToken, refreshToken}
  * @param artist: simple artist object {spotifyId, name}
+ * @param socketUtil: this is the socket utility object that contains the necessary socket.io
+ * data to update clients seamlessly when artist details have been found. We pass it to the job
+ * creation call.
  * @returns {Q.Promise}
  */
-Db.prototype.addArtist = function (user, artist) {
+Db.prototype.addArtist = function (user, artist, socketUtil) {
     var db = this;
     var deferred = Q.defer(),
         getArtistDetailsQueue = require('./queue-get-artist-details');
@@ -144,8 +144,10 @@ Db.prototype.addArtist = function (user, artist) {
                 });
             // if artist details have not been added
             if (qArtist.recent_release.id === undefined) {
-                // initialize a get details job
+                // initialize a get details job and pass socketUtil object
                 getArtistDetailsQueue.createJob({artist: qArtist});
+            } else {
+                socketUtil.alertArtistDetailsChange(qArtist);
             }
             deferred.resolve();
         } else {
@@ -164,7 +166,7 @@ Db.prototype.addArtist = function (user, artist) {
                     console.log('artist.create err thrown');
                     deferred.reject(err);
                 } else {
-                    // initialize a get details job
+                    // initialize a get details job and pass socketUtil object
                     getArtistDetailsQueue.createJob({artist: artist});
                 }
                 // associate user and artist
@@ -214,6 +216,7 @@ Db.prototype.removeArtist = function (user, artist) {
 /**
  * Updates an artist's values in the Artist collection
  * @param artist: updated schema values
+ * todo: handle error?
  */
 Db.prototype.updateArtist = function (artist) {
     Artist.findOneAndUpdate({'spotify_id': artist.spotify_id}, artist, function (err, artist) {

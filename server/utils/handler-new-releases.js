@@ -1,11 +1,11 @@
 var CronJob = require('cron').CronJob,
     Q = require('q'),
     Artist = require('../models/artist'),
-    Db = require('../utils/db-wrapper'),
+    Db = require('./handler-db'),
     getArtistDetailsQueue = require('./queue-get-artist-details'),
     syncLibraryQueue = require('./queue-sync-user-library'),
     spotifyApiServer = require('../utils/spotify-server-api'),
-    emailHandler = require('../utils/email-handler');
+    emailHandler = require('./handler-email');
 
 
 /**

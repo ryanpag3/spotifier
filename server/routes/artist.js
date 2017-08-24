@@ -2,7 +2,7 @@ var express = require('express'),
     Q = require('q'),
     router = express.Router(),
     SpotifyApiUser = require('../utils/spotify-user-api.js'),
-    scanner = require('../utils/new-release-handler.js');
+    scanner = require('../utils/handler-new-releases.js');
 
 router.post('/search', function(req, res) {
     var spotifyApiUser = new SpotifyApiUser();

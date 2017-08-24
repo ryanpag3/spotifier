@@ -4,7 +4,7 @@ var Q = require('q'),
     User = require('../server/models/user'),
     Artist = require('../server/models/artist'),
     sampleData = require('./sample-test-data'),
-    Db = require('../server/utils/db-wrapper.js'),
+    Db = require('../server/utils/handler-db.js'),
     spotifyServerApi = require('../server/utils/spotify-server-api');
 
 module.exports = {

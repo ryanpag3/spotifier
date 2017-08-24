@@ -38,12 +38,12 @@ app.config(['$routeProvider', '$locationProvider', 'SpotifyProvider',
         SpotifyProvider.setClientId('180cc653f1f24ae9864d5d718d68f3c6');
     }]);
 
-app.run(function ($http, $rootScope, $location, $route, authServ) {
+app.run(function ($http, $rootScope, $location, $route, authService) {
     $rootScope.$on('$routeChangeStart',
         function (event, next, current) {
         // prevent console err thrown for unrecognized routes
         if (next.access) {
-                authServ.getStatus()
+                authService.getStatus()
                     .then(function (authenticated) {
                         if (next.access.restricted && !authenticated) {
                             $location.path('/');

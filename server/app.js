@@ -7,12 +7,15 @@ var path = require('path'),
     passport = require('passport'),
     SpotifyStrategy = require('passport-spotify').Strategy,
     session = require('express-session'),
-    mongoose = require('mongoose');
+    MongoStore = require('connect-mongo')(session),
+    mongoose = require('mongoose'),
+    syncLibraryQueue = require('./utils/queue-sync-user-library'),
+    getArtistDetailsQueue = require('./utils/queue-get-artist-details');
     mongoose.Promise = require('bluebird');
 /*
     handle middleware
  */
-const setupApp = function(app, express) {
+const setupApp = function(app, express, socketUtil) {
     var redirectUri = 'http://localhost:3000/user/callback',
         clientSecret = 'a0d232e3a1844de785777c20944f2618',
         clientID = '5c3f5262d39e44ec999a8a0a9babac3e';
@@ -49,7 +52,9 @@ const setupApp = function(app, express) {
 
     }));
 
-
+    // pass socketUtility to queues
+    syncLibraryQueue.setSocketUtil(socketUtil);
+    getArtistDetailsQueue.setSocketUtil(socketUtil);
 
     app.use(cookieParser());
     app.use(bodyParser.json({limit: '5mb'}));
@@ -57,7 +62,10 @@ const setupApp = function(app, express) {
     app.use(session({
         secret: 'spotifier secret',
         resave: false,
-        saveUninitialized: false
+        saveUninitialized: false,
+        store: new MongoStore({
+            mongooseConnection: mongoose.connection
+        })
     }));
 
     // initialize passport

@@ -1,6 +1,6 @@
 var SpotifyApi = require('spotify-web-api-node'),
     Q = require('q'),
-    Db = require('../utils/db-wrapper.js'),
+    Db = require('./handler-db.js'),
     credentials = {
         clientId: '5c3f5262d39e44ec999a8a0a9babac3e',
         clientSecret: 'a0d232e3a1844de785777c20944f2618'
@@ -18,8 +18,15 @@ function Api() {
 
 /** METHODS **/
 
-// todo handle success fail cases of add all artists
-Api.prototype.syncLibrary = function(user) {
+/**
+ * Refreshes a user's access token if necessary, then retrieves all the unique
+ * artists of a user's saved songs library, then adds them to the database.
+ * @param user: req.user object containing id info
+ * @param socketUtil: need to pass this object into the artist details queue, which can
+ * only happen through this entry point.
+ * @returns {Q.Promise<T>}
+ */
+Api.prototype.syncLibrary = function(user, socketUtil) {
     var api = this,
         deferred = Q.defer();
 
@@ -27,10 +34,17 @@ Api.prototype.syncLibrary = function(user) {
          .then(function() {
               api.getLibraryArtists(user)
                   .then(function(artists) {
+                      console.log(artists.length);
                       var db = new Db();
                       console.log(user.name + '\'s library is being added.');
-                      db.addAllArtists(user, artists);
-                      deferred.resolve();
+                      db.addAllArtists(user, artists, socketUtil)
+                          .then(function() {
+                              db.getLibrary(user)
+                                  .then(function(library) {
+                                     socketUtil.alertLibraryAdded(user, library);
+                                  });
+                              deferred.resolve();
+                          });
               })
                   .catch(function(err) {
                       console.log(err);
@@ -106,7 +120,13 @@ Api.prototype.getLibraryArtists = function (user) {
     const api = this.spotifyApi;
     const limit = 50;
     var offset = 0,
-        deferred = Q.defer();
+        deferred = Q.defer(),
+        country = null;
+    // get country code because from_token doesnt work with is_playable property for some stupid reason
+    api.getMe()
+        .then(function(data) {
+            country = data.body.country;
+        });
 
 
     //  recursive wrapper
@@ -124,14 +144,14 @@ Api.prototype.getLibraryArtists = function (user) {
                             // grab primary artist id and ignore features
                             var artistId = track.artists[0].id;
                             // if we havent added the artist already and the artist currently is active on spotify
-                            if (self.artistAdded[artistId] === undefined && track.available_markets.length > 0) {
+                            if (self.artistAdded[artistId] === undefined) {
                                 var name = track.artists[0].name;
                                 self.artistAdded[artistId] = true; // flag artist added
                                 self.artists.push({spotify_id: artistId, name: name}); // push artist to array
                             }
                         }
                         // adjust offset to either 50 ahead or to the end of the track list
-                        offset += ((data.body.total - offset < limit) ? data.body.total - offset : limit);
+                        offset += limit;
                         // if offset is behind the end of the track list
                         if (offset < data.body.total - 1) {
                             setTimeout(go, 250); // run again

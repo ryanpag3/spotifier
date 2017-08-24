@@ -3,8 +3,8 @@
  */
 var express = require('express'),
     passport = require('passport'),
-    Db = require('../utils/db-wrapper.js'),
-    email = require('../utils/email-handler'),
+    Db = require('../utils/handler-db.js'),
+    email = require('../utils/handler-email'),
     router = express.Router();
 
 router.get('/login', passport.authenticate('spotify', {
@@ -19,6 +19,22 @@ router.get('/login', passport.authenticate('spotify', {
 router.get('/logout', function (req, res) {
     req.logout();
     res.redirect('/');
+});
+
+router.get('/get', function(req, res) {
+    if (req.user) {
+        var user = {
+            _id: req.user._id,
+            name: req.user.name
+        };
+        return res.status(200).json({
+            user: user
+        })
+    } else {
+        return res.status(500).json({
+            err: 'user not found!'
+        })
+    }
 });
 
 router.get('/status', function (req, res) {
@@ -69,7 +85,7 @@ router.get('/callback',
             });
 
         // // DEBUGGING
-        // res.redirect('/library');
+        res.redirect('/library');
     });
 
 /**

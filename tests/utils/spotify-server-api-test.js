@@ -5,12 +5,12 @@ var expect = require('chai').expect,
     fs = require('fs'),
     User = require('../../server/models/user'),
     Artist = require('../../server/models/artist'),
-    email = require('../../server/utils/email-handler'),
-    Db = require('../../server/utils/db-wrapper'),
+    email = require('../../server/utils/handler-email'),
+    Db = require('../../server/utils/handler-db'),
     testHelper = require('../test-helpers'),
     sampleData = require('../sample-test-data'),
     spotifyApiServer = require('../../server/utils/spotify-server-api'),
-    releaseScanner = require('../../server/utils/new-release-handler.js');
+    releaseScanner = require('../../server/utils/handler-new-releases.js');
 mongoose.Promise = require('bluebird');
 
 mongoose.connect('mongodb://localhost/spotifier_test', {

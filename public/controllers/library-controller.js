@@ -2,8 +2,8 @@
 
 var app = angular.module('spotifier');
 app.controller('library-controller', ['$scope', '$location', '$rootScope',
-    '$timeout', '$window', '$filter', 'libraryService',
-    function ($scope, $location, $rootScope, $timeout, $window, $filter, libraryService) {
+    '$timeout', '$window', '$filter', 'libraryService', 'authService', 'socket',
+    function ($scope, $location, $rootScope, $timeout, $window, $filter, libraryService, authService, socket) {
 
         var prevQuery;
         $scope.data = [];
@@ -13,6 +13,7 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
         $scope.results = null;
         $scope.resultBoxShown = false;
         $scope.resultsShown = false;
+        $scope.artistName = '';
 
         // define ui-grid api options
         $scope.gridOptions = {
@@ -34,15 +35,21 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
                     enableHiding: false,
                     cellClass: 'grid-artist-column'
                 },
-                {name: 'name', field: 'name', displayName: 'Artist', minWidth: 100, cellClass:'grid-center-text-vert'},
-                {name: 'title', field: 'recent_release.title', displayName: 'Recent Release Title', cellClass:'grid-center-text-vert', minWidth: 100},
+                {name: 'name', field: 'name', displayName: 'Artist', minWidth: 100, cellClass: 'grid-center-text-vert'},
+                {
+                    name: 'title',
+                    field: 'recent_release.title',
+                    displayName: 'Recent Release Title',
+                    cellClass: 'grid-center-text-vert',
+                    minWidth: 100
+                },
                 {
                     name: 'releaseDate',
                     field: 'recent_release.release_date',
                     displayName: 'Date',
                     width: 100,
                     minWidth: 100,
-                    cellClass:'grid-center-text-vert'
+                    cellClass: 'grid-center-text-vert'
                 }
             ],
             excessRows: 25,
@@ -54,13 +61,23 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
          * initialization code for this controller
          */
         function init() {
+            // serialize user info to session storage if it doesn't already exist
+            // todo: currently replacing every time due to mongodb wipes for debugging
+            // todo: turn caching back on
+            authService.serializeSessionUser()
+                .then(function () {
+                    var user = JSON.parse(sessionStorage.getItem('user'));
+                    socket.emit('add-user', user);
+                })
+                .catch(function (err) {
+                    // todo: handle session storage error
+                });
             getLibrary(); // request library
             libraryService.getSyncStatus() // request sync job status
                 .then(function (status) {
                     $scope.syncStatus = status;
                 })
         }
-
         init(); // run initialization code
 
         /**
@@ -121,8 +138,11 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
          * but has a limitation to one column used as the search key
          * possible todo: rename search bar variable to properly represent new search scope
          */
-        $scope.filterGrid = function() {
+        $scope.filterGrid = function () {
             $scope.gridOptions.data = $filter('filter')($scope.data, $scope.artistName);
+            if ($scope.artistName === '') {
+                $scope.gridOptions.data = $scope.data;
+            }
         };
 
         /**
@@ -147,18 +167,20 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
          */
         function pushArtistToLibrary(artist) {
             // check if artist currently is in library
-            var index = $scope.gridOptions.data.map(function (e) {
+            var index = $scope.data.map(function (e) {
                 return e.spotify_id
             }).indexOf(artist.spotify_id);
             // push if not
             if (index === -1) {
-                $scope.gridOptions.data.push({
+                var a = {
                     name: artist.name,
                     spotify_id: artist.spotify_id,
                     recent_release: {
-                        title: 'release info requested from Spotify, pending...' // placeholder text matching server
+                        title: 'waiting on info from Spotify...' // placeholder text matching server
                     }
-                });
+                };
+                $scope.data.push(a);
+                $scope.gridOptions.data.push(a);
             }
 
         };
@@ -195,6 +217,14 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
                 .then(function () {
                     $scope.syncStatus = 'not queued';
                 })
+                .catch(function (res) {
+                    if (res.data.err === 'Job is currently being processed.') {
+                        $scope.syncStatus = 'active';
+                        alert('We are unable to cancel your sync library job for the following reason: \n' + res.data.err + ' \n\nWe apologize for any inconvenience this may cause.');
+                    } else {
+                        console.log(res.data.err);
+                    }
+                })
         };
 
         /**
@@ -208,6 +238,41 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
                 });
         }
 
+        /**SOCKET IO EVENT LISTENERS**/
+        socket.on('sync-status-change', function (status) {
+            console.log(status);
+            $scope.syncStatus = status;
+            $scope.$apply();
+        });
+
+        socket.on('library-added', function (library) {
+            $scope.data = library;
+            console.log($scope.artistName);
+            if ($scope.artistName === '') {
+                $scope.gridOptions.data = $scope.data;
+            }
+            $scope.$apply();
+        });
+
+        socket.on('artist-details-found', function (artist) {
+            // add details to source library
+            var index = $scope.data.map(function (e) {
+                return e.spotify_id;
+            }).indexOf(artist.spotify_id);
+            if (index !== -1) {
+                $scope.data[index].recent_release = artist.recent_release;
+                $scope.$apply();
+            }
+            // add details to filtered library
+            var index = $scope.gridOptions.data.map(function (e) {
+                return e.spotify_id;
+            }).indexOf(artist.spotify_id);
+            if (index !== -1) {
+                $scope.gridOptions.data[index].recent_release = artist.recent_release;
+                $scope.$apply();
+            }
+        });
+
         /********** HELPER FUNCTIONS **********/
         /**
          * Removes an artist from the local library instance.
@@ -218,6 +283,10 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
                 return e.spotify_id
             }).indexOf(artist.spotify_id);
             $scope.gridOptions.data.splice(index, 1);
+            var index = $scope.data.map(function (e) {
+                return e.spotify_id
+            }).indexOf(artist.spotify_id);
+            $scope.data.splice(index, 1);
         }
 
         /** JQUERY **/
