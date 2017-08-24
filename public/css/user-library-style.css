@@ -10,7 +10,7 @@ p {
 .page-container {
     height: 100vh;
     min-height: 510px;
-    width: 100%;
+    width: 100vw;
     background-color: #c5c7c3;
 }
 
@@ -50,10 +50,13 @@ p {
 }
 
 .fa-btn {
+    display: block;
     background: transparent;
     border: none;
     outline: none;
     line-height: inherit;
+    padding: 0;
+    margin: 0 auto;
 }
 
 .added-button {
@@ -73,7 +76,8 @@ p {
 
 .search {
     position: relative;
-    width: 350px;
+    min-width: 275px;
+    width: 20%;
     z-index: 5;
     margin: 0 auto;
     vertical-align: middle;
@@ -91,10 +95,9 @@ p {
     width: 90%;
     margin-left: 2px;
     background-color: #484d46;
-    overflow: auto;
-    z-index: 5;
-    box-shadow: 3px 3px 10px #484d46;
     overflow: hidden;
+    z-index: 5;
+    box-shadow: 4px 4px 10px #484d46;
 }
 
 .result {
@@ -130,16 +133,15 @@ p {
 
 .result-pic {
     border-radius: 42px;
-    width: 42px;
-    height: 42px;
-    background-color: lightgray;
+    min-width: 42px;
+    min-height: 42px;
+    margin-left: 5px;
     background-position: center;
     background-size: cover;
 }
 
 .grid {
     height: calc(100vh - 80px) !important;
-    min-width: 400px;
 }
 
 .grid-center-text-vert {
@@ -179,16 +181,15 @@ p {
     margin: 0 auto;
 }
 
-.sync-queue-tooltip-text {
-    display: inline-block;
-    width: 99%;
-    max-width: 300px;
+.tooltip-text {
+    /*display: inline-block;*/
+    width: 98%;
     height: 60%;
     text-align: center;
     margin: 0 auto;
     margin-top: 10px;
     color: #c2c4c0;
-    font-size: 12pt;
+    font-size: 1.5rem;
 }
 
 .sync-queue-tooltip-nav {
@@ -222,6 +223,7 @@ p {
 
 .close-window-btn {
     position: absolute;
+    top: 15px;
     right: 15px;
     background: transparent;
     border: none;
@@ -297,13 +299,15 @@ p {
 }
 
 #help-btn {
-    float: right;
+    position: absolute;
+    top: 10px;
+    right: 10px;
     color: black;
     text-decoration: none !important;
 }
 
 #help-btn:hover {
-    color: #1dab4f;
+    color: white;
 }
 
 #instructions-tooltip-text {
@@ -323,4 +327,26 @@ p {
     text-align: center;
 }
 
+@media (max-width: 768px) {
+    .search {
+        margin: 0;
+    }
+
+    .left-sidebar-container {
+        height: 200px;
+        margin-bottom: 20px;
+    }
+    .tooltip-text {
+        height: 50%;
+    }
+    .sync-queue-tooltip-nav {
+        height: 20%;
+    }
+}
+
+@media (max-width: 1199px) {
+    .tooltip-text {
+        font-size: calc(.5vw + 12px);
+    }
+}
 
