@@ -89,10 +89,12 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
         $scope.search = function (query) {
             $scope.resultBoxShown = true;
             $scope.resultsShown = false;
-            $scope.resultSpinnerShown = true;
-
             // trim query
             var mQuery = query.trim();
+            if (mQuery !== ''){
+                $scope.resultSpinnerShown = true;
+            }
+
             // if not same as previous and not empty
             if (mQuery === prevQuery && mQuery !== '') {
                 $scope.resultSpinnerShown = false;
@@ -113,6 +115,7 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
                                 res[i].artistAdded = true;
                             }
                         }
+
                         $scope.results = res;
                         $scope.resultSpinnerShown = false;
                         $scope.resultsShown = true;
@@ -300,5 +303,12 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
                 $scope.$apply();
             }
         });
+
+        $(document).on('keydown', function(e) {
+            if (e.keyCode === 27) {
+                $scope.resultBoxShown = false;
+                $scope.$apply();
+            }
+        })
     }]);
 

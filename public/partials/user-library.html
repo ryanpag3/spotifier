@@ -14,7 +14,7 @@
                 <div id="spinner-container" data-ng-show="resultSpinnerShown">
                     <i id="result-spinner" class="fa fa-refresh fa-spin"></i>
                 </div>
-                <div class="result" data-ng-repeat="artist in results" data-ng-show="resultsShown">
+                <div class="result" data-ng-repeat="artist in results track by $index" data-ng-show="resultsShown">
                     <button class="result-add" data-ng-click="add(artist); artist.artistAdded = true" data-ng-show="!artist.artistAdded">
                         <i class="fa fa-align-center fa-plus fa-2x"></i>
                     </button>
@@ -42,7 +42,7 @@
     <div class="body-container container-fluid">
         <div class="row" style="height: 100%">
             <div class="left-sidebar-container col-sm-3 col-md-3 col-lg-2" >
-                <div class="sidebar shadow" data-ng-switch="syncStatus">
+                <div id="sync-status" class="sidebar shadow animated fadeIn" data-ng-switch="syncStatus">
                     <h2 class="tooltip-title">Sync Library</h2>
                     <hr class="tooltip-line">
                     <div class="sync-queue-tooltip" data-ng-switch-default>
@@ -77,7 +77,7 @@
                 <a id="help-btn" href="#"
                    data-ng-click="showInstructions = true"
                    data-ng-show="!showInstructions">need help?</a>
-                <div class="sidebar shadow" data-ng-show="showInstructions">
+                <div class="sidebar shadow animated fadeIn" data-ng-show="showInstructions">
                     <button class="close-window-btn fa fa-times"
                             title="hide these instructions"
                             data-ng-click="showInstructions = false"></button>

@@ -9,9 +9,10 @@ p {
 
 .page-container {
     height: 100vh;
-    min-height: 510px;
+    min-height: 706px;
     width: 100vw;
     background-color: #c5c7c3;
+    background: linear-gradient(45deg, lightgray, #8a8c88)
 }
 
 .body-container {
@@ -66,7 +67,7 @@ p {
 }
 
 .remove-button {
-    margin: 3px;
+    margin: 0 auto;
 }
 
 .btn-login {
@@ -81,6 +82,7 @@ p {
     z-index: 5;
     margin: 0 auto;
     vertical-align: middle;
+
 }
 
 .search-bar {
@@ -88,6 +90,7 @@ p {
     min-width: 200px;
     margin-top: 18px;
     margin-bottom: -10px;
+    border-radius: 30px;
 }
 
 .search-results {
@@ -202,7 +205,8 @@ p {
 .sync-queue-tooltip-btn {
     width: 100%;
     max-width: 200px;
-    font-size: 9pt;
+    font-size: 10pt;
+    border-radius: 15px;
 }
 
 
@@ -302,12 +306,12 @@ p {
     position: absolute;
     top: 10px;
     right: 10px;
-    color: black;
+    color: white;
     text-decoration: none !important;
 }
 
 #help-btn:hover {
-    color: white;
+    color: black;
 }
 
 #instructions-tooltip-text {
@@ -326,6 +330,15 @@ p {
     right: 0;
     text-align: center;
 }
+
+.fadeInLeft {
+    animation-duration: .3s;
+}
+
+.fadeIn {
+    animation-duration: .25s;
+}
+
 
 @media (max-width: 768px) {
     .search {
