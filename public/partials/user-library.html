@@ -1,7 +1,10 @@
 <div class="page-container" data-ng-controller="library-controller">
     <link rel="stylesheet" type="text/css" href="../css/user-library-style.css">
     <div id="header">
-        <h1 id="logo" class="hidden-xs">spotifier<span style="color: #1dab4f">.io</span></h1>
+        <div class="hidden-xs">
+                <img class="logo-img" src="../assets/img/logo22.png">
+            <h1 id="logo" >spotifier<span style="color: #1dab4f">.io</span></h1>
+        </div>
         <div class="search container">
             <form class="form-group" data-ng-submit="search(artistName)">
                 <input id="search" class="form-control search-bar" placeholder="search..."
@@ -70,7 +73,7 @@
                 </div>
             </div>
             <div class="library-container col-xs-12 col-sm-9 col-md-6 col-lg-6 col-lg-offset-1">
-                <span id="library-hint">To get started, enter the Sync Library queue or search for artists above.</span>
+                <span id="library-hint" data-ng-show="libraryEmpty">To get started, enter the Sync Library queue or search for artists above.</span>
                 <div class="grid" ui-grid="gridOptions"></div>
             </div>
             <div class="right-sidebar-container col-md-3 col-lg-2 col-lg-offset-1 hidden-xs hidden-sm">

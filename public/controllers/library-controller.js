@@ -6,14 +6,15 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
     function ($scope, $location, $rootScope, $timeout, $window, $filter, libraryService, authService, socket) {
 
         var prevQuery;
+        $scope.results = null;
         $scope.data = [];
         $scope.syncButtonShown = true;
-        $scope.enqueued = 'enqueued';
-        $scope.active = 'active';
-        $scope.results = null;
         $scope.resultBoxShown = false;
         $scope.resultsShown = false;
+
         $scope.artistName = '';
+        $scope.enqueued = 'enqueued';
+        $scope.active = 'active';
 
         // define ui-grid api options
         $scope.gridOptions = {
@@ -60,6 +61,11 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
          * initialization code for this controller
          */
         function init() {
+            // display help text if library is empty
+            if ($scope.data.length < 1) {
+                $scope.libraryEmpty = true;
+            }
+
             // serialize user info to session storage if it doesn't already exist
             // todo: currently replacing every time due to mongodb wipes for debugging
             // todo: turn caching back on
@@ -277,6 +283,14 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
 
 
         /********** HELPER FUNCTIONS **********/
+        $scope.$watch('data', function() {
+            $scope.libraryEmpty = $scope.gridOptions.data <= 0;
+        });
+
+        $scope.$watch('gridOptions.data', function(){
+            $scope.libraryEmpty = $scope.gridOptions.data <= 0;
+        });
+
         /**
          * Removes an artist from the local library instance.
          * @param {Object} artist
@@ -293,7 +307,7 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
         }
 
         /** JQUERY **/
-        // todo convert to a directive
+        // todo convert to a directive?
         // handle clicking outside search results
         $(document).mouseup(function (e) {
             var container = $(".search");
