@@ -2,9 +2,40 @@
 This will be where users who are not authenticated will route to.
 It will show information about the service.
 -->
+<link rel="stylesheet" type="text/css" href="../css/landing-style.css">
+<div id="page-container" class="row">
+    <div id="content-container" class="col-xs-12 col-sm-8 col-md-8 col-lg-6">
+        <div id="title-block">
+            <img id="logo" src="../assets/img/logo22.png">
+            <h1 id="name">spotifier<span style="color: #1dab4f">.io</span></h1>
+        </div>
+        <div id="about-block">
+            <div id="about">
+                <p>
+                    <strong>Reliable</strong> and <strong>consistent</strong>
+                    new release notifications for artists on Spotify.
+                    Scan your saved songs to begin tracking artists
+                    and be notified by email when they come out.
+                    To get started, click login with Spotify below.
+                </p>
+            </div>
+            <video id="demo" class="hidden-xs" controls autoplay muted loop>
+                <source src="../assets/webm/demo.mp4" type="video/mp4">
+                Your browser does not support the video.
+            </video>
+        </div>
 
-<div>
-    <a href="/user/login" target="_self">LOGIN</a>
-    <a href="/user/login" target="_self">CREATE ACCOUNT</a>
-    LANDING PAGE
+        <div id="nav-block">
+            <a href="/user/login" target="_self">
+                <button id="login-btn" class="btn btn-success">LOGIN WITH SPOTIFY</button>
+            </a>
+        </div>
+
+        <div id="social-bar" class="row">
+            <span style="display: block">Get in touch </span>
+            <a class="fa-btn fa fa-twitter fa-3x" target="_blank" href="https://twitter.com/ryanpage_io"></a>
+            <a class="fa-btn fa fa-github fa-3x" target="_blank" href="https://github.com/ryanpage42"></a>
+        </div>
+    </div>
 </div>
+
