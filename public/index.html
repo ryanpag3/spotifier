@@ -11,8 +11,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
-<body data-ng-app="spotifier" data-ng-controller="index-controller">
+<body class="spotifier" data-ng-app="spotifier" data-ng-controller="index-controller">
     <div data-ng-view></div>
+    <style>
+        .spotifier {
+            display: block;
+        }
+    </style>
 </body>
 
 <!--TODO REPLACE CDNS WITH MINIFIED JS FILES-->
@@ -33,12 +38,14 @@
 <script src="controllers/index-controller.js"></script>
 <script src="controllers/library-controller.js"></script>
 <script src="controllers/email-controller.js"></script>
-<script src="controllers/confirm-pending-controller.js"></script>
+<script src="controllers/confirmation-pending-controller.js"></script>
+<script src="controllers/confirmation-controller.js"></script>
 <!--services-->
 <script src="services/auth-service.js"></script>
 <script src="services/library-service.js"></script>
 <script src="services/database-service.js"></script>
 <script src="services/socket-service.js"></script>
-<!--directives-->
+
+
 
 </html>

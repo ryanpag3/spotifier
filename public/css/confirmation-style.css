@@ -2,24 +2,6 @@
     width: 350px;
     float: none;
     margin: 0 auto;
-    margin-bottom: 10px;
-}
-
-.nav-btn {
-    width: 200px;
-    height: 45px;
-    border-radius: 25px;
-    background-color: #1dab4f;
-    font-size: 14pt;
-    margin: 10px;
-}
-
-.email-form {
-    width: 400px;
-    float: none;
-    margin: 0 auto;
-    margin-top: 15px;
-    margin-bottom: 15px;
 }
 
 #content-container {
@@ -53,9 +35,9 @@
 }
 
 #status-title-line {
-    width: 400px;
+    width: 350px;
     border: solid 1px gray;
-    margin-top: -1px;
+    margin-top: -5px;
 }
 
 #body {
@@ -66,12 +48,19 @@
 
 #nav-block {
     display: flex;
-    flex-grow: 1;
-    margin: 10px;
     justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    margin: 50px;
 }
 
-
+#nav-btn {
+    max-width: 300px;
+    height: 45px;
+    border-radius: 25px;
+    background-color: #1dab4f;
+    font-size: 14pt;
+}
 
 #social-bar {
     color: white;
@@ -92,13 +81,7 @@
 @media screen and (min-width: 992px) {
 
     .status-text {
-        width: 450px;
         font-size: 14pt;
-    }
-
-    .nav-btn {
-        height: 40px;
-        font-size: 12pt;
     }
 
     #title-block {
@@ -120,15 +103,21 @@
         vertical-align: middle;
     }
 
+    #status-text {
+        width: 500px;
+    }
+
     #nav-block {
         align-items: flex-start;
     }
 
-
+    #nav-btn {
+        height: 40px;
+        font-size: 12pt;
+    }
 }
 
 /* Large Devices, Wide Screens */
 @media only screen and (min-width: 1200px) {
 
 }
-

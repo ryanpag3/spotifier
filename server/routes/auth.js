@@ -85,7 +85,7 @@ router.get('/callback',
             });
 
         // // DEBUGGING
-        res.redirect('/library');
+        // res.redirect('/library');
     });
 
 /**
@@ -123,14 +123,12 @@ router.post('/email/delete', function (req, res) {
 
 router.get('/email/send-confirmation', function (req, res) {
     email.sendConfirmationEmail(req.user)
-        .then(function () {
-            res.status(200).send();
-        })
         .catch(function (err) {
             return res.status(500).json({
                 err: err
             })
-        })
+        });
+    res.status(200).send();
 });
 
 /**
@@ -140,11 +138,12 @@ router.get('/email/send-confirmation', function (req, res) {
 router.get('/email/confirm', function (req, res) {
     email.confirm(req.query)
         .then(function () {
-            // successfully confirmed
-            res.redirect('/confirm-success');
+            var t = encodeURIComponent('true');
+            res.redirect('/confirmation?success=' + t);
         })
         .catch(function (err) {
-            res.redirect('/confirm-failure');
+            var f = encodeURIComponent('false');
+            res.redirect('/confirmation?success=' + f);
         })
 });
 

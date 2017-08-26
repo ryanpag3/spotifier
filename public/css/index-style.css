@@ -2,7 +2,41 @@ html, body {
     height: 100%;
     width: 100%;
     font-family: 'Montserrat', sans-serif;
+    color: white;
 }
 
+.spotifier {
+    display: none;
+}
+
+.social-fa-btn {
+    border: none;
+    background: transparent;
+    color: white;
+    text-decoration: none;
+    -webkit-transition: color 1s;
+    -moz-transition:    color 1s;
+    -ms-transition:     color 1s;
+    -o-transition:      color 1s;
+    transition:         color 1s;
+}
+
+.social-fa-btn:active, .social-fa-btn:visited, .social-fa-btn:focus {
+    color: white;
+    text-decoration: none;
+}
+
+.social-fa-btn:hover {
+    color: #1dab4f;
+    text-decoration: none;
+}
+
+#page-container {
+    height: 100vh;
+    min-width: 410px;
+    float: none;
+    margin: 0 auto;
+    background-color: #4c4e4a;
+}
 
 

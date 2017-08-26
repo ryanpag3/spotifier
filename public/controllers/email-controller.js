@@ -1,7 +1,7 @@
 var app = angular.module('spotifier');
 
-app.controller('email-controller', ['$scope', '$location', 'authService',
-    function ($scope, $location, authService) {
+app.controller('email-controller', ['$scope', '$location', '$route', 'authService',
+    function ($scope, $location, $route, authService) {
         $scope.matching = true;
 
         $scope.submitEmail = function () {
@@ -26,6 +26,7 @@ app.controller('email-controller', ['$scope', '$location', 'authService',
          */
         $scope.reenterEmail = function () {
             $location.path('/email');
+            $route.reload();
         }
 
     }]);
