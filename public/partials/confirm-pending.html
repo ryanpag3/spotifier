@@ -1,8 +1,30 @@
 <link type="text/css" rel="stylesheet" href="../css/confirm-pending-style.css">
-<div class="page-container" data-ng-controller="confirm-pending-controller">
-    CONFIRMATION SENT YO
-    WANNA RESEND? PRESS DIS SHIT
-    <button data-ng-click="resendConfirmation()" data-ng-controller="email-controller">SEND AGAIN YO</button>
-    <button data-ng-click="reenterEmail()" data-ng-controller="email-controller">ENTER EMAIL AGAIN YO</button>
-    IF YOU HAVE ALREADY CONFIRMED YOUR EMAIL, REFRESH PAGE OR PRESS HOME BUTTON TOP LEFT
+<div id="page-container" data-ng-controller="confirmation-pending-controller">
+    <div id="content-container" class="col-xs-12 col-sm-8 col-lg-6">
+        <div id="title-block">
+            <img id="logo" src="../assets/img/logo22.png">
+            <h1 id="name">spotifier<span style="color: #1dab4f">.io</span></h1>
+        </div>
+        <div id="body" data-ng-switch="success">
+            <div id="status">
+                <h2 class="status-title">Confirmation Email Sent!</h2>
+                <hr id="status-title-line">
+                <p class="status-text">
+                    A confirmation email has been dispatched and is awaiting your
+                    approval. Once you have successfully confirmed your address,
+                    you may refresh the page to begin tracking artists.
+                </p>
+            </div>
+            <div id="nav-block" data-ng-controller="email-controller">
+                    <button class="nav-btn btn btn-success" data-ng-click="resendConfirmation()">RESEND CONFIRMATION</button>
+                    <button class="nav-btn btn btn-success" data-ng-click="reenterEmail()">ENTER NEW EMAIL</button>
+            </div>
+        </div>
+
+        <div id="social-bar" class="row">
+            <span style="display: block">Get in touch </span>
+            <a class="social-fa-btn fa fa-twitter fa-3x" target="_blank" href="https://twitter.com/ryanpage_io"></a>
+            <a class="social-fa-btn fa fa-github fa-3x" target="_blank" href="https://github.com/ryanpage42"></a>
+        </div>
+    </div>
 </div>

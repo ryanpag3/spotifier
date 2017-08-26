@@ -1,20 +1,47 @@
 <link type="text/css" rel="stylesheet" href="../css/email-style.css">
-<div class="page-container" data-ng-controller="email-controller">
-    <div class="email-container">
-        <div class="email-directions-container">
-            <div style="width: 500px; text-align: center; padding-left: 16px; padding-right: 16px; font-size: 16px">
-                This site sends out emails to notify you of new releases on Spotify. Please enter your email
-                below to be sent a confirmation email. We will not send you any emails besides new release
-                notifications and major site updates, we promise!
-            </div>
+<div id="page-container" data-ng-controller="email-controller">
+    <div id="content-container" class="col-xs-12 col-sm-8 col-lg-6">
+        <div id="title-block">
+            <img id="logo" src="../assets/img/logo22.png">
+            <h1 id="name">spotifier<span style="color: #1dab4f">.io</span></h1>
         </div>
-        <div class="email-form-container">
-            <form name="emailform" class="email-form" novalidate data-ng-submit="email-form.$valid && submitEmail()">
-                <input class="form-control email-input" placeholder="Enter email" data-ng-model="email" required>
-                <input class="form-control email-input" placeholder="Confirm email" data-ng-model="confirmEmail" required>
-                <input type="submit" class="btn" id="email-submit" data-ng-click="submitEmail()" value="submit" data-ng-disabled="emailform.$invalid">
-                <div data-ng-show="!matching">Please check that the emails are matching!</div>
+        <div id="body" data-ng-switch="success">
+            <hr id="status-title-line">
+            <p class="status-text">
+                spotifier.io requires a confirmed email address to use our service.
+                Please enter yours below and we will send a confirmation link to the
+                specified address.
+            </p>
+            <form data-ng-submit="submitEmail()">
+                <div class="email-form form-group">
+                    <label for="emailAddress">Enter your email</label>
+                    <input type="email"
+                           class="form-control"
+                           id="emailAddress"
+                           placeholder="enter email..."
+                           data-ng-model="email">
+                </div>
+                <div class="email-form form-group">
+                    <label for="emailAddressConfirm">Enter your email again</label>
+                    <input type="email"
+                           class="form-control"
+                           id="emailAddressConfirm"
+                           placeholder="enter email..."
+                           data-ng-model="confirmEmail">
+                </div>
+                <div data-ng-show="!matching">
+                    Please check to make sure the emails match!
+                </div>
+                <div id="nav-block">
+                    <button class="nav-btn btn btn-success">SUBMIT</button>
+                </div>
             </form>
+        </div>
+
+        <div id="social-bar" class="row">
+            <span style="display: block">Get in touch </span>
+            <a class="social-fa-btn fa fa-twitter fa-3x" target="_blank" href="https://twitter.com/ryanpage_io"></a>
+            <a class="social-fa-btn fa fa-github fa-3x" target="_blank" href="https://github.com/ryanpage42"></a>
         </div>
     </div>
 </div>

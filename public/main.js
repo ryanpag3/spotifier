@@ -15,17 +15,13 @@ app.config(['$routeProvider', '$locationProvider', 'SpotifyProvider',
                 templateUrl: 'partials/email.html',
                 access: {restricted: true}
             })
+            .when('/confirmation', {
+                templateUrl: 'partials/confirmation.html',
+                access: {restricted: false}
+            })
             .when('/confirm-pending', {
                 templateUrl: 'partials/confirm-pending.html',
                 access: {restricted: true}
-            })
-            .when('/confirm-success', {
-                templateUrl: 'partials/confirm-success.html',
-                access: {restricted: false}
-            })
-            .when('/confirm-failure', {
-                templateUrl: 'partials/confirm-failure.html',
-                access: {restricted: false}
             })
             .when('/library', {
                 templateUrl: 'partials/user-library.html',
@@ -46,7 +42,7 @@ app.run(function ($http, $rootScope, $location, $route, authService) {
                 authService.getStatus()
                     .then(function (authenticated) {
                         if (next.access.restricted && !authenticated) {
-                            $location.path('/');
+                            $location.path($location.path('/'));
                             $route.reload();
                         }
                     })
