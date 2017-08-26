@@ -1,0 +1,148 @@
+.fa-btn {
+    border: none;
+    background: transparent;
+    color: white;
+    text-decoration: none;
+    -webkit-transition: color 1s;
+    -moz-transition:    color 1s;
+    -ms-transition:     color 1s;
+    -o-transition:      color 1s;
+    transition:         color 1s;
+}
+
+.fa-btn:active, .fa-btn:visited, .fa-btn:focus {
+    color: white;
+    text-decoration: none;
+}
+
+.fa-btn:hover {
+    color: #1dab4f;
+    text-decoration: none;
+}
+
+#page-container {
+    height: 100vh;
+    min-width: 410px;
+    float: none;
+    margin: 0 auto;
+    background-color: #4c4e4a;
+}
+
+#content-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    float: none;
+    margin: 0 auto;
+    text-align: center;
+}
+
+#title-block {
+    padding-top: 25px;
+}
+
+#logo {
+    display: block;
+    height: 100px;
+    float: none;
+    margin: 0 auto;
+    margin-bottom: -20px;
+}
+
+#name {
+    font-size: 50pt;
+    color: white;
+    text-align: center;
+}
+
+#about-block {
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+
+#about {
+    max-width: 550px;
+    color: white;
+    font-size: 16pt;
+    font-family: 'Montserrat Extra-Light', sans-serif;
+    float: none;
+    margin: 0 auto;
+}
+
+#demo {
+    width: 70%;
+    border: solid 2px white;
+    float: none;
+    margin: 0 auto;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+#nav-block {
+    flex-grow: 1;
+}
+
+#login-btn {
+    width: 60%;
+    max-width: 300px;
+    height: 50px;
+    border-radius: 25px;
+    background-color: #1dab4f;
+    margin: 5px;
+    margin-bottom: 50px;
+    font-size: 14pt;
+}
+
+#login-btn:hover {
+    background-color: #209235;
+    vertical-align: middle;
+}
+
+#social-bar {
+    color: white;
+    margin-bottom: 75px;
+}
+
+/* Extra Small Devices, Phones */
+@media only screen and (min-width : 480px) {
+
+}
+
+/* Small Devices, Tablets */
+@media only screen and (min-width : 768px) {
+
+}
+
+/* Medium Devices, Desktops */
+@media only screen and (min-width : 992px) {
+    #title-block {
+        display: inline-block;
+    }
+
+    #logo {
+        display: inline-block;
+        height: 75px;
+        margin: 0;
+    }
+    #name {
+        display: inline-block;
+        font-size: 48pt;
+        margin: 0;
+        margin-left: 10px;
+        line-height: inherit;
+        vertical-align: middle;
+    }
+
+    #login-btn {
+        height: 45px;
+    }
+
+    #social-bar {
+        margin-bottom: 10px;
+    }
+}
+
+/* Large Devices, Wide Screens */
+@media only screen and (min-width : 1200px) {
+
+}

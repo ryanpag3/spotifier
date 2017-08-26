@@ -154,12 +154,13 @@ p {
 
 .ui-grid {
     height: 100%;
+    min-height: 600px;
     color: #181818;
 }
 
 .ui-grid-viewport {
     height: calc(100vh - 108px) !important;
-    min-height: 400px;
+    min-height: 600px;
 }
 
 .grid-artist-column {
