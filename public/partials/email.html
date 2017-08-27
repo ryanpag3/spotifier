@@ -1,12 +1,12 @@
 <link type="text/css" rel="stylesheet" href="../css/email-style.css">
 <div id="page-container" data-ng-controller="email-controller">
+    <div id="title-block" class="hidden-xs">
+        <img id="logo" src="../assets/img/logo22.png">
+        <h1 id="name">spotifier<span style="color: #1dab4f">.io</span></h1>
+    </div>
     <div id="content-container" class="col-xs-12 col-sm-8 col-lg-6">
-        <div id="title-block">
-            <img id="logo" src="../assets/img/logo22.png">
-            <h1 id="name">spotifier<span style="color: #1dab4f">.io</span></h1>
-        </div>
+
         <div id="body" data-ng-switch="success">
-            <hr id="status-title-line">
             <p class="status-text">
                 spotifier.io requires a confirmed email address to use our service.
                 Please enter yours below and we will send a confirmation link to the
@@ -22,7 +22,7 @@
                            data-ng-model="email">
                 </div>
                 <div class="email-form form-group">
-                    <label for="emailAddressConfirm">Enter your email again</label>
+                    <label for="emailAddressConfirm">Confirm email</label>
                     <input type="email"
                            class="form-control"
                            id="emailAddressConfirm"

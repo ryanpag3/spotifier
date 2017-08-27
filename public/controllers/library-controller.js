@@ -24,7 +24,7 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
                     displayName: '',
                     cellTemplate: '<div data-ng-mouseenter="hover=true" data-ng-mouseleave="hover=false" style=""><button ' +
                     'data-ng-click="grid.appScope.removeArtist(row.entity)" ' +
-                    'data-ng-class="hover ? \' remove-button fa-btn fa fa-times fa-2x \' : \' added-button fa-btn fa fa-check fa-2x \'"></button></div>',
+                    'data-ng-class="hover ? \' social-fa-btn remove-button fa-btn fa fa-times fa-2x \' : \' social-fa-btn added-button fa-btn fa fa-check fa-2x \'"></button></div>',
                     width: 40
                 },
                 {

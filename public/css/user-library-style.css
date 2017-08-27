@@ -8,7 +8,6 @@ p {
 }
 
 .page-container {
-    height: 100vh;
     min-height: 706px;
     width: 100vw;
     background-color: #c5c7c3;
@@ -49,7 +48,7 @@ p {
     justify-content: center;
 }
 
-.social-fa-btn {
+.social-fa-btn, .social-fa-btn:hover {
     display: block;
     background: transparent;
     border: none;
@@ -57,6 +56,7 @@ p {
     line-height: inherit;
     padding: 0;
     margin: 0 auto;
+    color: #4c4e4a;
 }
 
 .added-button {
@@ -159,7 +159,7 @@ p {
 
 .ui-grid-viewport {
     height: calc(100vh - 108px) !important;
-    min-height: 600px;
+    min-height: 580px;
 }
 
 .grid-artist-column {
@@ -354,14 +354,36 @@ p {
     }
 
     .left-sidebar-container {
-        height: 200px;
+        height: 250px;
         margin-bottom: 20px;
     }
     .tooltip-text {
-        height: 50%;
+        font-size: 8pt;
+        height: 35%;
     }
     .sync-queue-tooltip-nav {
-        height: 20%;
+        margin-top: 15px;
+        height: 25%;
+    }
+
+    .library-container {
+        float: none;
+        margin: 0 auto;
+        width: 95%;
+        flex-grow: 1;
+        overflow: hidden;
+    }
+
+    .ui-grid {
+        font-size: 8pt;
+    }
+
+    .ui-grid-viewport {
+    }
+
+    #content-container {
+        display: flex;
+        flex-direction: column
     }
 }
 

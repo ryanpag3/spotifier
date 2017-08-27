@@ -1,10 +1,10 @@
 <link rel="stylesheet" type="text/css" href="../css/confirmation-style.css">
 <div id="page-container" data-ng-controller="confirmation-controller">
+    <div id="title-block">
+        <img id="logo" src="../assets/img/logo22.png">
+        <h1 id="name">spotifier<span style="color: #1dab4f">.io</span></h1>
+    </div>
     <div id="content-container" class="col-xs-12 col-sm-8 col-lg-6">
-        <div id="title-block">
-            <img id="logo" src="../assets/img/logo22.png">
-            <h1 id="name">spotifier<span style="color: #1dab4f">.io</span></h1>
-        </div>
         <div id="body" data-ng-switch="success">
             <div id="status">
                 <h1 class="status-title" data-ng-switch-when="true">Success!</h1>
@@ -22,13 +22,13 @@
             </div>
             <div id="nav-block">
                 <a href="/user/login" target="_self">
-                    <button id="login-btn" class="btn btn-success">LOGIN WITH SPOTIFY</button>
+                    <button id="nav-btn" class="btn btn-success">LOGIN WITH SPOTIFY</button>
                 </a>
             </div>
         </div>
 
         <div id="social-bar" class="row">
-            <span style="display: block">Get in touch </span>
+            <span style="display: block">Get in touch</span>
             <a class="social-fa-btn fa fa-twitter fa-3x" target="_blank" href="https://twitter.com/ryanpage_io"></a>
             <a class="social-fa-btn fa fa-github fa-3x" target="_blank" href="https://github.com/ryanpage42"></a>
         </div>
