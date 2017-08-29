@@ -1,0 +1,16 @@
+div(id='container')
+    style: include style.css
+    div(id='title-block')
+        img(id='logo' src='http://i.imgur.com/v9Lya6p.png')
+        h1(id='name')
+            span spotifier
+            span(style='color: #1dab4f;') .io
+    hr
+    div(id='body')
+        each artist in artists
+            div(id='artist')
+                span #{artist.name}
+                span #{artist.recent_release.title}
+                span #{artist.recent_release.images[0]}
+
+

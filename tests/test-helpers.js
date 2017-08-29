@@ -65,20 +65,21 @@ module.exports = {
         date.setDate(date.getDate() - 1); // move date back 24 hours
         var p = path.join(__dirname, './artist-release-cache.txt');
         // read file if exists, otherwise define
-        var artistCache = fs.existsSync(p) ? fs.readFileSync(p, 'utf-8') : '';
+        var artistCache = fs.readFileSync(p, 'utf-8');
         // this might be redundant to above
         if (artistCache) {
             artistCache = JSON.parse(artistCache);
         } else {
             artistCache = {};
         }
-        if (artistCache.syncDate === undefined || artistCache.syncDate < date) {
+
+        if (artistCache.syncDate === undefined || Date.parse(artistCache.syncDate) < date) {
             artistCache.syncDate = new Date();
             spotifyServerApi.getNewReleases()
                 .then(function (releases) {
                     artistCache.releases = releases;
                     // write file, create if doesnt exist
-                    fs.writeFile(p, JSON.stringify(artistCache, null, 4), {flag: 'wx'} ,function (err) {
+                    fs.writeFile(p, JSON.stringify(artistCache, null, 4), {flag: 'w'} ,function (err) {
                         if (err) {
                             console.log(err);
                         } else {

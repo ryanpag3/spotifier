@@ -121,7 +121,7 @@ module.exports = {
       return {
           name: potNames.choose(),
           email: {
-              address: privateConfig.gmail2.username,
+              address: privateConfig.gmail.username,
               confirmed: true
           }
       }

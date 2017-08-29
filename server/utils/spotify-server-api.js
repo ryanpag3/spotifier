@@ -110,19 +110,21 @@ var self = module.exports = {
         var checkDate = new Date();
         checkDate.setDate(checkDate.getDate() - 1); // 24 hours
         var p = path.join(__dirname, './cache/cached-new-releases.txt');
-        var cachedReleases = fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf-8')) : {};
+        var t = fs.readFileSync(p, 'utf-8');
+        var cachedReleases = fs.readFileSync(p, 'utf-8');
+        if (cachedReleases) {
+            cachedReleases = JSON.parse(cachedReleases);
+        } else {
+            cachedReleases = {};
+        }
 
-        // if (cachedReleases) {
-        //     cachedReleases = JSON.parse(cachedReleases);
-        // }
         // if syncDate has not been set or syncDate is older than 24 hours from this point
-        if (!cachedReleases.syncDate || cachedReleases.syncDate < checkDate){
+        if (cachedReleases.syncDate === undefined || Date.parse(cachedReleases.syncDate) < checkDate){
             cachedReleases.syncDate = new Date();
             self.refreshClientToken()
                 .then(function () {
                     run();
                     var offset = 0;
-
                     function run() {
                         spotifyApi.searchAlbums(query, {
                             limit: 50,
@@ -136,7 +138,8 @@ var self = module.exports = {
                                         name: data.body.albums.items[i].artists[0].name,
                                         recent_release: {
                                             id: data.body.albums.items[i].id,
-                                            title: data.body.albums.items[i].name
+                                            title: data.body.albums.items[i].name,
+                                            images: data.body.albums.items[i].images
                                         }
                                     };
                                     if (!artistAdded[album.name]){
@@ -148,8 +151,9 @@ var self = module.exports = {
                                 if (offset < data.body.albums.total) {
                                     run();
                                 } else {
+                                    console.log(releases);
                                     cachedReleases.releases = releases;
-                                    fs.writeFile(path.join(__dirname, './cache/cached-new-releases.txt'), JSON.stringify(cachedReleases, null, 4), {flag: 'wx'}, 'utf-8');
+                                    fs.writeFile(path.join(__dirname, './cache/cached-new-releases.txt'), JSON.stringify(cachedReleases, null, 4), {flag: 'w'}, 'utf-8');
                                     deferred.resolve(releases);
                                 }
                             })

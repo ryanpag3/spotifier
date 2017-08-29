@@ -1,0 +1,51 @@
+#container {
+    width: 100%;
+
+    font-family: Arial, "Helvetica Neue", sans-serif;
+}
+
+#title-block {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+#logo {
+    position: relative;
+    display: inline;
+    height: 60px;
+    padding: 5px;
+    border: solid 1px black;
+    background-color: #4d4d4d;
+}
+
+#name {
+    display: inline;
+    font-size: 32pt;
+    margin: 10px;
+    color: #4d4d4d;
+}
+
+#body {
+    font-size: 12pt;
+    color: #4d4d4d;
+    margin-top: 15px;
+}
+
+#confirm-link {
+    width: 100%;
+    text-align: center;
+}
+
+#signature {
+    margin-left: 25px;
+}
+
+#site-link {
+    margin-left: 4px;
+}
+
+#social-links {
+    font-size: 9pt;
+}
