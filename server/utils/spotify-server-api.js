@@ -110,7 +110,6 @@ var self = module.exports = {
         var checkDate = new Date();
         checkDate.setDate(checkDate.getDate() - 1); // 24 hours
         var p = path.join(__dirname, './cache/cached-new-releases.txt');
-        var t = fs.readFileSync(p, 'utf-8');
         var cachedReleases = fs.readFileSync(p, 'utf-8');
         if (cachedReleases) {
             cachedReleases = JSON.parse(cachedReleases);
@@ -139,7 +138,8 @@ var self = module.exports = {
                                         recent_release: {
                                             id: data.body.albums.items[i].id,
                                             title: data.body.albums.items[i].name,
-                                            images: data.body.albums.items[i].images
+                                            images: data.body.albums.items[i].images,
+                                            url: data.body.albums.items[i].external_urls.spotify
                                         }
                                     };
                                     if (!artistAdded[album.name]){

@@ -23,7 +23,8 @@ artistDetailsQueue.process(2, function (job, done) {
                         id: album.id,
                         title: album.name,
                         release_date: album.release_date,
-                        images: album.images
+                        images: album.images,
+                        url: album.external_urls.spotify
                     }
                 };
             } else {

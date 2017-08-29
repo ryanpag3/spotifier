@@ -57,6 +57,7 @@ Email.prototype.sendNewReleaseEmails = function () {
         // query for users with new_release field not empty
         User.find({'new_releases': {$ne: []}}, function (err, users) {
             if (err) {
+                // todo log
                 console.log(err);
             }
             if (users && users.length > 0) { // if users still have new_releases pending
@@ -68,23 +69,25 @@ Email.prototype.sendNewReleaseEmails = function () {
                     }
                 }, function (err, users) {
                     if (err) {
+                        // todo log
                         console.log(err);
                     }
                     var addresses = [];
-                    // build the 'to' option
+                    // build the recipients
                     for (var i = 0; i < users.length; i++) {
                         addresses.push(users[i].email.address);
                     }
                     // grab artist info
                     Artist.find({'_id': {$in: master.new_releases}},'name recent_release', function (err, artists) {
                         if (err) {
+                            // todo log
                             console.log(err);
                         }
                         var templateDir = path.join(__dirname, '../templates', 'new-release-email');
                         var newReleaseEmail = new EmailTemplate(templateDir);
-                        console.log(artists);
                         newReleaseEmail.render({artists: artists}, function(err, result) {
                             if (err) {
+                                // todo log
                                 console.log(err);
                             }
                             var mailOptions = {
@@ -113,6 +116,7 @@ Email.prototype.sendNewReleaseEmails = function () {
 
                                 })
                                 .catch(function (err) {
+                                    // todo log
                                     console.log(err);
                                     setTimeout(function () {
                                         sendNewReleaseBatch();

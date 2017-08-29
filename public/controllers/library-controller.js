@@ -39,9 +39,10 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
                 {name: 'name', field: 'name', displayName: 'Artist', minWidth: 100, cellClass: 'grid-center-text-vert'},
                 {
                     name: 'title',
-                    field: 'recent_release.title',
                     displayName: 'Recent Release Title',
-                    cellClass: 'grid-center-text-vert'
+                    field: 'recent_release.title',
+                    cellClass: 'grid-center-album-link',
+                    cellTemplate: '<a class="release-link" href="{{row.entity.recent_release.url}}" target="_blank">{{row.entity.recent_release.title}}</a>'
                 },
                 {
                     name: 'releaseDate',
@@ -248,14 +249,12 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
 
         /**SOCKET IO EVENT LISTENERS**/
         socket.on('sync-status-change', function (status) {
-            console.log(status);
             $scope.syncStatus = status;
             $scope.$apply();
         });
 
         socket.on('library-added', function (library) {
             $scope.data = library;
-            console.log($scope.artistName);
             if ($scope.artistName === '') {
                 $scope.gridOptions.data = $scope.data;
             }
@@ -292,18 +291,32 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
         });
 
         /**
-         * Removes an artist from the local library instance.
+         * Removes an artist from the local library instance, filtered library,
+         * and flags potentially cached search results that the artist has been
+         * removed.
          * @param {Object} artist
          */
         function removeArtistLoc(artist) {
-            var index = $scope.gridOptions.data.map(function (e) {
+            // remove from filtered library
+            var i = $scope.gridOptions.data.map(function (e) {
                 return e.spotify_id
             }).indexOf(artist.spotify_id);
-            $scope.gridOptions.data.splice(index, 1);
-            var index = $scope.data.map(function (e) {
+            $scope.gridOptions.data.splice(i, 1);
+            // remove from source library
+            var j = $scope.data.map(function (e) {
                 return e.spotify_id
             }).indexOf(artist.spotify_id);
-            $scope.data.splice(index, 1);
+            $scope.data.splice(j, 1);
+            // if we have cached search results
+            if ($scope.results){
+                var k = $scope.results.map(function(e) {
+                    return e.spotify_id
+                }).indexOf(artist.spotify_id);
+                if (k !== -1){
+                    $scope.results[k].artistAdded = false;
+                }
+            }
+
         }
 
         /** JQUERY **/

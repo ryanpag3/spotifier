@@ -136,19 +136,24 @@ Db.prototype.addArtist = function (user, artist, socketUtil) {
     var query = {'spotify_id': artist.spotify_id};
     // query for artist
     Artist.findOne(query, function (err, qArtist) {
+        if (err) {
+            console.log(err);
+        }
         // if exists
         if (qArtist) {
             db.assignArtist(user, qArtist)
+                .then(function() {
+                    // if artist details have not been added
+                    if (qArtist.recent_release.id === undefined) {
+                        // initialize a get details job and pass socketUtil object
+                        getArtistDetailsQueue.createJob({artist: qArtist});
+                    } else {
+                        socketUtil.alertArtistDetailsChange(qArtist);
+                    }
+                })
                 .catch(function (err) {
                     deferred.reject(err);
                 });
-            // if artist details have not been added
-            if (qArtist.recent_release.id === undefined) {
-                // initialize a get details job and pass socketUtil object
-                getArtistDetailsQueue.createJob({artist: qArtist});
-            } else {
-                socketUtil.alertArtistDetailsChange(qArtist);
-            }
             deferred.resolve();
         } else {
             // if doesn't exist

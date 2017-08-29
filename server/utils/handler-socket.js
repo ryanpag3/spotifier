@@ -38,11 +38,12 @@ Socket.prototype.alertLibraryAdded = function (user, library) {
 Socket.prototype.alertArtistDetailsChange = function (artist) {
     var self = this;
     var _ids = Object.keys(this.users);
+
     Artist.findOne({'spotify_id': artist.spotify_id}, 'users_tracking', function (err, qArtist) {
         if (err) {
             console.log(err);
         }
-        if (artist) {
+        if (qArtist) {
             for (var i = 0; i < qArtist.users_tracking.length; i++) {
                 if (_ids.indexOf(qArtist.users_tracking[i].toString()) !== -1) {
                     self.users[qArtist.users_tracking[i]].emit('artist-details-found', artist);
