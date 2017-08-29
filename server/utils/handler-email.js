@@ -1,5 +1,8 @@
 var nodemailer = require('nodemailer'),
     querystring = require('querystring'),
+    pug = require('pug'),
+    EmailTemplate = require('email-templates').EmailTemplate,
+    path = require('path'),
     Q = require('q'),
     User = require('../models/user'),
     Artist = require('../models/artist'),
@@ -53,14 +56,11 @@ Email.prototype.sendNewReleaseEmails = function () {
     function sendNewReleaseBatch() {
         // query for users with new_release field not empty
         User.find({'new_releases': {$ne: []}}, function (err, users) {
-            console.log(users.length);
             if (err) {
                 console.log(err);
             }
             if (users && users.length > 0) { // if users still have new_releases pending
                 var master = users[0]; // master is the user we will query for all matching artist patterns with
-                console.log(master.name);
-                console.log(users.length);
                 User.find({
                     'new_releases': {
                         $all: master.new_releases,
@@ -76,41 +76,49 @@ Email.prototype.sendNewReleaseEmails = function () {
                         addresses.push(users[i].email.address);
                     }
                     // grab artist info
-                    Artist.find({'_id': {$in: master.new_releases}}, function (err, artists) {
+                    Artist.find({'_id': {$in: master.new_releases}},'name recent_release', function (err, artists) {
                         if (err) {
                             console.log(err);
                         }
-                        var mailOptions = {
-                            from: configPrivate.gmail.username,
-                            to: addresses,
-                            subject: 'new release found!',
-                            text: JSON.stringify(artists, null, 4)
-                        };
-                        self.send(mailOptions)
-                            .then(function () {
-                                // remove new_release data from users who we just sent email to
-                                User.updateMany({
-                                        'new_releases': {
-                                            $all: master.new_releases,
-                                            $size: master.new_releases.length
-                                        }
-                                    },
-                                    {$set: {'new_releases': []}}, function (err) {
-                                        if (err) {
-                                            // todo turn into debug statement
-                                            console.log(err);
-                                        }
-                                        console.log('run');
-                                        sendNewReleaseBatch(); // process next release batch and send
-                                    });
-
-                            })
-                            .catch(function (err) {
+                        var templateDir = path.join(__dirname, '../templates', 'new-release-email');
+                        var newReleaseEmail = new EmailTemplate(templateDir);
+                        console.log(artists);
+                        newReleaseEmail.render({artists: artists}, function(err, result) {
+                            if (err) {
                                 console.log(err);
-                                setTimeout(function () {
-                                    sendNewReleaseBatch();
-                                }, 120000);
-                            });
+                            }
+                            var mailOptions = {
+                                from: configPrivate.gmail.username,
+                                to: addresses,
+                                subject: 'New Release Found!',
+                                html: result.html
+                            };
+                            self.send(mailOptions)
+                                .then(function () {
+                                    // remove new_release data from users who we just sent email to
+                                    User.updateMany({
+                                            'new_releases': {
+                                                $all: master.new_releases,
+                                                $size: master.new_releases.length
+                                            }
+                                        },
+                                        {$set: {'new_releases': []}}, function (err) {
+                                            if (err) {
+                                                // todo turn into debug statement
+                                                console.log(err);
+                                            }
+                                            console.log('run');
+                                            sendNewReleaseBatch(); // process next release batch and send
+                                        });
+
+                                })
+                                .catch(function (err) {
+                                    console.log(err);
+                                    setTimeout(function () {
+                                        sendNewReleaseBatch();
+                                    }, 120000);
+                                });
+                        });
                     });
                 })
             } else {
@@ -139,26 +147,42 @@ Email.prototype.sendConfirmationEmail = function (user) {
                     code: confirmCode,
                     id: user._id.toString()
                 });
-                db.setConfirmCode(user, confirmCode)
-                    .then(function () {
-                        var confirmUrl = configPublic.url + '/user/email/confirm?' + query;
-                        var mailOptions = {
-                            from: configPrivate.gmail.username,
-                            to: user.email.address,
-                            subject: 'confirmation',
-                            html: '<a href="' + confirmUrl + '">' + confirmUrl + '</a>'
-                        };
-                        email.send(mailOptions)
-                            .then(function (successMsg) {
-                                deferred.resolve(successMsg);
-                            })
-                            .catch(function (err) { // catch send err
-                                deferred.reject(err);
-                            })
-                    })
-                    .catch(function (err) { // catch setConfirmCode err
-                        deferred.reject(err);
-                    })
+
+                var templateDir = path.join(__dirname, '../templates', 'confirmation-email');
+                var confirmEmail = new EmailTemplate(templateDir);
+                var confirmUrl = configPublic.url + '/user/email/confirm?' + query;
+                var templateVals = {url: confirmUrl};
+
+                // debugging
+                // console.log(pug.renderFile(path.join(__dirname, '../templates/confirmation-email', 'html.pug'),
+                //     {
+                //         url: confirmUrl
+                //     }));
+
+                confirmEmail.render(templateVals, function(err, result) {
+                    if (err) {
+                        console.log(err);
+                    }
+                    var mailOptions = {
+                        from: configPrivate.gmail.username,
+                        to: user.email.address,
+                        subject: 'Here\'s your confirmation link!',
+                        html: result.html,
+                        text: result.text
+                    };
+                    email.send(mailOptions)
+                        .then(function (successMsg) {
+                            db.setConfirmCode(user, confirmCode)
+                                .catch(function (err) { // catch setConfirmCode err
+                                    deferred.reject(err);
+                                });
+                            deferred.resolve(successMsg);
+                        })
+                        .catch(function (err) { // catch send err
+                            deferred.reject(err);
+                        })
+                });
+
             } else {
                 var mailOptions = {
                     from: configPrivate.gmail.username,

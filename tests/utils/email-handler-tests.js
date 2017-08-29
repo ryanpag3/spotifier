@@ -30,8 +30,8 @@ describe('email-handler tests', function () {
     });
 
     it('sendConfirmationEmail should resolve on a successful email sent with a confirmCode', function (done) {
-        this.timeout(4000); // allow more time for this unit test
-        testHelper.insert(sampleData.passUser())
+        this.timeout(10000); // allow more time for this unit test
+        testHelper.insert(sampleData.unconfirmedUser())
             .then(function (user) {
                 email.sendConfirmationEmail(user)
                     .then(function (successMsg) {
