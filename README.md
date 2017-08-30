@@ -17,7 +17,7 @@ Place those files in `./server/sslcert/` and you should be good to go.
 
 ## Running the tests
 
-Unit tests are written with `chai`, `sinon`, and `mocha`. They are found in the `./tests/`` directory and can be run
+Unit tests are written with `chai`, `sinon`, and `mocha`. They are found in the `./tests/` directory and can be run
 from the command line with `mocha <test-file-name>.js`
 
 ## Authors
