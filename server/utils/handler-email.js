@@ -155,7 +155,7 @@ Email.prototype.sendConfirmationEmail = function (user) {
                 // setup email template
                 var templateDir = path.join(__dirname, '../templates', 'confirmation-email');
                 var confirmEmail = new EmailTemplate(templateDir);
-                var confirmUrl = configPublic.url + '/user/email/confirm?' + query;
+                var confirmUrl = 'https://' + configPrivate.serverIp + ':3000/user/email/confirm?' + query;
                 var templateVals = {url: confirmUrl};
                 // render email template
                 confirmEmail.render(templateVals, function(err, result) {
