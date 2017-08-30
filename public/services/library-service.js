@@ -6,7 +6,6 @@ app.factory('libraryService', ['$q', '$http',
             cancelSync: cancelSync,
             get: get,
             searchSpotify: searchSpotify,
-            search: search,
             add: add,
             remove: remove,
             getSyncStatus: getSyncStatus

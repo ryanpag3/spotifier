@@ -162,6 +162,9 @@ router.get('/email/status', function (req, res) {
         })
 });
 
+/**
+ * endpoint for unsubscribing a user's email
+ */
 router.post('/email/unsubscribe', function(req, res) {
     var db = new Db();
     db.unsubscribeEmail(req.body.email)
