@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "description": "A new music notifier for spotify",
   "main": "server.js",
-  "scripts": {
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://gitlab.com/ryanpage/spotify-notifier.git"
@@ -29,7 +28,7 @@
     "cookie-parser": "^1.4.3",
     "cron": "^1.2.1",
     "email-templates": "^2.7.1",
-    "express": "^4.15.3",
+    "express": "^4.15.4",
     "express-session": "^1.15.3",
     "helmet": "^3.8.1",
     "kue": "^0.11.6",
