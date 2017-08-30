@@ -7,7 +7,6 @@ var express = require('express'),
 router.post('/search', function(req, res) {
     var spotifyApiUser = new SpotifyApiUser();
     // used for high concurrency
-    // todo automatically transition to queue system when rate of searches reaches certain point
     // var data = {user: req.user, query: req.body.query};
     // jobQueue.createSearchArtistJob(data, function(result) {
     //         return res.status(200).json({

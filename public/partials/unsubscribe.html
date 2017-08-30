@@ -1,0 +1,39 @@
+<link type="text/css" rel="stylesheet" href="../css/email-style.css">
+<div id="page-container" data-ng-controller="email-controller">
+    <div id="title-block" class="hidden-xs">
+        <img id="logo" src="../assets/img/logo22.png">
+        <h1 id="name">spotifier<span style="color: #1dab4f">.io</span></h1>
+    </div>
+    <div id="content-container" class="col-xs-12 col-sm-8 col-lg-6">
+        <div id="body" data-ng-switch="success">
+            <p class="status-text result-text" data-ng-show="unsubscribed === true">
+                You have been successfully unsubscribed from spotifier.io!
+            </p>
+            <p class="status-text result-text" data-ng-show="unsubscribed === false">
+                We couldn't unsubscribe you from the service. Please try again.
+            </p>
+            <p class="status-text">
+               Please enter your email address to be unsubscribed from spotifier.io
+            </p>
+            <form data-ng-submit="unsubscribeEmail()">
+                <div class="email-form form-group">
+                    <label for="emailAddress">Enter your email</label>
+                    <input type="email"
+                           class="form-control"
+                           id="emailAddress"
+                           placeholder="enter email..."
+                           data-ng-model="email">
+                </div>
+                <div id="nav-block">
+                    <button class="nav-btn btn btn-success">SUBMIT</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="social-bar" class="row">
+            <span style="display: block">Get in touch </span>
+            <a class="social-fa-btn fa fa-twitter fa-3x" target="_blank" href="https://twitter.com/ryanpage_io"></a>
+            <a class="social-fa-btn fa fa-github fa-3x" target="_blank" href="https://github.com/ryanpage42"></a>
+        </div>
+    </div>
+</div>

@@ -44,7 +44,7 @@ function scan() {
                     'recent_release.id': {$nin: [releases[i].recent_release.id, null]}
                 }, function(err, artist) {
                     if (err) {
-                        console.log(err); // todo turn into debug report
+                        console.log(err);
                     }
                     if (artist !== null) {
                         console.log('new release found!');

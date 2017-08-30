@@ -1,14 +1,13 @@
 var Queue = require('bull'),
     Q = require('q'),
     User = require('../models/user.js'),
-    syncLibraryQueue = new Queue('sync-library'),
+    syncLibraryQueue = new Queue('sync-library'), // todo add redis production server values
     SpotifyApiUser = require('./spotify-user-api.js');
 var socketUtil; // assigned on job creation, need to use global namespace to allow event listener usage
 
 syncLibraryQueue
     .on('active', function (job, jobPromise) {
         socketUtil.alertSyncQueueStatusChange(job.data.user, 'active');
-        console.log(job.data.user.name + ' started sync library job.');
         var update = {
             sync_queue: {
                 status: 'active'

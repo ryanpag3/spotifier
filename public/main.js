@@ -5,7 +5,6 @@ var app = angular.module('spotifier', ['ngRoute', 'spotify', 'ui.grid', 'ui.grid
 
 app.config(['$routeProvider', '$locationProvider', 'SpotifyProvider',
     function ($routeProvider, $locationProvider, SpotifyProvider) {
-        // todo add ensure authentication route middleware
         $routeProvider
             .when('/', {
                 templateUrl: 'partials/landing.html',
@@ -14,6 +13,10 @@ app.config(['$routeProvider', '$locationProvider', 'SpotifyProvider',
             .when('/email', {
                 templateUrl: 'partials/email.html',
                 access: {restricted: true}
+            })
+            .when('/unsubscribe', {
+                templateUrl: 'partials/unsubscribe.html',
+                access: {restricted: false}
             })
             .when('/confirmation', {
                 templateUrl: 'partials/confirmation.html',

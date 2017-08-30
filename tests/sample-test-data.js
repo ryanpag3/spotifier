@@ -117,14 +117,21 @@ module.exports = {
     },
 
     // pass all user tests and check for multiple email functionality
-    passUser2: function() {
-      return {
-          name: potNames.choose(),
-          email: {
-              address: privateConfig.gmail.username,
-              confirmed: true
-          }
-      }
+    passUser2: function () {
+        return {
+            name: potNames.choose(),
+            email: {
+                address: privateConfig.gmail.username,
+                confirmed: true
+            }
+        }
+    },
+
+    unsubscribedUser: function () {
+        return {
+            name: potNames.choose(),
+            email: {}
+        }
     }
 };
 

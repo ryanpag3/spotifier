@@ -81,7 +81,7 @@ router.get('/callback',
                     })
             })
             .catch(function (err) { // create user err catch
-                // todo
+                console.log(err);
             });
 
         // // DEBUGGING
@@ -90,7 +90,6 @@ router.get('/callback',
 
 /**
  * API endpoint for inserting/updating a user's email into the database.
- * todo
  */
 router.post('/email/add', function (req, res) {
     var db = new Db();
@@ -133,7 +132,6 @@ router.get('/email/send-confirmation', function (req, res) {
 
 /**
  * API endpoint for confirming a user's email in the database.
- * todo
  */
 router.get('/email/confirm', function (req, res) {
     email.confirm(req.query)
@@ -149,7 +147,6 @@ router.get('/email/confirm', function (req, res) {
 
 /**
  * API endpoint for getting a user's email authentication status.
- * todo
  */
 router.get('/email/status', function (req, res) {
     email.getStatus(req.user)
@@ -162,6 +159,17 @@ router.get('/email/status', function (req, res) {
             return res.status(500).json({
                 err: err
             })
+        })
+});
+
+router.post('/email/unsubscribe', function(req, res) {
+    var db = new Db();
+    db.unsubscribeEmail(req.body.email)
+        .then(function() {
+            res.status(200).send();
+        })
+        .catch(function() {
+            res.status(500).send();
         })
 });
 

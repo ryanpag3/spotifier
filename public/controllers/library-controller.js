@@ -76,7 +76,7 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
                     socket.emit('add-user', user);
                 })
                 .catch(function (err) {
-                    // todo: handle session storage error
+                    // do nothing
                 });
             getLibrary(); // request library
             libraryService.getSyncStatus() // request sync job status
@@ -128,7 +128,7 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
                         $scope.resultsShown = true;
                     })
                     .catch(function (err) {
-                        // todo
+                        // do nothing
                     });
                 $(function () {
                     $('#spotify-search').blur();
@@ -166,7 +166,7 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
                     pushArtistToLibrary(artist);
                 })
                 .catch(function () {
-                    // todo handle service error response
+                    // do nothing
                 })
         };
 

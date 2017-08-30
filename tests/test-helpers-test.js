@@ -87,7 +87,6 @@ describe('test-helper unit tests', function () {
                         testHelper.assignRandom(100)
                             .then(function () {
                                 User.find({}, function (err, users) {
-                                    console.log(users);
                                     done();
                                 })
                             })

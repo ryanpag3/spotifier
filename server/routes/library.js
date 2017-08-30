@@ -12,8 +12,10 @@ var express = require('express'),
     Db = require('../utils/handler-db.js'),
     syncLibraryJobQueue = require('../utils/queue-sync-user-library.js');
 
+/**
+ * returns the authenticated user's tracked artist library
+ */
 router.get('/update', function(req, res) {
-    // debugging
     var db = new Db();
     db.getLibrary(req.user)
         .then(function(library) {
@@ -38,12 +40,15 @@ router.get('/sync', function(req, res) {
                 });
             res.status(200).send();
         })
-        // catch refresh access token error
-        .catch(function(err) {
+        .catch(function(err) { // catch refresh access token error
             console.log(err);
         });
 });
 
+/**
+ * Calls the sync library queue utility to attempt to remove
+ * the job for the specified user from the queue.
+ */
 router.get('/cancel-sync', function(req, res) {
    syncLibraryJobQueue.removeJob(req.user)
        .then(function() {
@@ -56,6 +61,10 @@ router.get('/cancel-sync', function(req, res) {
        })
 });
 
+/**
+ * This endpoint returns the current sync queue status for the
+ * authenticated user in a JSON object.
+ */
 router.get('/sync-status', function(req, res) {
     syncLibraryJobQueue.getJobStatus(req.user)
         .then(function(status) {
@@ -70,6 +79,14 @@ router.get('/sync-status', function(req, res) {
         })
 });
 
+/**
+ * API endpoint for adding an artist for the authenticated user.
+ * We retrieve the socket utility object from express middleware,
+ * then refresh a user's spotify access token if it has expired,
+ * then we get detailed db information for the user, and finally
+ * we use the database wrapper to associate the artist with the
+ * user.
+ */
 router.post('/add', function(req, res) {
     var socketUtil = req.app.get('socketio');
     var db = new Db();
@@ -99,7 +116,11 @@ router.post('/add', function(req, res) {
         })
 });
 
-// todo: handle success and fail cases
+/**
+ * API endpoint for removing an artist from the database for
+ * a specific user. Calls the database wrapper which returns
+ * a promise that we use to return a status code.
+ */
 router.post('/remove', function(req, res) {
     var deferred = Q.defer(),
         db = new Db();
@@ -115,6 +136,10 @@ router.post('/remove', function(req, res) {
     return deferred.promise;
 });
 
+/**
+ * API endpoint for returning the currently authenticated
+ * user information.
+ */
 router.get('/me', function(req, res) {
     return res.status(200).json({
         user: req.user

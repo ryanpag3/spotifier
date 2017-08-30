@@ -1,6 +1,5 @@
 var nodemailer = require('nodemailer'),
     querystring = require('querystring'),
-    pug = require('pug'),
     EmailTemplate = require('email-templates').EmailTemplate,
     path = require('path'),
     Q = require('q'),
@@ -10,6 +9,10 @@ var nodemailer = require('nodemailer'),
     configPrivate = require('../../config-private'),
     configPublic = require('../../config-public');
 
+/**
+ * define the email authentication information
+ * @constructor
+ */
 var Email = function () {
     this.transporter = nodemailer.createTransport({
         service: 'Gmail',
@@ -21,8 +24,8 @@ var Email = function () {
 };
 
 /**
- * todo
- * @param options
+ * Send an email
+ * @param options: mailer options specified in respective email setup functions
  * @returns {Q.Promise<T>}
  */
 Email.prototype.send = function (options) {
@@ -52,50 +55,49 @@ Email.prototype.sendNewReleaseEmails = function () {
     var deferred = Q.defer();
 
     sendNewReleaseBatch();
-
     function sendNewReleaseBatch() {
         // query for users with new_release field not empty
         User.find({'new_releases': {$ne: []}}, function (err, users) {
             if (err) {
-                // todo log
                 console.log(err);
             }
             if (users && users.length > 0) { // if users still have new_releases pending
                 var master = users[0]; // master is the user we will query for all matching artist patterns with
-                User.find({
-                    'new_releases': {
-                        $all: master.new_releases,
-                        $size: master.new_releases.length
-                    }
-                }, function (err, users) {
+                User.find({$and: [{'email.address': {$ne: null}}, {'new_releases': {$eq: master.new_releases}}]}, function (err, users) {
+                    var addresses = [];
+                    // catch err
                     if (err) {
-                        // todo log
                         console.log(err);
                     }
-                    var addresses = [];
+
                     // build the recipients
                     for (var i = 0; i < users.length; i++) {
                         addresses.push(users[i].email.address);
                     }
-                    // grab artist info
+                    // query for artists with an id in the selected array
                     Artist.find({'_id': {$in: master.new_releases}},'name recent_release', function (err, artists) {
-                        if (err) {
-                            // todo log
-                            console.log(err);
-                        }
                         var templateDir = path.join(__dirname, '../templates', 'new-release-email');
                         var newReleaseEmail = new EmailTemplate(templateDir);
+                        // catch err
+                        if (err) {
+                            console.log(err);
+                        }
+
+                        // render email template
                         newReleaseEmail.render({artists: artists}, function(err, result) {
+                            // catch err
                             if (err) {
-                                // todo log
                                 console.log(err);
                             }
+                            // define email options
                             var mailOptions = {
                                 from: configPrivate.gmail.username,
                                 to: addresses,
-                                subject: 'New Release Found!',
-                                html: result.html
+                                subject: 'We\'ve found some releases for you!',
+                                html: result.html,
+                                text: result.text
                             };
+                            // send
                             self.send(mailOptions)
                                 .then(function () {
                                     // remove new_release data from users who we just sent email to
@@ -107,17 +109,15 @@ Email.prototype.sendNewReleaseEmails = function () {
                                         },
                                         {$set: {'new_releases': []}}, function (err) {
                                             if (err) {
-                                                // todo turn into debug statement
                                                 console.log(err);
                                             }
-                                            console.log('run');
                                             sendNewReleaseBatch(); // process next release batch and send
                                         });
 
                                 })
                                 .catch(function (err) {
-                                    // todo log
                                     console.log(err);
+                                    // if email fails to send, we set a backoff of 2 mins before retrying
                                     setTimeout(function () {
                                         sendNewReleaseBatch();
                                     }, 120000);
@@ -130,12 +130,11 @@ Email.prototype.sendNewReleaseEmails = function () {
             }
         });
     }
-
     return deferred.promise;
 };
 
 /**
- * todo
+ * Send a confirmation email for the specified user
  * @param user
  * @returns {Q.Promise<T>}
  */
@@ -143,26 +142,22 @@ Email.prototype.sendConfirmationEmail = function (user) {
     var email = this,
         db = new Db(),
         deferred = Q.defer();
-    db.getUser(user)
+    db.getUser(user) // get user information
         .then(function (user) {
+            // is the user confirmed already?
             if (user.email.confirmed !== true) {
                 var confirmCode = generateConfirmCode(configPublic.confirmCodeLength);
-                var query = querystring.stringify({
+                var query = querystring.stringify({ // build query string
                     code: confirmCode,
                     id: user._id.toString()
                 });
 
+                // setup email template
                 var templateDir = path.join(__dirname, '../templates', 'confirmation-email');
                 var confirmEmail = new EmailTemplate(templateDir);
                 var confirmUrl = configPublic.url + '/user/email/confirm?' + query;
                 var templateVals = {url: confirmUrl};
-
-                // debugging
-                // console.log(pug.renderFile(path.join(__dirname, '../templates/confirmation-email', 'html.pug'),
-                //     {
-                //         url: confirmUrl
-                //     }));
-
+                // render email template
                 confirmEmail.render(templateVals, function(err, result) {
                     if (err) {
                         console.log(err);
@@ -186,14 +181,6 @@ Email.prototype.sendConfirmationEmail = function (user) {
                             deferred.reject(err);
                         })
                 });
-
-            } else {
-                var mailOptions = {
-                    from: configPrivate.gmail.username,
-                    to: user.email.address,
-                    subject: 'already confirmed',
-                    text: 'this email address has already been confirmed! :)'
-                }
             }
         })
         .catch(function (err) { // catch getUser err
@@ -203,7 +190,7 @@ Email.prototype.sendConfirmationEmail = function (user) {
 };
 
 /**
- * todo
+ * Flags a user as successfully confirmed in the database.
  * @param query
  */
 Email.prototype.confirm = function (query) {
@@ -225,6 +212,7 @@ Email.prototype.confirm = function (query) {
                     }
                 }, function (err) {
                     if (err) {
+                        console.log(err);
                         deferred.reject(err);
                     } else {
                         deferred.resolve();
@@ -232,10 +220,14 @@ Email.prototype.confirm = function (query) {
                 })
             }
             else {
-                deferred.reject('invalid confirm code');
+                var error = 'invalid confirm code';
+                console.log(error);
+                deferred.reject(error);
             }
         } else {
-            deferred.reject('user not found!');
+            var error = 'user not found!';
+            console.log(error);
+            deferred.reject(error);
         }
     });
     return deferred.promise;
@@ -247,7 +239,6 @@ Email.prototype.getStatus = function (user) {
         if (err) {
             deferred.reject(err);
         }
-        console.log(user.email.confirmed);
         deferred.resolve(user.email.confirmed);
     });
     return deferred.promise;

@@ -99,6 +99,7 @@ Db.prototype.addAllArtists = function (user, artists, socketUtil) {
                 deferred.reject(err); // add artist threw error, reject
             });
     }
+
     return deferred.promise;
 };
 
@@ -142,7 +143,7 @@ Db.prototype.addArtist = function (user, artist, socketUtil) {
         // if exists
         if (qArtist) {
             db.assignArtist(user, qArtist)
-                .then(function() {
+                .then(function () {
                     // if artist details have not been added
                     if (qArtist.recent_release.id === undefined) {
                         // initialize a get details job and pass socketUtil object
@@ -221,16 +222,12 @@ Db.prototype.removeArtist = function (user, artist) {
 /**
  * Updates an artist's values in the Artist collection
  * @param artist: updated schema values
- * todo: handle error?
  */
 Db.prototype.updateArtist = function (artist) {
     Artist.findOneAndUpdate({'spotify_id': artist.spotify_id}, artist, function (err, artist) {
         if (err) {
             console.log(err);
         }
-        // if (artist) {
-        //     console.log(artist.name + ' has been updated.');
-        // }
     })
 };
 
@@ -272,7 +269,6 @@ Db.prototype.assignArtist = function (user, artist) {
 Db.prototype.artistNewReleaseFound = function (artist) {
     User.updateMany({'_id': {$in: artist.users_tracking}}, {$addToSet: {'new_releases': artist._id}}, function (err) {
         if (err) {
-            // todo turn into debug report
             console.log(err);
         }
     })
@@ -420,4 +416,21 @@ Db.prototype.setConfirmCode = function (user, confirmCode) {
     return deferred.promise;
 };
 
+/**
+ * queries for a user by the specified email and unsets the field
+ * @param email
+ * @returns {Q.Promise<T>}
+ */
+Db.prototype.unsubscribeEmail = function (email) {
+    var deferred = Q.defer();
+    User.update({'email.address': email}, {$unset: {'email': 1}}, function (err) {
+        if (err) {
+            console.log(err);
+            deferred.reject();
+        } else {
+            deferred.resolve();
+        }
+    });
+    return deferred.promise;
+};
 module.exports = Db;

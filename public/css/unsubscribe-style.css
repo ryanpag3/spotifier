@@ -1,0 +1,147 @@
+.status-text {
+    width: 350px;
+    float: none;
+    font-size: 12pt;
+    margin: 0 auto;
+    padding-top: 30px;
+    padding-bottom: 10px;
+}
+
+.result-text {
+    color: red;
+}
+
+.nav-btn {
+    width: 200px;
+    height: 45px;
+    border-radius: 25px;
+    background-color: #1dab4f;
+    font-size: 14pt;
+    margin: 10px;
+}
+
+.email-form {
+    width: 350px;
+    float: none;
+    margin: 0 auto;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+#content-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    float: none;
+    margin: 0 auto;
+    text-align: center;
+}
+
+#title-block {
+    padding-top: 10px;
+    background-color: #323331;
+}
+
+#logo {
+    display: block;
+    height: 100px;
+    float: none;
+    margin: 0 auto;
+    margin-bottom: -20px;
+}
+
+#name {
+    font-size: 50pt;
+    color: white;
+    text-align: center;
+}
+
+#status {
+}
+
+#status-title-line {
+    width: 400px;
+    border: solid 1px gray;
+    margin-top: -1px;
+}
+
+#body {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+#nav-block {
+    display: flex;
+    flex-grow: 1;
+    margin: 10px;
+    justify-content: center;
+}
+
+#social-bar {
+    color: white;
+    padding-bottom: 75px;
+}
+
+/* Extra Small Devices, Phones */
+@media only screen and (min-width: 480px) {
+
+}
+
+/* Small Devices, Tablets */
+@media only screen and (min-width: 768px) {
+
+}
+
+/* Medium Devices, Desktops */
+@media screen and (min-width: 992px) {
+
+    .status-text {
+        width: 450px;
+        font-size: 12pt;
+    }
+
+    .nav-btn {
+        height: 40px;
+        font-size: 12pt;
+    }
+
+    #title-block {
+        display: flex;
+        width: 100%;
+        height: 100px;
+        background-color: #323331;
+        align-items: center;
+        padding: 0;
+    }
+
+    #logo {
+        display: inline-block;
+        height: 60px;
+        margin: 0;
+        padding-left: 10px;
+    }
+
+    #name {
+        display: inline-block;
+        font-size: 36pt;
+        margin: 0;
+        margin-left: 10px;
+        line-height: inherit;
+        vertical-align: middle;
+    }
+
+    #nav-block {
+        align-items: flex-start;
+    }
+
+    #social-bar {
+        padding-bottom: 10px;
+    }
+
+}
+
+/* Large Devices, Wide Screens */
+@media only screen and (min-width: 1200px) {
+
+}

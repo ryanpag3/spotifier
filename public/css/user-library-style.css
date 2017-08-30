@@ -10,6 +10,7 @@ p {
 .page-container {
     min-height: 706px;
     width: 100vw;
+    min-width: 410px;
     background-color: #c5c7c3;
 }
 
@@ -76,7 +77,7 @@ p {
 
 .search {
     position: relative;
-    min-width: 275px;
+    min-width: 265px;
     width: 20%;
     z-index: 5;
     margin: 0 auto;
@@ -96,10 +97,11 @@ p {
     position: absolute;
     width: 90%;
     margin-left: 2px;
-    background-color: #484d46;
+    background-color: #21221e;
     overflow: hidden;
     z-index: 5;
     box-shadow: 4px 4px 10px #484d46;
+    border-radius: 15px;
 }
 
 .result {
@@ -241,7 +243,7 @@ p {
 .menu-button {
     color: white;
     text-decoration: none !important;
-    margin: 16px;
+    margin: 8px;
 
 }
 
@@ -359,12 +361,17 @@ p {
 
 
 @media (max-width: 768px) {
+
     .search {
         margin: 0;
     }
 
+    .search-results {
+        box-shadow: none;
+    }
+
     .left-sidebar-container {
-        height: 250px;
+        min-height: 200px;
         margin-bottom: 20px;
     }
     .tooltip-text {
@@ -389,6 +396,10 @@ p {
     }
 
     .ui-grid-viewport {
+    }
+
+    .menu-button {
+        margin: 4px;
     }
 
     #content-container {

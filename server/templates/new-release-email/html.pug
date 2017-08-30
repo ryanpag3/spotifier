@@ -6,11 +6,31 @@ div(id='container')
             span spotifier
             span(style='color: #1dab4f;') .io
     hr
+
     div(id='body')
+        span Hello!
+        br
+        br
+        span We found some new releases for artists that you are tracking. Click any one below to check it out!
+
+    div(id='artist-body')
         each artist in artists
-            div(id='artist')
-                span #{artist.name}
-                span #{artist.recent_release.title}
-                span #{artist.recent_release.images[0]}
+            a(id='link' href=artist.recent_release.url)
+                div(id='artist')
+                    div(id='pic-container')
+                        img(id='pic' src=artist.recent_release.images[0].url)
+                    div(id='details')
+                        span(id='album-title') #{artist.recent_release.title}
+                        br
+                        span(id='artist-name') By #{artist.name}
 
-
+br
+br
+div(id='social-links')
+    span Need help? Want to help? Contact me!
+    br
+    a(id='twitter' href='https://twitter.com/ryanpage_io') Twitter
+    span &nbsp;|&nbsp;
+    a(id='github' href='https://github.com/ryanpage42') Github
+    span &nbsp;|&nbsp;
+    a(id='unsubscr1ibe' href='http://localhost:3000/unsubscribe') Unsubscribe from Spotifier

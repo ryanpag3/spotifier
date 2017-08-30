@@ -9,7 +9,8 @@ app.factory('authService', ['$q', '$http', '$location',
             getStatus: getStatus,
             getEmailStatus: getEmailStatus,
             submitEmail: submitEmail,
-            sendConfirmationEmail: sendConfirmationEmail
+            sendConfirmationEmail: sendConfirmationEmail,
+            unsubscribeEmail: unsubscribeEmail
         });
 
         /**
@@ -68,7 +69,7 @@ app.factory('authService', ['$q', '$http', '$location',
                     sendConfirmationEmail();
                 })
                 .catch(function (err) {
-                    console.log(err);
+                    // do nothing
                 })
         }
 
@@ -78,7 +79,19 @@ app.factory('authService', ['$q', '$http', '$location',
                     $location.path('/confirm-pending');
                 })
                 .catch(function (err) {
-                    console.log(err);
+                    // do nothing
                 })
+        }
+
+        function unsubscribeEmail(emailAddress) {
+            var deferred = $q.defer();
+            $http.post('/user/email/unsubscribe', {email: emailAddress})
+                .then(function(res) {
+                    deferred.resolve();
+                })
+                .catch(function(err) {
+                    deferred.reject();
+                });
+            return deferred.promise;
         }
     }]);

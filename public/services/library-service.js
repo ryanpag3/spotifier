@@ -82,11 +82,6 @@ app.factory('libraryService', ['$q', '$http',
             return deferred.promise;
         }
 
-        // gets user library search results from http request
-        function search(query) {
-            // todo create ajax call and handle promises
-        }
-
         /**
          * Add an artist to a user's library
          */
@@ -94,11 +89,9 @@ app.factory('libraryService', ['$q', '$http',
             var deferred = $q.defer();
             $http.post('/library/add', {artist: artist})
                 .then(function (res) {
-                    // todo handle success response
                     deferred.resolve();
                 })
                 .catch(function (err) {
-                    // todo handle error response
                     deferred.reject();
                 });
             return deferred.promise;

@@ -14,6 +14,16 @@ app.controller('email-controller', ['$scope', '$location', '$route', 'authServic
             }
         };
 
+        $scope.unsubscribeEmail = function() {
+            authService.unsubscribeEmail($scope.email)
+                .then(function() {
+                   $scope.unsubscribed = true;
+                })
+                .catch(function() {
+                    $scope.unsubscribed = false;
+                });
+        };
+
         /**
          * Ng-click handler for sending a confirmation again.
          */

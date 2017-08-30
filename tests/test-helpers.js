@@ -65,7 +65,7 @@ module.exports = {
         date.setDate(date.getDate() - 1); // move date back 24 hours
         var p = path.join(__dirname, './artist-release-cache.txt');
         // read file if exists, otherwise define
-        var artistCache = fs.readFileSync(p, 'utf-8');
+        var artistCache = fs.existsSync(p) ? fs.readFileSync(p, 'utf-8') : undefined;
         // this might be redundant to above
         if (artistCache) {
             artistCache = JSON.parse(artistCache);
@@ -213,8 +213,10 @@ module.exports = {
             var user;
             if (i % 2 === 0) {
                 user = sampleData.passUser();
-            } else {
+            } else if (i % 3 === 0) {
                 user = sampleData.passUser2();
+            } else {
+                user = sampleData.unconfirmedUser();
             }
             User.create(user, function (err) {
                 if (err) {
@@ -254,7 +256,7 @@ module.exports = {
                 }
 
                 for (var i = 0; i < n; i++) {
-                    db.assignArtist(users[getRandom(users.length - 1)], artists[getRandom(artists.length - 1)])
+                    db.assignArtist(users[getRandom(users.length)], artists[getRandom(artists.length)])
                         .catch(function (err) {
                             deferred.reject(err);
                         });
