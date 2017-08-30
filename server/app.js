@@ -9,6 +9,7 @@ var path = require('path'),
     session = require('express-session'),
     MongoStore = require('connect-mongo')(session),
     mongoose = require('mongoose'),
+    helmet = require('helmet'),
     syncLibraryQueue = require('./utils/queue-sync-user-library'),
     getArtistDetailsQueue = require('./utils/queue-get-artist-details');
     mongoose.Promise = require('bluebird');
@@ -56,6 +57,7 @@ const setupApp = function(app, express, socketUtil) {
     syncLibraryQueue.setSocketUtil(socketUtil);
     getArtistDetailsQueue.setSocketUtil(socketUtil);
 
+    app.use(helmet());
     app.use(cookieParser());
     app.use(bodyParser.json({limit: '5mb'}));
     app.use(bodyParser.urlencoded({ extended: false, limit: '5mb' }));
