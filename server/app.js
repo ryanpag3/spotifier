@@ -23,8 +23,8 @@ const setupApp = function(app, express, socketUtil) {
         clientID = '5c3f5262d39e44ec999a8a0a9babac3e';
 
     var options = {
-        server: { socketOptions: { keepAlive: 1, connectTimeoutMS: 30000 } },
-        replset: { socketOptions: { keepAlive: 1, connectTimeoutMS: 30000 } },
+        keepAlive: 1,
+        connectTimeoutMS: 30000,
         useMongoClient: true
     };
 
