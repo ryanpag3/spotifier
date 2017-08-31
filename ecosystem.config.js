@@ -8,7 +8,7 @@ module.exports = {
     // First application
     {
       name      : 'spotifier',
-      script    : '/server/server.js',
+      script    : './server/server.js',
       env: {
         COMMON_VARIABLE: 'true'
       },
