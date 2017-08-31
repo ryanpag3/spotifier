@@ -17,6 +17,6 @@ require('./app.js')(app, express, socket); // expose middleware/setup applicatio
 
 httpServer.listen(3000, function () {
     console.log('Server successfully launched on port 3000');
-    console.log(process.env.NODE_ENV);
+    console.log('node_env=' + process.env.NODE_ENV);
 });
 
