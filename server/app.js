@@ -22,9 +22,13 @@ const setupApp = function(app, express, socketUtil) {
         clientSecret = 'a0d232e3a1844de785777c20944f2618',
         clientID = '5c3f5262d39e44ec999a8a0a9babac3e';
 
-    mongoose.connect('mongodb://localhost/spotifier', {
+    var options = {
+        server: { socketOptions: { keepAlive: 1, connectTimeoutMS: 30000 } },
+        replset: { socketOptions: { keepAlive: 1, connectTimeoutMS: 30000 } },
         useMongoClient: true
-    });
+    };
+
+    mongoose.connect('mongodb://localhost/spotifier', options);
 
     /*
         Passport session setup.
