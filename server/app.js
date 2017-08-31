@@ -11,6 +11,7 @@ var path = require('path'),
     mongoose = require('mongoose'),
     helmet = require('helmet'),
     configPrivate = require('../config-private'),
+    configPublic = require('../config-public'),
     syncLibraryQueue = require('./utils/queue-sync-user-library'),
     getArtistDetailsQueue = require('./utils/queue-get-artist-details');
     mongoose.Promise = require('bluebird');
@@ -18,7 +19,7 @@ var path = require('path'),
     handle middleware
  */
 const setupApp = function(app, express, socketUtil) {
-    var redirectUri = configPrivate.serverIp + '/user/callback',
+    var redirectUri = (process.env.NODE_ENV ? configPublic.prodUrl : configPublic.url) + '/user/callback',
         clientSecret = 'a0d232e3a1844de785777c20944f2618',
         clientID = '5c3f5262d39e44ec999a8a0a9babac3e';
 

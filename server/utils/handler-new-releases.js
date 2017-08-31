@@ -23,13 +23,13 @@ var CronJob = require('cron').CronJob,
  * 3. for every new combination of new releases found, query for other users with that same combination
  * 4. add all users for that combination to a bulk email, send email, and clear their new release fields
  */
-// var job = new CronJob('* * * * * 1-7', function() {
-//         console.log('starting job!'); // todo
-//         scan();
-//     },
-//     null,
-//     true, // start job right now
-//     'America/Los_Angeles'); // set time zone
+var job = new CronJob('0 5 * * * 1-7', function() {
+        console.log('starting job!');
+        scan();
+    },
+    null,
+    true, // start job right now
+    'America/Los_Angeles'); // set time zone
 
 function scan() {
     var deferred = Q.defer();
