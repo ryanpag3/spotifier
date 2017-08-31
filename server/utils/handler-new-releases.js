@@ -28,7 +28,7 @@ var job = new CronJob('0 5 * * * 1-7', function() {
         scan();
     },
     null,
-    true, // start job right now
+    false, // start job right now
     'America/Los_Angeles'); // set time zone
 
 function scan() {
