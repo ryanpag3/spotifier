@@ -58,7 +58,6 @@ artistDetailsQueue
         socketUtil.alertArtistDetailsChange(result);
         var db = new Db();
         db.updateArtist(result);
-        console.log('artist details gotten.')
     });
 
 
