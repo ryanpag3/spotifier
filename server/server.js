@@ -8,7 +8,7 @@ var express = require('express'),
     Socket = require('./utils/handler-socket'),
     httpServer = http.createServer(app),
     // setup sockets
-    io = require('socket.io')(httpsServer),
+    io = require('socket.io')(httpServer),
     socket = new Socket(io);
     app.set('socketio', socket);
 
