@@ -1,7 +1,6 @@
 #page-container {
     height: 100vh;
-    min-width: 410px;
-    min-height: 935px;
+    min-width: 350px;
     float: none;
     margin: 0 auto;
     background-color: #4c4e4a;
@@ -45,7 +44,7 @@
 }
 
 #about {
-    width: 375px;
+    width: 95%;
     max-width: 500px;
     color: white;
     font-size: 14pt;
@@ -73,7 +72,7 @@
     height: 50px;
     border-radius: 25px;
     background-color: #1dab4f;
-    margin: 5px;
+    margin: 0px;
     margin-bottom: 50px;
     font-size: 14pt;
 }
@@ -84,8 +83,9 @@
 }
 
 #social-bar {
+    width: 100%;
     color: white;
-    padding-bottom: 75px;
+    padding-bottom: 65px;
 }
 
 /* Extra Small Devices, Phones */
@@ -100,6 +100,10 @@
 
 /* Medium Devices, Desktops */
 @media screen and (min-width : 992px) {
+    #page-container {
+        min-height: 805px;
+    }
+
     #title-block {
         display: inline-block;
         background-color: transparent;
