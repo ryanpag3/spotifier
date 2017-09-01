@@ -8,27 +8,33 @@ app.config(['$routeProvider', '$locationProvider', 'SpotifyProvider',
         $routeProvider
             .when('/', {
                 templateUrl: 'partials/landing.html',
-                access: {restricted: false}
+                access: {restricted: false},
+                title: 'Welcome'
             })
             .when('/email', {
                 templateUrl: 'partials/email.html',
-                access: {restricted: true}
+                access: {restricted: true},
+                title: 'Email'
             })
             .when('/unsubscribe', {
                 templateUrl: 'partials/unsubscribe.html',
-                access: {restricted: false}
+                access: {restricted: false},
+                title: 'Unsubscribe'
             })
             .when('/confirmation', {
                 templateUrl: 'partials/confirmation.html',
-                access: {restricted: false}
+                access: {restricted: false},
+                title: 'Confirmation'
             })
             .when('/confirm-pending', {
                 templateUrl: 'partials/confirm-pending.html',
-                access: {restricted: true}
+                access: {restricted: true},
+                title: 'Confirmation Pending'
             })
             .when('/library', {
                 templateUrl: 'partials/user-library.html',
-                access: {restricted: true}
+                access: {restricted: true},
+                title: 'User Library'
             })
             .otherwise('/');
 
@@ -51,5 +57,8 @@ app.run(function ($http, $rootScope, $location, $route, authService) {
                     })
             }
 
-        })
+        });
+    $rootScope.$on('$routeChangeSuccess', function(current, previous) {
+        document.title = 'spotifier.io - ' + $route.current.title;
+    });
 });
