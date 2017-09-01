@@ -1,5 +1,5 @@
 .status-text {
-    width: 350px;
+    width: 100%;
     float: none;
     margin: 0 auto;
 }
@@ -13,6 +13,7 @@
     /*margin: 10px;*/
     margin-right: 10px;
     margin-left: 10px;
+    margin-top: 10px;
 }
 
 #content-container {
@@ -47,7 +48,8 @@
 }
 
 #status-title-line {
-    width: 375px;
+    width: 95%;
+    max-width: 375px;
     border: solid 1px gray;
     margin-top: -5px;
 }
@@ -61,7 +63,7 @@
 #nav-block {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     flex-grow: 1;
     margin: 0px;
 }
@@ -69,6 +71,12 @@
 #social-bar {
     color: white;
     margin-bottom: 75px;
+}
+
+@media screen and (orientation: landscape) {
+    #page-container {
+        min-height: 600px;
+    }
 }
 
 /* Extra Small Devices, Phones */

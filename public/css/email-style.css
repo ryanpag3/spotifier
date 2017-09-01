@@ -1,5 +1,5 @@
 .status-text {
-    width: 350px;
+    width: 300px;
     float: none;
     font-size: 12pt;
     margin: 0 auto;
@@ -17,7 +17,8 @@
 }
 
 .email-form {
-    width: 350px;
+    width: 95%;
+    max-width: 400px;
     float: none;
     margin: 0 auto;
     margin-top: 15px;
@@ -52,15 +53,6 @@
     text-align: center;
 }
 
-#status {
-}
-
-#status-title-line {
-    width: 400px;
-    border: solid 1px gray;
-    margin-top: -1px;
-}
-
 #body {
     display: flex;
     flex-direction: column;
@@ -76,7 +68,17 @@
 
 #social-bar {
     color: white;
-    padding-bottom: 75px;
+    padding-bottom: 10px;
+}
+
+@media only screen and (orientation: landscape) {
+    #page-container {
+        min-height: 600px;
+    }
+
+    #content-container {
+        height: 100%;
+    }
 }
 
 /* Extra Small Devices, Phones */

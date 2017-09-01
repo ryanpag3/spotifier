@@ -10,7 +10,7 @@ p {
 .page-container {
     min-height: 706px;
     width: 100vw;
-    min-width: 410px;
+    min-width: 320px;
     background-color: #c5c7c3;
 }
 
@@ -22,6 +22,7 @@ p {
     background-color: white;
     padding-left: 0;
     padding-right: 0;
+    overflow: hidden;
 }
 
 .artist-container {
@@ -351,6 +352,10 @@ p {
     text-align: center;
 }
 
+#nav-bar {
+    z-index: 5;
+}
+
 .fadeInLeft {
     animation-duration: .3s;
 }
@@ -360,10 +365,47 @@ p {
 }
 
 
+@media screen and (orientation: landscape) {
+    #page-container {
+        min-height: 600px;
+    }
+
+    #content-container {
+        min-height: 600px;
+    }
+
+    #library-container {
+        min-height: 600px;
+    }
+}
+
+@media (max-width: 350px) {
+    #header {
+        height: 100px;
+    }
+
+    .body-container {
+        height: calc(100vh);
+    }
+
+    #library-container {
+        height: 100%;
+    }
+
+    .search {
+        height: 100%;
+    }
+
+   .form-group {
+       margin-top: 40px;
+   }
+}
+
 @media (max-width: 768px) {
 
     .search {
         margin: 0;
+        padding-top: 10px;
     }
 
     .search-results {
@@ -381,6 +423,10 @@ p {
     .sync-queue-tooltip-nav {
         margin-top: 15px;
         height: 25%;
+    }
+
+    .body-container {
+        height: 100vh;
     }
 
     .library-container {
@@ -402,9 +448,14 @@ p {
         margin: 4px;
     }
 
+    #body-container {
+        height: 100%;
+    }
+
     #content-container {
         display: flex;
-        flex-direction: column
+        flex-direction: column;
+        height: 100%;
     }
 }
 

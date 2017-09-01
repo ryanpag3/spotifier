@@ -1,6 +1,6 @@
 #page-container {
-    height: 100vh;
-    min-width: 350px;
+    height: 100%;
+    min-width: 320px;
     float: none;
     margin: 0 auto;
     background-color: #4c4e4a;
@@ -85,11 +85,56 @@
 #social-bar {
     width: 100%;
     color: white;
-    padding-bottom: 65px;
+    padding-bottom: 10px;
+}
+
+@media only screen and (orientation: landscape) {
+    #page-container {
+        min-height: 620px;
+    }
+
+    #title-block {
+        display: inline-block;
+        background-color: transparent;
+    }
+
+    #name {
+        display: inline-block;
+        font-size: 64pt;
+        margin: 0;
+        margin-left: 10px;
+        line-height: inherit;
+        vertical-align: middle;
+    }
+
+    #logo {
+        display: inline-block;
+        height: 125px;
+        margin: 0;
+    }
+}
+
+@media only screen and (max-width : 350px) {
+    #name {
+        font-size: 36pt;
+    }
+
+    #about {
+        font-size: 10pt;
+    }
+
+    #nav-btn {
+        font-size: 10pt;
+    }
+
+    #social-bar {
+        padding-bottom: 0px;
+    }
 }
 
 /* Extra Small Devices, Phones */
 @media only screen and (min-width : 480px) {
+
 
 }
 
@@ -110,8 +155,8 @@
     }
 
     #about {
-        font-size: 18pt;
-        width: 550px;
+        font-size: 12pt;
+        width: 500px;
     }
 
     #logo {

@@ -35,7 +35,7 @@ html, body {
     display: flex;
     flex-direction: column;
     height: 100vh;
-    min-width: 410px;
+    min-width: 320px;
     float: none;
     margin: 0 auto;
     background-color: #4c4e4a;

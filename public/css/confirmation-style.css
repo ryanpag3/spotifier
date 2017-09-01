@@ -1,5 +1,6 @@
 .status-text {
-    width: 350px;
+    width: 95%;
+    max-width: 350px;
     float: none;
     margin: 0 auto;
 }
@@ -28,7 +29,7 @@
 }
 
 #name {
-    font-size: 50pt;
+    font-size: 36pt;
     color: white;
     text-align: center;
 }
@@ -38,7 +39,8 @@
 }
 
 #status-title-line {
-    width: 350px;
+    width: 95%;
+    max-width: 350px;
     border: solid 1px gray;
     margin-top: -5px;
 }
@@ -67,7 +69,7 @@
 
 #social-bar {
     color: white;
-    margin-bottom: 75px;
+    margin-bottom: 10px;
 }
 
 /* Extra Small Devices, Phones */
