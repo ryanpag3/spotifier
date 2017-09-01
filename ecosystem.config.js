@@ -24,7 +24,7 @@ module.exports = {
    */
   deploy : {
     production : {
-      user : 'root',
+      user : 'ryan',
       host : 'localhost',
       ref  : 'origin/master',
       repo : 'https://github.com/ryanpage42/spotifier.git',
