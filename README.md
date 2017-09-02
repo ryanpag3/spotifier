@@ -7,13 +7,9 @@ for running long processes in a queue, and angular for front-end.
 ## Getting Started
 
 Getting started developing for spotifier.io is easy. First, `clone` the repository to your development directory
-of choice. Then run `npm install` to initialize the required node modules. The development server runs on `https`
-so you will need to create your own self-signed certificate. Here is a quick one-liner to get you
-started:
-
-`openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365`
-
-Place those files in `./server/sslcert/` and you should be good to go.
+of choice. Then run `npm install` to initialize the required node modules. You will need to setup a file called
+`config-private.js` in the directory `/private/` and use your own email credentials to to test that functionality. 
+It is highly recommended that you use a dummy gmail account due to the current utility implementation. 
 
 You will also need to run your own local mongo and redis servers for the application to run properly. 
 
