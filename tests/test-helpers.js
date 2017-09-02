@@ -30,32 +30,36 @@ module.exports = {
             .then(function () {
                 self.addRandomArtists(numArtists)
                     .then(function () {
-                        var iterations = 1;
-                        var index = 0;
-                        // the db can't really handle 100k requests over a period of a few seconds
-                        // so check to make sure we don't crash the db with assignment calls
-                        if (numAssigns > 100000){
-                            iterations = numAssigns / 50000;
-                            numAssigns = 50000;
-                        }
-                        run();
-                        function run() {
-                            setTimeout(function() {
-                                self.assignRandom(numAssigns)
-                                    .then(function () {
-                                        User.find({}, function (err, users) {
-                                            if (err) {
-                                                deferred.reject(err);
-                                            }
-                                            index++;
-                                            index < iterations ? run() : deferred.resolve();
-                                        })
-                                    })
-                                    .catch(function (err) {
-                                        deferred.reject(err);
-                                    })
-                            }, 4000);
-                        }
+                        self.assignRandom(numAssigns)
+                            .then(function() {
+                                deferred.resolve();
+                            })
+                        // var iterations = 1;
+                        // var index = 0;
+                        // // the db can't really handle 100k requests over a period of a few seconds
+                        // // so check to make sure we don't crash the db with assignment calls
+                        // if (numAssigns > 100000){
+                        //     iterations = numAssigns / 10000;
+                        //     numAssigns = 10000;
+                        // }
+                        // run();
+                        // function run() {
+                        //     setTimeout(function() {
+                        //         self.assignRandom(numAssigns)
+                        //             .then(function () {
+                        //                 User.find({}, function (err, users) {
+                        //                     if (err) {
+                        //                         deferred.reject(err);
+                        //                     }
+                        //                     index++;
+                        //                     index < iterations ? run() : deferred.resolve();
+                        //                 })
+                        //             })
+                        //             .catch(function (err) {
+                        //                 deferred.reject(err);
+                        //             })
+                        //     }, 10000);
+                        // }
                     })
                     .catch(function (err) {
                         deferred.reject(err);
@@ -220,32 +224,26 @@ module.exports = {
         if (!n) {
             throw new Error('n cannot be undefined!');
         }
-        var i = 1;
-        run();
 
-        function run() {
-            var user;
+        var users = [];
+        for (var i = 0; i < n; i++){
             if (i % 2 === 0) {
-                user = sampleData.passUser();
+                users.push(sampleData.passUser());
             } else if (i % 3 === 0) {
-                user = sampleData.passUser2();
+                users.push(sampleData.passUser2());
             } else {
-                user = sampleData.unconfirmedUser();
+                users.push(sampleData.unconfirmedUser());
             }
-            User.create(user, function (err) {
-                if (err) {
-                    console.log(err);
-                } else {
-                    console.log('user: ' + i++ + '/' + n + ' created.');
-                    if (i <= n) {
-                        run();
-                    } else {
-                        deferred.resolve('job done!');
-                    }
-                }
-            })
         }
 
+        User.insertMany(users, function(err) {
+           if (err) {
+               deferred.reject(err);
+           } else {
+               console.log('users inserted!');
+               deferred.resolve();
+           }
+        });
         return deferred.promise;
     },
 
@@ -270,14 +268,51 @@ module.exports = {
                 }
 
                 for (var i = 0; i < n; i++) {
-                    db.assignArtist(users[getRandom(users.length)], artists[getRandom(artists.length)])
-                        .catch(function (err) {
-                            deferred.reject(err);
-                        });
+                    console.log(i + '/' + n);
+                    // db.assignArtist(users[getRandom(users.length)], artists[getRandom(artists.length)])
+                    //     .catch(function (err) {
+                    //         deferred.reject(err);
+                    //     });
+
+                    // update arrays
+                    // batch save arrays
+                    // get position of random user and random artist
+                    const userPos = getRandom(users.length);
+                    const artistPos = getRandom(artists.length);
+
+                    console.log(users[userPos]);
+                    if (users[userPos].saved_artists.indexOf(artists[artistPos]._id) === -1) {
+                        users[userPos].saved_artists.push(artists[artistPos]._id);
+                    }
+                    if (artists[artistPos].users_tracking.indexOf(users[userPos]._id) === -1) {
+                        artists[artistPos].users_tracking.push(users[userPos]._id);
+                    }
                 }
-                setTimeout(function () {
-                    deferred.resolve();
-                }, 100);
+
+                // not sure if this is the best way to handle this
+                // maybe an updateMany with a filter would be a better approach
+                User.remove({}, function(err) {
+                    if (err) {
+                        console.log(err);
+                    }
+                  User.insertMany(users, function(err) {
+                      if (err) {
+                          console.log(err);
+                      }
+                      Artist.remove({}, function(err) {
+                          if (err) {
+                              console.log(err);
+                          }
+                          Artist.insertMany(artists, function(err) {
+                              if (err) {
+                                  console.log(err);
+                              } else {
+                                  deferred.resolve();
+                              }
+                          })
+                      });
+                  });
+                });
             })
         });
         return deferred.promise;

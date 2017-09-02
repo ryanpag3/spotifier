@@ -23,7 +23,7 @@ var CronJob = require('cron').CronJob,
  * 3. for every new combination of new releases found, query for other users with that same combination
  * 4. add all users for that combination to a bulk email, send email, and clear their new release fields
  */
-var job = new CronJob('0 5 * * * 1-7', function() {
+var job = new CronJob('40 12 * * * 1-7', function() {
         console.log('starting job!');
         scan();
     },

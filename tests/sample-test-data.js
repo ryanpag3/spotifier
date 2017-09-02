@@ -130,7 +130,8 @@ module.exports = {
     unsubscribedUser: function () {
         return {
             name: potNames.choose(),
-            email: {}
+            email: {},
+            saved_artists: []
         }
     }
 };
