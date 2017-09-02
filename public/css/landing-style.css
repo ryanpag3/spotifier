@@ -154,6 +154,10 @@
         background-color: transparent;
     }
 
+    #about-block {
+        margin-top: 5px;
+    }
+
     #about {
         font-size: 12pt;
         width: 500px;
@@ -161,12 +165,12 @@
 
     #logo {
         display: inline-block;
-        height: 125px;
+        height: 100px;
         margin: 0;
     }
     #name {
         display: inline-block;
-        font-size: 64pt;
+        font-size: 48pt;
         margin: 0;
         margin-left: 10px;
         line-height: inherit;
