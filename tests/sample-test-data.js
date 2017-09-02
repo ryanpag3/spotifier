@@ -2,7 +2,7 @@
  * contains sample test cases to use on unit tests
  * @type {[null]}
  */
-var privateConfig = require('../config-private'),
+var privateConfig = require('../private/config-private'),
     moniker = require('moniker'),
     potNames = moniker.generator([moniker.noun]);
 module.exports = {

@@ -30,18 +30,32 @@ module.exports = {
             .then(function () {
                 self.addRandomArtists(numArtists)
                     .then(function () {
-                        self.assignRandom(numAssigns)
-                            .then(function () {
-                                User.find({}, function (err, users) {
-                                    if (err) {
+                        var iterations = 1;
+                        var index = 0;
+                        // the db can't really handle 100k requests over a period of a few seconds
+                        // so check to make sure we don't crash the db with assignment calls
+                        if (numAssigns > 100000){
+                            iterations = numAssigns / 50000;
+                            numAssigns = 50000;
+                        }
+                        run();
+                        function run() {
+                            setTimeout(function() {
+                                self.assignRandom(numAssigns)
+                                    .then(function () {
+                                        User.find({}, function (err, users) {
+                                            if (err) {
+                                                deferred.reject(err);
+                                            }
+                                            index++;
+                                            index < iterations ? run() : deferred.resolve();
+                                        })
+                                    })
+                                    .catch(function (err) {
                                         deferred.reject(err);
-                                    }
-                                    deferred.resolve();
-                                })
-                            })
-                            .catch(function (err) {
-                                deferred.reject(err);
-                            })
+                                    })
+                            }, 4000);
+                        }
                     })
                     .catch(function (err) {
                         deferred.reject(err);
