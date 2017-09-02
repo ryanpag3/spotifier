@@ -146,7 +146,7 @@
 /* Medium Devices, Desktops */
 @media screen and (min-width : 992px) {
     #page-container {
-        min-height: 805px;
+        min-height: 675px;
     }
 
     #title-block {
