@@ -62,14 +62,7 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
          * initialization code for this controller
          */
         function init() {
-            // display help text if library is empty
-            if ($scope.data.length < 1) {
-                $scope.libraryEmpty = true;
-            }
-
             // serialize user info to session storage if it doesn't already exist
-            // todo: currently replacing every time due to mongodb wipes for debugging
-            // todo: turn caching back on
             authService.serializeSessionUser()
                 .then(function () {
                     var user = JSON.parse(sessionStorage.getItem('user'));
@@ -286,10 +279,6 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
 
 
         /********** HELPER FUNCTIONS **********/
-        $scope.$watch('data', function() {
-            $scope.libraryEmpty = $scope.data.length <= 0;
-        });
-
         /**
          * Removes an artist from the local library instance, filtered library,
          * and flags potentially cached search results that the artist has been
