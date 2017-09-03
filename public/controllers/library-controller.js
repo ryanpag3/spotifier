@@ -242,8 +242,8 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
         function getLibrary() {
             libraryService.get()
                 .then(function (library) {
-                    $scope.data = library;
-                    $scope.gridOptions.data = library;
+                    $scope.data = library.slice();
+                    $scope.gridOptions.data = library.slice();
                 });
         }
 
@@ -260,7 +260,7 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
         socket.on('library-added', function (library) {
             $scope.data = library;
             if ($scope.searchInput === '') {
-                $scope.gridOptions.data = $scope.data;
+                $scope.gridOptions.data = $scope.data.slice();
             }
             $scope.$apply();
         });
@@ -307,7 +307,7 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
             }).indexOf(artist.spotify_id);
             $scope.gridOptions.data.splice(i, 1);
 
-            // // remove from source library
+            // remove from source library
             var j = $scope.data.map(function (e) {
                 return e.spotify_id
             }).indexOf(artist.spotify_id);

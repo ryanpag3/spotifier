@@ -211,8 +211,8 @@ Db.prototype.removeArtist = function (user, artist) {
                 console.log(err);
             }
                 // remove artist ObjectId from user tracking array
-                User.findOneAndUpdate({'_id': user._id}, {$pull: {'saved_artists': artist._id}},
-                    function (err, user) {
+                User.update({'_id': user._id}, {$pull: {'saved_artists': artist._id}},
+                    function (err) {
                         if (err) {
                             deferred.reject(err);
                         } else {
