@@ -6,7 +6,7 @@ var nodemailer = require('nodemailer'),
     User = require('../models/user'),
     Artist = require('../models/artist'),
     Db = require('./handler-db'),
-    configPrivate = require('../../config-private'),
+    configPrivate = require('../../private/config-private'),
     configPublic = require('../../config-public');
 
 /**

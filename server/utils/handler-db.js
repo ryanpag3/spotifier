@@ -87,8 +87,9 @@ Db.prototype.addAllArtists = function (user, artists, socketUtil) {
     go(); // start recursive call
     function go() {
         // add artist
-        db.addArtist(user, artists[i++], socketUtil)
+        db.addArtist(user, artists[i], socketUtil)
             .then(function () {
+                i++;
                 if (i < artists.length) {
                     setTimeout(go, 0);
                 } else {
@@ -196,15 +197,22 @@ Db.prototype.addArtist = function (user, artist, socketUtil) {
  * @returns {Q.Promise}
  */
 Db.prototype.removeArtist = function (user, artist) {
+
     var deferred = Q.defer();
     // query for user information
     User.findOne({'name': user.name}, function (err, user) {
+        if (err) {
+            console.log(err);
+        }
         // query for artist information, remove user objectId from tracking array
         Artist.findOneAndUpdate({'spotify_id': artist.spotify_id}, {$pull: {'users_tracking': user._id}},
             function (err, artist) {
+            if (err) {
+                console.log(err);
+            }
                 // remove artist ObjectId from user tracking array
-                User.update({'_id': user._id}, {$pull: {'saved_artists': artist._id}},
-                    function (err) {
+                User.findOneAndUpdate({'_id': user._id}, {$pull: {'saved_artists': artist._id}},
+                    function (err, user) {
                         if (err) {
                             deferred.reject(err);
                         } else {

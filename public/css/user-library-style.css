@@ -374,7 +374,7 @@ p {
         min-height: 600px;
     }
 
-    #library-container {
+    .library-container {
         min-height: 600px;
     }
 }
@@ -386,10 +386,6 @@ p {
 
     .body-container {
         height: calc(100vh);
-    }
-
-    #library-container {
-        height: 100%;
     }
 
     .search {
@@ -442,6 +438,7 @@ p {
     }
 
     .ui-grid-viewport {
+
     }
 
     .menu-button {

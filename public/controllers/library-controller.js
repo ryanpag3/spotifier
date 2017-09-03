@@ -12,7 +12,7 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
         $scope.resultBoxShown = false;
         $scope.resultsShown = false;
 
-        $scope.artistName = '';
+        $scope.searchInput = '';
         $scope.enqueued = 'enqueued';
         $scope.active = 'active';
 
@@ -141,16 +141,16 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
          * https://stackoverflow.com/questions/26232723/angularjs-ui-grid-filter-from-text-input-field
          * ui-grid does not have a native global filter so what we do is apply our own filter to the data
          * on ng-change based on the source which we define by $scope.data and then the filter key, which in
-         * this case is the ng-model for the search bar, $scope.artistName.
+         * this case is the ng-model for the search bar, $scope.searchInput.
          *
          * another possible solution: http://plnkr.co/edit/ZjsDQ8dp9XWELAOGvyBw?p=preview
          * but has a limitation to one column used as the search key
          * possible todo: rename search bar variable to properly represent new search scope
          */
         $scope.filterGrid = function () {
-            $scope.gridOptions.data = $filter('filter')($scope.data, $scope.artistName);
-            if ($scope.artistName === '') {
-                $scope.gridOptions.data = $scope.data;
+            $scope.gridOptions.data = $filter('filter')($scope.data, $scope.searchInput);
+            if ($scope.searchInput === '') {
+                $scope.gridOptions.data = $scope.data.slice();
             }
         };
 
@@ -253,9 +253,13 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
             $scope.$apply();
         });
 
+        /**
+         * Updates the library with the most recent data. If the search bar is empty, we update the filtered grid with
+         * newest data as well.
+         */
         socket.on('library-added', function (library) {
             $scope.data = library;
-            if ($scope.artistName === '') {
+            if ($scope.searchInput === '') {
                 $scope.gridOptions.data = $scope.data;
             }
             $scope.$apply();
@@ -302,11 +306,13 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
                 return e.spotify_id
             }).indexOf(artist.spotify_id);
             $scope.gridOptions.data.splice(i, 1);
-            // remove from source library
+
+            // // remove from source library
             var j = $scope.data.map(function (e) {
                 return e.spotify_id
             }).indexOf(artist.spotify_id);
             $scope.data.splice(j, 1);
+
             // if we have cached search results
             if ($scope.results){
                 var k = $scope.results.map(function(e) {
