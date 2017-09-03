@@ -23,15 +23,17 @@ var CronJob = require('cron').CronJob,
  * 3. for every new combination of new releases found, query for other users with that same combination
  * 4. add all users for that combination to a bulk email, send email, and clear their new release fields
  */
-var job = new CronJob('25 23 * * * 1-7', function() {
+var job = new CronJob('00 00 04 * * 0-6', function() {
         console.log('starting job!');
         scan();
     },
-    null,
+    null, // callback
     false, // start job right now
     'America/Los_Angeles'); // set time zone
+job.start();
 
 function scan() {
+    console.log('scan started!');
     var deferred = Q.defer();
     var db = new Db();
     spotifyApiServer.getNewReleases()
