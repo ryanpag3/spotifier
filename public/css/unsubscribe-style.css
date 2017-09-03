@@ -28,6 +28,11 @@
     margin-bottom: 15px;
 }
 
+.social-fa-btn:active, .social-fa-btn:visited, .social-fa-btn:focus {
+    color: white;
+    text-decoration: none;
+}
+
 #content-container {
     display: flex;
     flex-direction: column;

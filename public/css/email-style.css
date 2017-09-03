@@ -16,6 +16,11 @@
     margin: 10px;
 }
 
+.social-fa-btn:active, .social-fa-btn:visited, .social-fa-btn:focus {
+    color: white;
+    text-decoration: none;
+}
+
 .email-form {
     width: 95%;
     max-width: 400px;
