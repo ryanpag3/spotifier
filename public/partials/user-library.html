@@ -74,8 +74,11 @@
 
                     </div>
                     <div class="sync-queue-tooltip active-sync" data-ng-switch-when="active">
-                        <div class="tooltip-text">Yay! Your library is currently being processed and imported. Hang
-                            tight and expect an email from us when it's done!
+                        <div class="tooltip-text">
+                            Yay! Your library is currently being processed and imported. Hang tight and expect an email from us when it's done!
+                        </div>
+                        <div class="sync-queue-tooltip-nav">
+                            <button class="btn btn-danger sync-queue-tooltip-btn" data-ng-click="syncLibrary()">TRY AGAIN</button>
                         </div>
                     </div>
                 </div>

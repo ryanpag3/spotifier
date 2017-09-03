@@ -1,4 +1,5 @@
 var nodemailer = require('nodemailer'),
+    ses = require('nodemailer-ses-transport'),
     querystring = require('querystring'),
     EmailTemplate = require('email-templates').EmailTemplate,
     path = require('path'),
@@ -14,13 +15,12 @@ var nodemailer = require('nodemailer'),
  * @constructor
  */
 var Email = function () {
-    this.transporter = nodemailer.createTransport({
-        service: 'Gmail',
-        auth: {
-            user: configPrivate.gmail.username,
-            pass: configPrivate.gmail.password
-        }
-    });
+    // todo add flag for prod/dev environment
+    this.transporter = nodemailer.createTransport(ses({
+        accessKeyId: configPrivate.awsSecretId,
+        secretAccessKey: configPrivate.awsSecretKey,
+        region: 'us-west-2'
+    }));
 };
 
 /**
@@ -88,40 +88,43 @@ Email.prototype.sendNewReleaseEmails = function () {
                             // catch err
                             if (err) {
                                 console.log(err);
-                            }
-                            // define email options
-                            var mailOptions = {
-                                from: configPrivate.gmail.username,
-                                to: addresses,
-                                subject: 'We\'ve found some releases for you!',
-                                html: result.html,
-                                text: result.text
-                            };
-                            // send
-                            self.send(mailOptions)
-                                .then(function () {
-                                    // remove new_release data from users who we just sent email to
-                                    User.updateMany({
-                                            'new_releases': {
-                                                $all: master.new_releases,
-                                                $size: master.new_releases.length
-                                            }
-                                        },
-                                        {$set: {'new_releases': []}}, function (err) {
-                                            if (err) {
-                                                console.log(err);
-                                            }
-                                            sendNewReleaseBatch(); // process next release batch and send
-                                        });
+                            } else if (validateTemplate(result)) {
+                                // define email options
+                                var mailOptions = {
+                                    from: configPrivate.domain.email,
+                                    to: addresses,
+                                    subject: 'We\'ve found some releases for you!',
+                                    html: result.html,
+                                    text: result.text
+                                };
+                                // send
+                                self.send(mailOptions)
+                                    .then(function () {
+                                        // remove new_release data from users who we just sent email to
+                                        User.updateMany({
+                                                'new_releases': {
+                                                    $all: master.new_releases,
+                                                    $size: master.new_releases.length
+                                                }
+                                            },
+                                            {$set: {'new_releases': []}}, function (err) {
+                                                if (err) {
+                                                    console.log(err);
+                                                }
+                                                sendNewReleaseBatch(); // process next release batch and send
+                                            });
 
-                                })
-                                .catch(function (err) {
-                                    console.log(err);
-                                    // if email fails to send, we set a backoff of 2 mins before retrying
-                                    setTimeout(function () {
-                                        sendNewReleaseBatch();
-                                    }, 120000);
-                                });
+                                    })
+                                    .catch(function (err) {
+                                        console.log(err);
+                                        // if email fails to send, we set a backoff of 2 mins before retrying
+                                        setTimeout(function () {
+                                            sendNewReleaseBatch();
+                                        }, 120000);
+                                    });
+                            } else {
+                                console.log('error creating template for confirmation email!');
+                            }
                         });
                     });
                 })
@@ -161,25 +164,28 @@ Email.prototype.sendConfirmationEmail = function (user) {
                 confirmEmail.render(templateVals, function(err, result) {
                     if (err) {
                         console.log(err);
+                    } else if (validateTemplate(result)) {
+                        var mailOptions = {
+                            from: configPrivate.domain.email,
+                            to: user.email.address,
+                            subject: 'Here\'s your confirmation link!',
+                            html: result.html,
+                            text: result.text
+                        };
+                        email.send(mailOptions)
+                            .then(function (successMsg) {
+                                db.setConfirmCode(user, confirmCode)
+                                    .catch(function (err) { // catch setConfirmCode err
+                                        deferred.reject(err);
+                                    });
+                                deferred.resolve(successMsg);
+                            })
+                            .catch(function (err) { // catch send err
+                                deferred.reject(err);
+                            })
+                    } else {
+                        console.log('there was an error creating the email template!')
                     }
-                    var mailOptions = {
-                        from: configPrivate.gmail.username,
-                        to: user.email.address,
-                        subject: 'Here\'s your confirmation link!',
-                        html: result.html,
-                        text: result.text
-                    };
-                    email.send(mailOptions)
-                        .then(function (successMsg) {
-                            db.setConfirmCode(user, confirmCode)
-                                .catch(function (err) { // catch setConfirmCode err
-                                    deferred.reject(err);
-                                });
-                            deferred.resolve(successMsg);
-                        })
-                        .catch(function (err) { // catch send err
-                            deferred.reject(err);
-                        })
                 });
             }
         })
@@ -255,5 +261,15 @@ function generateConfirmCode(length) {
         code += potential.charAt(pos);
     }
     return code;
+}
+
+/**
+ * simple boolean helper function to make sure the server doesn't crash
+ * if the templates don't exist.
+ * @param template
+ * @returns {*}
+ */
+function validateTemplate(template) {
+    return template.html && template.text;
 }
 
