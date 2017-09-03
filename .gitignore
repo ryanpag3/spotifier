@@ -4,3 +4,4 @@ config-private.js
 utils/cache/cached-new-releases.txt
 tests/artist-release-cache.txt
 server/sslcert/*
+private/
