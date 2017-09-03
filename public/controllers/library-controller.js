@@ -287,11 +287,7 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
 
         /********** HELPER FUNCTIONS **********/
         $scope.$watch('data', function() {
-            $scope.libraryEmpty = $scope.gridOptions.data <= 0;
-        });
-
-        $scope.$watch('gridOptions.data', function(){
-            $scope.libraryEmpty = $scope.gridOptions.data <= 0;
+            $scope.libraryEmpty = $scope.data.length <= 0;
         });
 
         /**

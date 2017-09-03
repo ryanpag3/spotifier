@@ -2,8 +2,8 @@
     <link rel="stylesheet" type="text/css" href="../css/user-library-style.css">
     <div id="header">
         <div class="hidden-xs">
-                <img class="logo-img" src="../assets/img/logo22.png">
-            <h1 id="logo" >spotifier<span style="color: #1dab4f">.io</span></h1>
+            <img class="logo-img" src="../assets/img/logo22.png">
+            <h1 id="logo">spotifier<span style="color: #1dab4f">.io</span></h1>
         </div>
         <div class="search container">
             <form class="form-group" data-ng-submit="search(searchInput)">
@@ -11,14 +11,15 @@
                        data-ng-change="filterGrid()"
                        data-ng-model="searchInput"
                        title="look up artists on spotify and add them to your library to be notified of new releases."
-                        autocomplete="off">
+                       autocomplete="off">
             </form>
             <div class="search-results shadow" data-ng-cloak data-ng-show="resultBoxShown">
                 <div id="spinner-container" data-ng-show="resultSpinnerShown">
                     <i id="result-spinner" class="fa fa-refresh fa-spin"></i>
                 </div>
                 <div class="result" data-ng-repeat="artist in results track by $index" data-ng-show="resultsShown">
-                    <button class="result-add" data-ng-click="add(artist); artist.artistAdded = true" data-ng-show="!artist.artistAdded">
+                    <button class="result-add" data-ng-click="add(artist); artist.artistAdded = true"
+                            data-ng-show="!artist.artistAdded">
                         <i class="fa fa-align-center fa-plus fa-2x"></i>
                     </button>
                     <button class="result-add"
@@ -43,7 +44,7 @@
     </div>
     <div class="body-container container-fluid">
         <div id="content-container" class="row" style="height: 100%;">
-            <div class="left-sidebar-container col-sm-3 col-md-3 col-lg-2" >
+            <div class="left-sidebar-container col-sm-3 col-md-3 col-lg-2">
                 <div id="sync-status" class="sidebar shadow animated fadeIn" data-ng-switch="syncStatus">
                     <h2 class="tooltip-title">Sync Library</h2>
                     <hr class="tooltip-line">
@@ -55,26 +56,32 @@
                         </p>
                         <div class="sync-queue-tooltip-nav">
                             <button class="sync-queue-tooltip-btn btn btn-success" data-ng-click="syncLibrary()"
-                                    title="Enter into a queue to have your spotify library processed and added to spotifier.io">SYNC MY LIBRARY</button>
+                                    title="Enter into a queue to have your spotify library processed and added to spotifier.io">
+                                SYNC MY LIBRARY
+                            </button>
                         </div>
 
                     </div>
                     <div class="sync-queue-tooltip" data-ng-switch-when="enqueued">
-                        <div class="tooltip-text">You have been entered into the queue to sync your Spotify library. You will receive an email once your library has been successfully imported into spotifier.io</div>
+                        <div class="tooltip-text">You have been entered into the queue to sync your Spotify library. You
+                            will receive an email once your library has been successfully imported into spotifier.io
+                        </div>
                         <div class="sync-queue-tooltip-nav">
-                            <button class="btn btn-danger sync-queue-tooltip-btn" data-ng-click="cancelSyncLibrary()">CANCEL</button>
+                            <button class="btn btn-danger sync-queue-tooltip-btn" data-ng-click="cancelSyncLibrary()">
+                                CANCEL
+                            </button>
                         </div>
 
                     </div>
                     <div class="sync-queue-tooltip active-sync" data-ng-switch-when="active">
-                        <div class="tooltip-text">Yay! Your library is currently being processed and imported. Hang tight and expect an email from us when it's done!</div>
+                        <div class="tooltip-text">Yay! Your library is currently being processed and imported. Hang
+                            tight and expect an email from us when it's done!
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="library-container col-xs-12 col-sm-9 col-md-6 col-lg-6 col-lg-offset-1">
-                <div style="background-color: white">
-                    <span id="library-hint" data-ng-show="libraryEmpty">To get started, enter the Sync Library queue or search for artists above.</span>
-                </div>
+                <span id="library-hint">To get started, enter the Sync Library queue or search for artists above.</span>
                 <div class="grid" ui-grid="gridOptions" ui-grid-auto-resize></div>
             </div>
             <div class="right-sidebar-container col-md-3 col-lg-2 col-lg-offset-1 hidden-xs hidden-sm">
@@ -89,15 +96,18 @@
                     <hr class="tooltip-line">
                     <div class="tooltip-text">
                         <p>
-                            To get started, either enter yourself into the <span style="color: #1dab4f">Sync Library</span>
+                            To get started, either enter yourself into the <span
+                                style="color: #1dab4f">Sync Library</span>
                             queue, or use the search bar at the top of the page to find artists to follow.
                         </p>
                         <p>
-                            You can also use the search bar to filter your saved artists by typing out an artist, album name,
+                            You can also use the search bar to filter your saved artists by typing out an artist, album
+                            name,
                             or even a release date to filter and find the exact result you want. No need to press enter!
                         </p>
                         <p>
-                            When an artist releases new music on Spotify, spotifier.io will send an email with the release
+                            When an artist releases new music on Spotify, spotifier.io will send an email with the
+                            release
                             information and a link to open spotify and check it out.
                         </p>
                     </div>

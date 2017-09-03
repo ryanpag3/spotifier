@@ -17,10 +17,10 @@ html, body {
     transition:         color 1s;
 }
 
-.social-fa-btn:active, .social-fa-btn:visited, .social-fa-btn:focus {
-    color: white;
-    text-decoration: none;
-}
+/*.social-fa-btn:active, .social-fa-btn:visited, .social-fa-btn:focus {*/
+    /*color: white;*/
+    /*text-decoration: none;*/
+/*}*/
 
 .social-fa-btn:hover {
     color: #1dab4f;
