@@ -130,7 +130,6 @@ var self = module.exports = {
                             offset: offset
                         })
                             .then(function (data) {
-                                console.log(offset + '/' + data.body.albums.total);
                                 for (var i = 0; i < data.body.albums.items.length; i++) {
                                     var album = {
                                         spotify_id: data.body.albums.items[i].artists[0].id,
@@ -151,7 +150,6 @@ var self = module.exports = {
                                 if (offset < data.body.albums.total) {
                                     run();
                                 } else {
-                                    console.log(releases);
                                     cachedReleases.releases = releases;
                                     fs.writeFile(path.join(__dirname, './cache/cached-new-releases.txt'), JSON.stringify(cachedReleases, null, 4), {flag: 'w'}, 'utf-8');
                                     deferred.resolve(releases);

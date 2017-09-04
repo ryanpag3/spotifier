@@ -25,7 +25,7 @@ var CronJob = require('cron').CronJob,
  */
 var job = new CronJob('00 00 04 * * 0-6', function() {
         console.log('starting job!');
-        scan();
+        this.startScan(true); // true flags send emails
     },
     null, // callback
     false, // start job right now
@@ -49,13 +49,12 @@ function scan() {
                         console.log(err);
                     }
                     if (artist !== null) {
-                        console.log('new release found!');
-                        console.log(artist.name);
                         artist.recent_release = releases[i].recent_release;
                         artist.save();
                         db.artistNewReleaseFound(artist);
                     }
-                    if (++i < releases.length) {
+                    i++;
+                    if (i < releases.length) {
                         run();
                     } else {
                         console.log('done processing new releases!');
