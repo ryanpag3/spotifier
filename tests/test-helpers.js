@@ -4,7 +4,6 @@ var Q = require('q'),
     User = require('../server/models/user'),
     Artist = require('../server/models/artist'),
     sampleData = require('./sample-test-data'),
-    Db = require('../server/utils/handler-db.js'),
     spotifyServerApi = require('../server/utils/spotify-server-api');
 
 module.exports = {
@@ -256,7 +255,6 @@ module.exports = {
         if (n === undefined) {
             deferred.reject('number must be passed as parameter to assignRandom!');
         }
-        var db = new Db();
 
         User.find({}, function (err, users) {
             if (err) {
@@ -268,7 +266,6 @@ module.exports = {
                 }
 
                 for (var i = 0; i < n; i++) {
-                    console.log(i + '/' + n);
                     // db.assignArtist(users[getRandom(users.length)], artists[getRandom(artists.length)])
                     //     .catch(function (err) {
                     //         deferred.reject(err);
@@ -280,7 +277,6 @@ module.exports = {
                     const userPos = getRandom(users.length);
                     const artistPos = getRandom(artists.length);
 
-                    console.log(users[userPos]);
                     if (users[userPos].saved_artists.indexOf(artists[artistPos]._id) === -1) {
                         users[userPos].saved_artists.push(artists[artistPos]._id);
                     }

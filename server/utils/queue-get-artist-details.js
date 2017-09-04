@@ -55,7 +55,7 @@ artistDetailsQueue
         console.log('get artist details job failed, restarting...');
     })
     .on('completed', function (job, result) {
-        socketUtil.alertArtistDetailsChange(result);
+        if (socketUtil) { socketUtil.alertArtistDetailsChange(result); }
         var db = new Db();
         db.updateArtist(result);
     });
@@ -63,7 +63,7 @@ artistDetailsQueue
 
 module.exports = {
     createJob: function (artist) {
-        artistDetailsQueue.add(artist, {
+        artistDetailsQueue.add({artist: artist}, {
             attempts: 3
         });
     },

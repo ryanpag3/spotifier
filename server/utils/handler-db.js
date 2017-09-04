@@ -148,7 +148,7 @@ Db.prototype.addArtist = function (user, artist, socketUtil) {
                     // if artist details have not been added
                     if (qArtist.recent_release.id === undefined) {
                         // initialize a get details job and pass socketUtil object
-                        getArtistDetailsQueue.createJob({artist: qArtist});
+                        getArtistDetailsQueue.createJob(qArtist);
                     } else {
                         socketUtil.alertArtistDetailsChange(qArtist);
                     }
@@ -174,7 +174,7 @@ Db.prototype.addArtist = function (user, artist, socketUtil) {
                     deferred.reject(err);
                 } else {
                     // initialize a get details job and pass socketUtil object
-                    getArtistDetailsQueue.createJob({artist: artist});
+                    getArtistDetailsQueue.createJob(artist);
                 }
                 // associate user and artist
                 db.assignArtist(user, artist)

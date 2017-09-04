@@ -33,9 +33,11 @@ describe('new-release-scanner unit tests', function () {
     });
 
     it('should update users who are tracking artists with notifications', function(done) {
-        this.timeout(60000 * 10); // staging a sample database takes a little while due to artist lookup on spotify
-
-        testHelper.stageSampleNewReleaseDb(200, 200, 1000)
+        var numUsers = 1,
+            numArtists = 10,
+            numAssigns = 1;
+        this.timeout(5000 * numArtists); // staging a sample database takes a little while due to artist lookup on spotify
+        testHelper.stageSampleNewReleaseDb(numUsers, numArtists, numAssigns)
             .then(function() {
                 // pass a boolean to determine whether to actually send the emails
                 releaseScanner.startScan(false)
@@ -50,7 +52,7 @@ describe('new-release-scanner unit tests', function () {
                                 }
                                 done();
                             })
-                        }, 5000);
+                        }, 0);
                     })
                     .catch(function(err) {
                         console.log(err);
@@ -60,6 +62,33 @@ describe('new-release-scanner unit tests', function () {
                 console.log(err);
             });
 
-    })
+    });
+
+    it('should run queue jobs for artist details for new releases', function(done) {
+       var numUsers = 1,
+           numArtists = 10,
+           numAssigns = 1;
+
+       this.timeout(10000 * numArtists); // set test timeout based on artists which is the time bottleneck
+       // stage the dummy db
+       testHelper.stageSampleNewReleaseDb(numUsers, numArtists, numAssigns)
+           .then(function() {
+               // scan for new releases
+               releaseScanner.startScan(false)
+                   .then(function() {
+                       // query for all artists
+                       Artist.find({}, function(err, artists) {
+                           // check to make sure all artists have release dates added
+                           setTimeout(function() {
+                               for (var i = 0; i < artists.length; i++) {
+                                   expect(artists[i].recent_release.release_date).to.be.a('string');
+                               }
+                           }, 250 * numArtists); // add a little time buffer to allow queue to finish
+
+                           done(); // run callback on successful data validation
+                       })
+                   })
+           })
+    });
 
 });
