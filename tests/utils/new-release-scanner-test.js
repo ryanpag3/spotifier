@@ -35,7 +35,7 @@ describe('new-release-scanner unit tests', function () {
     it('should update users who are tracking artists with notifications', function(done) {
         var numUsers = 1,
             numArtists = 10,
-            numAssigns = 1;
+            numAssigns = 10;
         this.timeout(5000 * numArtists); // staging a sample database takes a little while due to artist lookup on spotify
         testHelper.stageSampleNewReleaseDb(numUsers, numArtists, numAssigns)
             .then(function() {
@@ -44,12 +44,15 @@ describe('new-release-scanner unit tests', function () {
                     .then(function() {
                         setTimeout(function() {
                             User.find({}, function(err, users) {
+                                console.log(users);
                                 if (err) {
                                     expect(err).to.be.undefined;
                                 }
+                                var userReleasesFound = 0;
                                 for(var i = 0; i < users.length; i++) {
-                                    expect(users[i].new_releases.length).to.be.greaterThan(0);
+                                    if (users[i].new_releases.length > 0) userReleasesFound++;
                                 }
+                                expect(userReleasesFound).to.be.greaterThan(0);
                                 done();
                             })
                         }, 0);

@@ -103,12 +103,12 @@ if (process.env.NODE_ENV) {
         true, // start job right now
         'America/Los_Angeles'); // set time zone
 }
-// else {
-//     run();
-//     function run() {
-//         startScan(true);
-//     }
-// }
+else {
+    run();
+    function run() {
+        startScan(true);
+    }
+}
 
 /**
  * expose methods
