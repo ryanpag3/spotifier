@@ -122,7 +122,7 @@ module.exports = {
      */
     addRandomArtists: function (n) {
         var deferred = Q.defer();
-        if (!n) {
+        if (n === undefined) {
            throw new Error('n cannot be undefined!');
         }
         // get releases from the past two weeks
@@ -220,7 +220,7 @@ module.exports = {
      */
     addRandomUsers: function (n) {
         var deferred = Q.defer();
-        if (!n) {
+        if (n === undefined) {
             throw new Error('n cannot be undefined!');
         }
 

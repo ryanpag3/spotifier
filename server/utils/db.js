@@ -210,6 +210,7 @@ Db.prototype.removeArtist = function (user, artist) {
             if (err) {
                 console.log(err);
             }
+            if (artist){
                 // remove artist ObjectId from user tracking array
                 User.update({'_id': user._id}, {$pull: {'saved_artists': artist._id}},
                     function (err) {
@@ -222,7 +223,8 @@ Db.prototype.removeArtist = function (user, artist) {
                 if (err) {
                     deferred.reject(err);
                 }
-            })
+            }
+        })
     });
     return deferred.promise;
 };
@@ -445,9 +447,28 @@ Db.prototype.unsubscribeEmail = function (email) {
 /**
  * Queries for missing artist details, runs get details jobs on artists
  * that return.
+ * todo: this will result in slight job duplication if an artist is already queued
+ * todo: not sure if it's worth checking if a job exists for the artist at this point
+ *
  */
 Db.prototype.validateArtistDetails = function() {
-
+    var getArtistDetailsQueue = require('./queue-get-artist-details');
+    // 1. query for artists that have new releases that are missing any fields
+    // 2. create details jobs for all that return
+    Artist.find({$or: [
+        {'recent_release.id' : {$exists: false}},
+        {'recent_release.title' : {$exists: false}},
+        {'recent_release.release_date' : {$exists: false}},
+        {'recent_release.images' : {$exists: false}},
+        {'recent_release.url' : {$exists: false}}
+    ]}, function(err, artists) {
+        if (err) {
+            console.log(err);
+        }
+        for (var i = 0; i < artists.length; i++) {
+            getArtistDetailsQueue.createJob(artists[i]);
+        }
+    })
 };
 module.exports = Db;
 
