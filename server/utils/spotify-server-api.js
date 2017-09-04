@@ -103,6 +103,7 @@ var self = module.exports = {
      * Gets all albums released in the last two weeks.
      */
     getNewReleases: function () {
+        console.log('grabbing new releases from Spotify!');
         var deferred = Q.defer();
         var releases = [];
         var artistAdded = {};
@@ -150,6 +151,7 @@ var self = module.exports = {
                                 if (offset < data.body.albums.total) {
                                     run();
                                 } else {
+                                    console.log('Last two weeks of releases from Spotify grabbed!');
                                     cachedReleases.releases = releases;
                                     fs.writeFile(path.join(__dirname, './cache/cached-new-releases.txt'), JSON.stringify(cachedReleases, null, 4), {flag: 'w'}, 'utf-8');
                                     deferred.resolve(releases);

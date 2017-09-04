@@ -23,15 +23,6 @@ var CronJob = require('cron').CronJob,
  * 3. for every new combination of new releases found, query for other users with that same combination
  * 4. add all users for that combination to a bulk email, send email, and clear their new release fields
  */
-var job = new CronJob('00 00 04 * * 0-6', function() {
-        console.log('starting job!');
-        this.startScan(true); // true flags send emails
-    },
-    null, // callback
-    false, // start job right now
-    'America/Los_Angeles'); // set time zone
-job.start();
-
 function scan() {
     console.log('scan started!');
     var deferred = Q.defer();
@@ -66,35 +57,58 @@ function scan() {
     return deferred.promise;
 }
 
-module.exports = {
-    startScan: function (sendEmails) {
-        var deferred = Q.defer();
-        // pause job queues
-        syncLibraryQueue.pause();
-        getArtistDetailsQueue.pause();
-        // scan for new releases
-        scan()
-            .then(function () {
-                // resume job queues
-                syncLibraryQueue.resume();
-                getArtistDetailsQueue.resume();
+var startScan = function (sendEmails) {
+    var deferred = Q.defer();
+    // pause job queues
+    syncLibraryQueue.pause();
+    getArtistDetailsQueue.pause();
+    // scan for new releases
+    scan()
+        .then(function () {
+            // resume job queues
+            syncLibraryQueue.resume();
+            getArtistDetailsQueue.resume();
 
-                if (sendEmails){
-                    // send new release emails
-                    emailHandler.sendNewReleaseEmails()
-                        .then(function() {
-                            console.log('EMAIL SERVICE RESOLVED');
-                            deferred.resolve();
-                        });
-                } else {
-                    deferred.resolve();
-                }
-            })
-            .catch(function(err) {
-                deferred.reject(err);
-            });
-        return deferred.promise;
+            if (sendEmails){
+                // send new release emails
+                emailHandler.sendNewReleaseEmails()
+                    .then(function() {
+                        console.log('EMAIL SERVICE RESOLVED');
+                        deferred.resolve();
+                    });
+            } else {
+                deferred.resolve();
+            }
+        })
+        .catch(function(err) {
+            deferred.reject(err);
+        });
+    return deferred.promise;
+};
+
+// if we are in production env create the cron job that will start at 4am
+// otherwise run on startup
+if (process.env.NODE_ENV){
+    var job = new CronJob('00 00 04 * * 0-6', function() {
+            console.log('starting job!');
+            startScan(true); // true flags send emails
+        },
+        null, // callback
+        true, // start job right now
+        'America/Los_Angeles'); // set time zone
+}
+else {
+    run();
+    function run() {
+        startScan(true);
     }
+}
+
+/**
+ * expose methods
+ */
+module.exports = {
+    startScan: startScan
 };
 
 
