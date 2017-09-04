@@ -1,6 +1,6 @@
 var SpotifyApi = require('spotify-web-api-node'),
     Q = require('q'),
-    Db = require('./handler-db.js'),
+    Db = require('./db.js'),
     credentials = {
         clientId: '5c3f5262d39e44ec999a8a0a9babac3e',
         clientSecret: 'a0d232e3a1844de785777c20944f2618'

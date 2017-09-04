@@ -3,8 +3,8 @@
  */
 var express = require('express'),
     passport = require('passport'),
-    Db = require('../utils/handler-db.js'),
-    email = require('../utils/handler-email'),
+    Db = require('../utils/db.js'),
+    email = require('../utils/email'),
     router = express.Router();
 
 router.get('/login', passport.authenticate('spotify', {

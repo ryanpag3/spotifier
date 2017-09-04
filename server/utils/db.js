@@ -441,4 +441,44 @@ Db.prototype.unsubscribeEmail = function (email) {
     });
     return deferred.promise;
 };
+
+/**
+ * Queries for missing artist details, runs get details jobs on artists
+ * that return.
+ */
+Db.prototype.validateArtistDetails = function() {
+
+};
 module.exports = Db;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

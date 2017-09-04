@@ -3,7 +3,7 @@ var Queue = require('bull'),
     cluster = require('cluster'),
     path = require('path'),
     spotifyApiServer = require('../utils/spotify-server-api'),
-    Db = require('./handler-db');
+    Db = require('./db');
 var socketUtil;
 
 var artistDetailsQueue = new Queue('artist-details'); // todo add prod redis values

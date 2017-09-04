@@ -1,11 +1,11 @@
 var CronJob = require('cron').CronJob,
     Q = require('q'),
     Artist = require('../models/artist'),
-    Db = require('./handler-db'),
+    Db = require('./db'),
     getArtistDetailsQueue = require('./queue-get-artist-details'),
     syncLibraryQueue = require('./queue-sync-user-library'),
     spotifyApiServer = require('../utils/spotify-server-api'),
-    emailHandler = require('./handler-email');
+    emailHandler = require('./email');
 
 
 /**
@@ -62,8 +62,14 @@ function scan() {
     return deferred.promise;
 }
 
+/**
+ * Pauses the running job queues, scans for new releases, then if sendEmails is set to true,
+ * calls the email handler sendNewReleasesEmails function.
+ *
+ * @param sendEmails: boolean to determine if we are actually going to send out the emails
+ * @returns {Q.Promise<T>}
+ */
 var startScan = function (sendEmails) {
-    console.log('sendEmails === ' + sendEmails);
     var deferred = Q.defer();
     // pause job queues
     syncLibraryQueue.pause();
@@ -91,24 +97,6 @@ var startScan = function (sendEmails) {
         });
     return deferred.promise;
 };
-
-// if we are in production env create the cron job that will start at 4am
-// otherwise run on startup
-if (process.env.NODE_ENV) {
-    var job = new CronJob('00 00 04 * * 0-6', function () {
-            console.log('starting job!');
-            startScan(true); // true flags send emails
-        },
-        null, // callback
-        true, // start job right now
-        'America/Los_Angeles'); // set time zone
-}
-else {
-    run();
-    function run() {
-        startScan(true);
-    }
-}
 
 /**
  * expose methods

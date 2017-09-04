@@ -9,7 +9,7 @@ var express = require('express'),
     Q = require('q'),
     router = express.Router(),
     SpotifyApiUser = require('../utils/spotify-user-api.js'),
-    Db = require('../utils/handler-db.js'),
+    Db = require('../utils/db.js'),
     syncLibraryJobQueue = require('../utils/queue-sync-user-library.js');
 
 /**

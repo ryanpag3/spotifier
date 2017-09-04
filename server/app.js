@@ -10,7 +10,6 @@ var path = require('path'),
     MongoStore = require('connect-mongo')(session),
     mongoose = require('mongoose'),
     helmet = require('helmet'),
-    configPrivate = require('../private/config-private'),
     configPublic = require('../config-public'),
     syncLibraryQueue = require('./utils/queue-sync-user-library'),
     getArtistDetailsQueue = require('./utils/queue-get-artist-details');
