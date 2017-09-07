@@ -250,6 +250,7 @@ var self = module.exports = {
                                     cachedReleases.releases = releases;
                                     fs.writeFile(path.join(__dirname, './cache/cached-new-releases.txt'), JSON.stringify(cachedReleases, null, 4), {encoding: 'utf-8', flag: 'w'}, function(err) {
                                         if (err) {
+                                            console.log('write file error thrown!');
                                             console.log(err);
                                         }
                                     });
