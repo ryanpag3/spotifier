@@ -85,7 +85,7 @@ router.get('/callback',
             });
 
         // // DEBUGGING
-        // res.redirect('/library');
+        res.redirect('/library');
     });
 
 /**

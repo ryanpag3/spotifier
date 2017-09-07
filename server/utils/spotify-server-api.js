@@ -62,6 +62,7 @@ var self = module.exports = {
                                                 }
                                                 // if EP exists
                                                 if (releases[i] && releases[i].album_type === 'album') {
+                                                    // console.log(releases[i]);
                                                     self.getAlbumInfo(releases[i].id)
                                                         .then(function(ep) {
                                                             // console.log(ep);
@@ -102,6 +103,10 @@ var self = module.exports = {
                             // no albums currently on spotify
                             deferred.resolve();
                         }
+                    })
+                    .catch(function(err) {
+                        console.log(err);
+                        deferred.reject(err);
                     })
             })
             .catch(function (err) {
