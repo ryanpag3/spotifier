@@ -253,7 +253,8 @@ var self = module.exports = {
                                             console.log(err);
                                         }
                                     });
-                                    console.log(releases.length);
+                                    var keys = Object.keys(releases);
+                                    console.log(keys.length);
                                     deferred.resolve(releases);
                                 }
                             })
