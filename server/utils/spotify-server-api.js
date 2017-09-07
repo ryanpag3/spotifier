@@ -248,11 +248,12 @@ var self = module.exports = {
                                 } else {
                                     console.log('Last two weeks of releases from Spotify grabbed!');
                                     cachedReleases.releases = releases;
-                                    fs.writeFile(path.join(__dirname, './cache/cached-new-releases.txt'), JSON.stringify(cachedReleases, null, 4), {flag: 'w'}, 'utf-8', function(err) {
+                                    fs.writeFile(path.join(__dirname, './cache/cached-new-releases.txt'), JSON.stringify(cachedReleases, null, 4), {encoding: 'utf-8', flag: 'w'}, function(err) {
                                         if (err) {
                                             console.log(err);
                                         }
                                     });
+                                    console.log('did we get here?');
                                     deferred.resolve(releases);
                                 }
                             })
