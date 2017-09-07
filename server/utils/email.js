@@ -286,6 +286,6 @@ function validateTemplate(template) {
  * @returns {*}
  */
 function validateEmailOptions(options) {
-    return options.from && options.to && options.subject && options.html && options.text;
+    return options.from && options.to.length > 0 && options.subject && options.html && options.text;
 }
 
