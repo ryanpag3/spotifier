@@ -38,6 +38,7 @@ function scan() {
                 var artistReleaseTitles = releases[releaseSpotifyIds[i]].map(function (e) {
                     return e.recent_release.title.toLowerCase();
                 });
+                console.log(artistReleaseTitles.length);
                 // query for artist by spotify_id
                 Artist.findOne({'spotify_id': releaseSpotifyIds[i]}, function (err, artist) {
                     if (err) { console.log(err); }
@@ -180,6 +181,7 @@ var startScan = function (sendEmails) {
             }
         })
         .catch(function (err) {
+            console.log(err);
             deferred.reject(err);
         });
     return deferred.promise;

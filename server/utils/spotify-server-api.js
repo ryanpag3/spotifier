@@ -253,7 +253,6 @@ var self = module.exports = {
                                             console.log(err);
                                         }
                                     });
-                                    console.log('did we get here?');
                                     deferred.resolve(releases);
                                 }
                             })
