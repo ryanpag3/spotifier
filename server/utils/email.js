@@ -40,7 +40,7 @@ Email.prototype.send = function (options) {
         });
     }
     else {
-        deferred.reject('email options incorrectly set.')
+        deferred.resolve('email options incorrectly set.');
     }
     return deferred.promise;
 };
