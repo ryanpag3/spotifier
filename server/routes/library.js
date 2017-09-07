@@ -163,11 +163,6 @@ if (!process.env.NODE_ENV) {
     })
 }
 
-router.get('/scan', function(req, res) {
-    releaseScanner.startScan(true);
-    res.status(200).send();
-});
-
 
 /** HELPER FUNCTIONS **/
 /**
