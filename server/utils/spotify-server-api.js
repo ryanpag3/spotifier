@@ -203,6 +203,7 @@ var self = module.exports = {
         var p = path.join(__dirname, './cache/cached-new-releases.txt');
         var cachedReleases = fs.existsSync(p) ? fs.readFileSync(p, 'utf-8') : undefined;
         if (cachedReleases) {
+            console.log('new releases parsed from cache file.');
             cachedReleases = JSON.parse(cachedReleases);
         } else {
             cachedReleases = {};
@@ -210,6 +211,7 @@ var self = module.exports = {
 
         // if syncDate has not been set or syncDate is older than 24 hours from this point
         if (cachedReleases.syncDate === undefined || Date.parse(cachedReleases.syncDate) < checkDate){
+            console.log('cached releases out of date. Writing new releases...');
             cachedReleases.syncDate = new Date();
             self.refreshClientToken()
                 .then(function () {
@@ -246,7 +248,11 @@ var self = module.exports = {
                                 } else {
                                     console.log('Last two weeks of releases from Spotify grabbed!');
                                     cachedReleases.releases = releases;
-                                    fs.writeFile(path.join(__dirname, './cache/cached-new-releases.txt'), JSON.stringify(cachedReleases, null, 4), {flag: 'w'}, 'utf-8');
+                                    fs.writeFile(path.join(__dirname, './cache/cached-new-releases.txt'), JSON.stringify(cachedReleases, null, 4), {flag: 'w'}, 'utf-8', function(err) {
+                                        if (err) {
+                                            console.log(err);
+                                        }
+                                    });
                                     deferred.resolve(releases);
                                 }
                             })
