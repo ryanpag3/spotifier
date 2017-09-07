@@ -149,6 +149,9 @@ function scan() {
                     }
                 })
             }
+        })
+        .catch(function(err) {
+            console.log(err);
         });
     return deferred.promise;
 }
