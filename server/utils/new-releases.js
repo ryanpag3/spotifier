@@ -43,6 +43,7 @@ function scan() {
                     if (err) { console.log(err); }
                     // if exists and has a recent_release that has been set
                     if (artist !== null && artist.recent_release.id !== undefined) {
+                        console.log('checking ' + artist.name);
                         if (artistReleaseTitles.length > 1) { // if artist has multiple releases in past two weeks
                             spotifyApiServer.getRecentRelease(artist)
                                 .then(function (album) {
