@@ -31,7 +31,8 @@ artistDetailsQueue.process(2, function (job, done) {
                 artist = {
                     spotify_id: job.data.artist.spotify_id,
                     recent_release: {
-                        title: 'No albums currently on Spotify'
+                        title: 'No albums currently on Spotify',
+                        release_date: '-'
                     }
                 }
             }
@@ -55,7 +56,9 @@ artistDetailsQueue
         console.log('get artist details job failed, restarting...');
     })
     .on('completed', function (job, result) {
-        if (socketUtil) { socketUtil.alertArtistDetailsChange(result); }
+        if (socketUtil) {
+            socketUtil.alertArtistDetailsChange(result);
+        }
         var db = new Db();
         db.updateArtist(result);
     });
@@ -64,7 +67,7 @@ artistDetailsQueue
 module.exports = {
     createJob: function (artist) {
         artistDetailsQueue.add({artist: artist}, {
-            attempts: 3
+            attempts: 20
         });
     },
 
@@ -84,7 +87,7 @@ module.exports = {
      * this is run on startup to expose the socket utility to the queue service
      * @param mSocketUtil
      */
-    setSocketUtil: function(mSocketUtil) {
+    setSocketUtil: function (mSocketUtil) {
         socketUtil = mSocketUtil;
     }
 };

@@ -93,7 +93,16 @@ module.exports = {
         if (artistCache.syncDate === undefined || Date.parse(artistCache.syncDate) < date) {
             artistCache.syncDate = new Date();
             spotifyServerApi.getNewReleases()
-                .then(function (releases) {
+                .then(function (releasesObj) {
+                    var releases = [];
+                    // convert associative array to regular array
+                    var keys = Object.keys(releasesObj);
+                    console.log(keys.length);
+                    for (var k = 0; k < keys.length; k++) {
+                        for (var j = 0; j < releasesObj[keys[k]].length; j++) {
+                            releases.push(releasesObj[keys[k]][j]);
+                        }
+                    }
                     artistCache.releases = releases;
                     // write file, create if doesnt exist
                     fs.writeFile(p, JSON.stringify(artistCache, null, 4), {flag: 'w'} ,function (err) {
@@ -147,6 +156,7 @@ module.exports = {
                                         spotify_id: releases[pos].spotify_id,
                                         name: releases[pos].name,
                                         recent_release: {
+                                            title: release.name,
                                             id: release.id,
                                             release_date: release.release_date,
                                             images: release.images
@@ -177,10 +187,12 @@ module.exports = {
                         spotifyServerApi.getSecondRecentRelease(releases[pos])
                             .then(function (release) {
                                 if (release) {
+                                    console.log(releases[pos].name);
                                     var artist = {
                                         spotify_id: releases[pos].spotify_id,
                                         name: releases[pos].name,
                                         recent_release: {
+                                            title: release.name,
                                             id: release.id,
                                             release_date: release.release_date,
                                             images: release.images

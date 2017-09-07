@@ -30,13 +30,18 @@ var Email = function () {
  */
 Email.prototype.send = function (options) {
     var deferred = Q.defer();
-    this.transporter.sendMail(options, function (err, info) {
-        if (err) {
-            deferred.reject(err);
-        } else {
-            deferred.resolve('sent: ' + info.response);
-        }
-    });
+    if (validateEmailOptions(options)) {
+        this.transporter.sendMail(options, function (err, info) {
+            if (err) {
+                deferred.reject(err);
+            } else {
+                deferred.resolve('sent: ' + info.response);
+            }
+        });
+    }
+    else {
+        deferred.reject('email options incorrectly set.')
+    }
     return deferred.promise;
 };
 
@@ -55,6 +60,7 @@ Email.prototype.sendNewReleaseEmails = function () {
     var deferred = Q.defer();
 
     sendNewReleaseBatch();
+
     function sendNewReleaseBatch() {
         // query for users with new_release field not empty
         User.find({'new_releases': {$ne: []}}, function (err, users) {
@@ -75,7 +81,7 @@ Email.prototype.sendNewReleaseEmails = function () {
                         addresses.push(users[i].email.address);
                     }
                     // query for artists with an id in the selected array
-                    Artist.find({'_id': {$in: master.new_releases}},'name recent_release', function (err, artists) {
+                    Artist.find({'_id': {$in: master.new_releases}}, 'name recent_release', function (err, artists) {
                         var templateDir = path.join(__dirname, '../templates', 'new-release-email');
                         var newReleaseEmail = new EmailTemplate(templateDir);
                         // catch err
@@ -84,7 +90,7 @@ Email.prototype.sendNewReleaseEmails = function () {
                         }
 
                         // render email template
-                        newReleaseEmail.render({artists: artists}, function(err, result) {
+                        newReleaseEmail.render({artists: artists}, function (err, result) {
                             // catch err
                             if (err) {
                                 console.log(err);
@@ -133,6 +139,7 @@ Email.prototype.sendNewReleaseEmails = function () {
             }
         });
     }
+
     return deferred.promise;
 };
 
@@ -161,7 +168,7 @@ Email.prototype.sendConfirmationEmail = function (user) {
                 var confirmUrl = (process.env.NODE_ENV ? configPublic.prodUrl : configPublic.url) + '/user/email/confirm?' + query;
                 var templateVals = {url: confirmUrl};
                 // render email template
-                confirmEmail.render(templateVals, function(err, result) {
+                confirmEmail.render(templateVals, function (err, result) {
                     if (err) {
                         console.log(err);
                     } else if (validateTemplate(result)) {
@@ -271,5 +278,14 @@ function generateConfirmCode(length) {
  */
 function validateTemplate(template) {
     return template.html && template.text;
+}
+
+/**
+ * Validates to make sure that all mail options are set before sending
+ * @param options
+ * @returns {*}
+ */
+function validateEmailOptions(options) {
+    return options.from && options.to && options.subject && options.html && options.text;
 }
 

@@ -34,22 +34,22 @@ describe('new-release-scanner unit tests', function () {
 
     it('should update users who are tracking artists with notifications', function(done) {
         var numUsers = 1,
-            numArtists = 10,
-            numAssigns = 10;
-        this.timeout(5000 * numArtists); // staging a sample database takes a little while due to artist lookup on spotify
+            numArtists = 30,
+            numAssigns = 1000;
+        this.timeout(60000 * 45); // staging a sample database takes a little while due to artist lookup on spotify
         testHelper.stageSampleNewReleaseDb(numUsers, numArtists, numAssigns)
             .then(function() {
                 // pass a boolean to determine whether to actually send the emails
-                releaseScanner.startScan(false)
+                releaseScanner.startScan(true)
                     .then(function() {
                         setTimeout(function() {
                             User.find({}, function(err, users) {
-                                console.log(users);
                                 if (err) {
                                     expect(err).to.be.undefined;
                                 }
                                 var userReleasesFound = 0;
                                 for(var i = 0; i < users.length; i++) {
+                                    console.log(users[i]);
                                     if (users[i].new_releases.length > 0) userReleasesFound++;
                                 }
                                 expect(userReleasesFound).to.be.greaterThan(0);
@@ -69,10 +69,10 @@ describe('new-release-scanner unit tests', function () {
 
     it('should run queue jobs for artist details for new releases', function(done) {
        var numUsers = 1,
-           numArtists = 10,
+           numArtists = 1,
            numAssigns = 1;
 
-       this.timeout(10000 * numArtists); // set test timeout based on artists which is the time bottleneck
+       this.timeout(60000 * 45); // set test timeout based on artists which is the time bottleneck
        // stage the dummy db
        testHelper.stageSampleNewReleaseDb(numUsers, numArtists, numAssigns)
            .then(function() {

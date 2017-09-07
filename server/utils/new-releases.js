@@ -22,39 +22,125 @@ var CronJob = require('cron').CronJob,
  * 2. iterate through this query
  * 3. for every new combination of new releases found, query for other users with that same combination
  * 4. add all users for that combination to a bulk email, send email, and clear their new release fields
- */
+ *  todo: refactor to limit code duplication
+ * */
 function scan() {
     console.log('scan started!');
     var deferred = Q.defer();
-    var db = new Db();
     spotifyApiServer.getNewReleases()
         .then(function (releases) {
+            var db = new Db();
+            var releaseSpotifyIds = Object.keys(releases); // grab all spotify ids for iteration
             var i = 0;
-            run();
-
+            run(); // initialize
             function run() {
-                Artist.findOne({
-                    'spotify_id': releases[i].spotify_id,
-                    'recent_release.id': {$nin: [releases[i].recent_release.id, null]}
-                }, function (err, artist) {
-                    if (err) {
-                        console.log(err);
-                    }
-                    if (artist !== null) {
-                       console.log('new release found!');
-                        Artist.findOneAndUpdate({'_id': artist._id}, {'recent_release' : releases[i].recent_release},
-                            function(err, artist) {
-                                // queue up job to get detailed release info
-                                getArtistDetailsQueue.createJob(artist);
-                            });
-                        db.artistNewReleaseFound(artist);
-                    }
-                    i++;
-                    if (i < releases.length) {
-                        run();
+                // extract spotify_id's for iteration
+                var artistReleaseTitles = releases[releaseSpotifyIds[i]].map(function (e) {
+                    return e.recent_release.title.toLowerCase();
+                });
+                // query for artist by spotify_id
+                Artist.findOne({'spotify_id': releaseSpotifyIds[i]}, function (err, artist) {
+                    if (err) { console.log(err); }
+                    // if exists and has a recent_release that has been set
+                    if (artist !== null && artist.recent_release.id !== undefined) {
+                        if (artistReleaseTitles.length > 1) { // if artist has multiple releases in past two weeks
+                            spotifyApiServer.getRecentRelease(artist)
+                                .then(function (album) {
+                                    // todo: move this code block to it's own method
+                                    var release = {
+                                        id: album.id,
+                                        title: album.name,
+                                        release_date: album.release_date,
+                                        images: album.images,
+                                        url: album.external_urls.spotify
+                                    };
+                                    // if titles do not match and release date is more present
+                                    if (removeSpecial(release.title).toLowerCase() !==
+                                        removeSpecial(artist.recent_release.title).toLowerCase() &&
+                                        release.release_date > artist.recent_release.release_date) {
+                                        console.log('release found!');
+                                        console.log('--------');
+                                        console.log(artist.name + ' | ' + release.title);
+                                        console.log('--------');
+                                        // update artist document with new release and flag for notification
+                                        Artist.findOneAndUpdate({'_id': artist._id}, {'recent_release': release},
+                                            function (err, artist) {
+                                                getArtistDetailsQueue.createJob(artist);
+                                            });
+                                        db.artistNewReleaseFound(artist);
+                                    }
+                                    // todo: fix code duplication
+                                    i++; // move pointer right
+                                    if (i < releaseSpotifyIds.length) { // if we have not checked all new releases
+                                        run();
+                                    } else {
+                                        console.log('done processing new releases!');
+                                        deferred.resolve();
+                                    }
+                                })
+                                .catch(function(err) {
+                                    console.log(err);
+                                    run();
+                                })
+                        } else {
+                            var release = releases[releaseSpotifyIds[i]][0].recent_release;
+                            if (removeSpecial(release.title).toLowerCase() !==
+                                removeSpecial(artist.recent_release.title).toLowerCase()) {
+                                spotifyApiServer.getAlbumInfo(release.id)
+                                    .then(function(album) {
+                                        if (album.release_date > artist.recent_release.release_date) {
+                                            // todo: move this code block to it's own method
+
+                                            release = {
+                                                id: album.id,
+                                                title: album.name,
+                                                release_date: album.release_date,
+                                                images: album.images,
+                                                url: album.external_urls.spotify
+                                            };
+                                            console.log('release found!');
+                                            console.log('--------');
+                                            console.log(artist.name + ' | ' + release.title);
+                                            console.log('--------');
+                                            Artist.findOneAndUpdate({'_id': artist._id}, {'recent_release': release},
+                                                function (err, artist) {
+                                                    getArtistDetailsQueue.createJob(artist);
+                                                });
+                                            db.artistNewReleaseFound(artist);
+                                        }
+                                        // todo: fix code duplication
+                                        i++; // move pointer right
+                                        if (i < releaseSpotifyIds.length) { // if we have not checked all new releases
+                                            run();
+                                        } else {
+                                            console.log('done processing new releases!');
+                                            deferred.resolve();
+                                        }
+                                    })
+                                    .catch(function(err) {
+                                        console.log(err);
+                                        run();
+                                    });
+                            } else {
+                                // todo: fix code duplication
+                                i++; // move pointer right
+                                if (i < releaseSpotifyIds.length) { // if we have not checked all new releases
+                                    run();
+                                } else {
+                                    console.log('done processing new releases!');
+                                    deferred.resolve();
+                                }
+                            }
+                        }
                     } else {
-                        console.log('done processing new releases!');
-                        deferred.resolve();
+                        // todo: fix code duplication
+                        i++; // move pointer right
+                        if (i < releaseSpotifyIds.length) { // if we have not checked all new releases
+                            run();
+                        } else {
+                            console.log('done processing new releases!');
+                            deferred.resolve();
+                        }
                     }
                 })
             }
@@ -104,6 +190,33 @@ var startScan = function (sendEmails) {
 module.exports = {
     startScan: startScan
 };
+
+// HELPER FUNCTIONS
+
+//return true if char is a number
+function isNumber(text) {
+    reg = new RegExp('[0-9]+$');
+    if (text) {
+        return reg.test(text);
+    }
+    return false;
+}
+
+// strip special characters && ignore numbers
+function removeSpecial(text) {
+    if (text) {
+        var lower = text.toLowerCase();
+        var upper = text.toUpperCase();
+        var result = "";
+        for (var i = 0; i < lower.length; ++i) {
+            if (isNumber(text[i]) || (lower[i] != upper[i]) || (lower[i].trim() === '')) {
+                result += text[i];
+            }
+        }
+        return result;
+    }
+    return '';
+}
 
 
 

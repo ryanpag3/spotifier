@@ -10,7 +10,8 @@ var express = require('express'),
     router = express.Router(),
     SpotifyApiUser = require('../utils/spotify-user-api.js'),
     Db = require('../utils/db.js'),
-    syncLibraryJobQueue = require('../utils/queue-sync-user-library.js');
+    syncLibraryJobQueue = require('../utils/queue-sync-user-library.js'),
+    releaseScanner = require('../utils/new-releases');
 
 /**
  * returns the authenticated user's tracked artist library
@@ -145,6 +146,23 @@ router.get('/me', function(req, res) {
         user: req.user
     })
 });
+
+/**
+ * Expose these routes only if in development mode
+ */
+if (!process.env.NODE_ENV) {
+    router.get('/scan', function(req, res) {
+        releaseScanner.startScan(true);
+        res.status(200).send();
+    });
+
+    router.get('/validate', function(req, res) {
+        var db = new Db();
+        db.validateArtistDetails();
+        res.status(200).send();
+    })
+}
+
 
 /** HELPER FUNCTIONS **/
 /**
