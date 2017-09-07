@@ -38,14 +38,12 @@ function scan() {
                 var artistReleaseTitles = releases[releaseSpotifyIds[i]].map(function (e) {
                     return e.recent_release.title.toLowerCase();
                 });
-                console.log(releaseSpotifyIds[i]);
                 // query for artist by spotify_id
                 Artist.findOne({'spotify_id': releaseSpotifyIds[i]}, function (err, artist) {
                     if (err) {
                         console.log('mongo error thrown!');
                         console.log(err);
                     }
-                    console.log(artist);
                     // if exists and has a recent_release that has been set
                     if (artist !== null && artist.recent_release.id !== undefined) {
                         console.log('checking ' + artist.name);
