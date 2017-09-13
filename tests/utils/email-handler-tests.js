@@ -105,10 +105,10 @@ describe('email-handler tests', function () {
     });
 
     it('should resolve after all users have been notified of their new releases', function(done) {
-        var numUsers = 2000,
-            numArtists = 500,
-            numAssigns = 25000;
-        this.timeout(5000 * numArtists); // staging the database takes a little while
+        var numUsers = 1,
+            numArtists = 10,
+            numAssigns = 25;
+        this.timeout(60000 * numArtists); // staging the database takes a little while
         // (number of users, number of artists, number of random assignments)
         testHelper.stageSampleNewReleaseDb(numUsers, numArtists, numAssigns)
             .then(function() {

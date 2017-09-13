@@ -187,7 +187,6 @@ module.exports = {
                         spotifyServerApi.getSecondRecentRelease(releases[pos])
                             .then(function (release) {
                                 if (release) {
-                                    console.log(releases[pos].name);
                                     var artist = {
                                         spotify_id: releases[pos].spotify_id,
                                         name: releases[pos].name,

@@ -56,7 +56,6 @@ describe('test-helper unit tests', function () {
         var n = 5;
         testHelper.addRandomArtists(n)
             .then(function (res) {
-                console.log(res);
                 Artist.find({}, function (err, artists) {
                     expect(artists.length).to.equal(n);
                     done();
@@ -68,7 +67,6 @@ describe('test-helper unit tests', function () {
         var n = 50;
         testHelper.addRandomUsers(n)
             .then(function (res) {
-                console.log(res);
                 User.find({}, function (err, users) {
                     expect(err).to.be.null;
                     expect(users.length).to.equal(n);

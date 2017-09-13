@@ -303,9 +303,6 @@ var self = module.exports = {
                                 if (i < data.body.items.length - 1) {
                                     i++;
                                 } else {
-                                    if (i === 0) {
-                                        console.log('artist only had one release!');
-                                    }
                                     break;
                                 }
                             }

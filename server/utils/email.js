@@ -69,6 +69,7 @@ Email.prototype.sendNewReleaseEmails = function () {
             }
             if (users && users.length > 0) { // if users still have new_releases pending
                 var master = users[0]; // master is the user we will query for all matching artist patterns with
+                // query for users with an email address and new releases that are equal to the master
                 User.find({$and: [{'email.address': {$ne: null}}, {'new_releases': {$eq: master.new_releases}}]}, function (err, users) {
                     var addresses = [];
                     // catch err
@@ -88,18 +89,20 @@ Email.prototype.sendNewReleaseEmails = function () {
                         if (err) {
                             console.log(err);
                         }
-
+                        
+                        var unsubUrl = process.env.NODE_ENV ? 'https://spotifier.io/unsubscribe' : 'http://localhost:3000/unsubscribe';
                         // render email template
-                        newReleaseEmail.render({artists: artists}, function (err, result) {
+                        newReleaseEmail.render({artists: artists, url: unsubUrl}, function (err, result) {
                             // catch err
                             if (err) {
                                 console.log(err);
                             } else if (validateTemplate(result)) {
+                                var today = new Date(Date.now()).toLocaleDateString('en-US');
                                 // define email options
                                 var mailOptions = {
                                     from: configPrivate.domain.email,
                                     to: addresses,
-                                    subject: 'We\'ve found some releases for you!',
+                                    subject: 'New releases on Spotify for ' + today + '.',
                                     html: result.html,
                                     text: result.text
                                 };
