@@ -126,7 +126,7 @@ function scan() {
                                         run();
                                     });
                             } else {
-                                // todo: fix code duplication
+                                // TODO: fix code duplication
                                 i++; // move pointer right
                                 if (i < releaseSpotifyIds.length) { // if we have not checked all new releases
                                     run();

@@ -34,6 +34,7 @@ Db.prototype.createUser = function (mUser) {
                 email: {
                     confirmed: false
                 },
+                refresh_token: mUser.refreshToken,
                 sync_queue: {
                     status: 'not queued'
                 }
@@ -46,7 +47,7 @@ Db.prototype.createUser = function (mUser) {
         } else {
             // update user's refresh token, used for playlist creation
             // TODO: check and see if it's necessary to update refresh token every login
-            user.refresh_token = mUser.refresh_token;
+            user.refresh_token = mUser.refreshToken;
             user.save();
             deferred.resolve(user);
         }
@@ -274,6 +275,7 @@ Db.prototype.assignArtist = function (user, artist) {
 };
 
 /**
+ * TODO: improve name
  * When the new release scanner finds a new release for an artist, it calls this so that all users
  * who are tracking an artist will have this artist pushed to their new_release field. Once the new
  * release scanner finishes processing all artists, the new_release field will be used to build email
