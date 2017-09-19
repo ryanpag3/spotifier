@@ -8,7 +8,7 @@ var express = require('express'),
     router = express.Router();
 
 router.get('/login', passport.authenticate('spotify', {
-        scope: ['user-read-private', 'user-read-email', 'user-library-read'],
+        scope: ['user-read-private', 'user-read-email', 'user-library-read', 'playlist-modify-private', 'playlist-modify-public'],
         showDialog: true
     }),
     // callback function

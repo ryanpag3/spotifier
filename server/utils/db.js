@@ -44,6 +44,10 @@ Db.prototype.createUser = function (mUser) {
                 deferred.resolve(user);
             });
         } else {
+            // update user's refresh token, used for playlist creation
+            // TODO: check and see if it's necessary to update refresh token every login
+            user.refresh_token = mUser.refresh_token;
+            user.save();
             deferred.resolve(user);
         }
     });

@@ -15,8 +15,10 @@ var User = new Schema({
         confirmed: Boolean,
         confirm_code: String
     },
+    refresh_token: String,
     saved_artists: [Schema.ObjectId],
     new_releases: [Schema.ObjectId],
+    new_release_playlist_id: String,
     sync_queue: {
         id: Number,
         status: String

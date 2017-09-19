@@ -53,7 +53,7 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
                     cellClass: 'grid-center-text-vert'
                 }
             ],
-            excessRows: 25,
+            excessRows: 5,
             rowHeight: 45,
             enableColumnMenus: false
         };
