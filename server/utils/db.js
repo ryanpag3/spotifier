@@ -17,7 +17,7 @@ var Db = function () {
 
 /**
  * creates a new user document in the db
- * @param mUser: user object serialized in cookie {name, accessToken, refreshToken}
+ * @param mUser: user object serialized in cookie {name, accessToken, refresh_token}
  * @returns {Q.Promise|Object} user doc from mongo
  */
 Db.prototype.createUser = function (mUser) {
@@ -34,7 +34,7 @@ Db.prototype.createUser = function (mUser) {
                 email: {
                     confirmed: false
                 },
-                refresh_token: mUser.refreshToken,
+                refresh_token: mUser.refresh_token,
                 sync_queue: {
                     status: 'not queued'
                 }
@@ -47,7 +47,7 @@ Db.prototype.createUser = function (mUser) {
         } else {
             // update user's refresh token, used for playlist creation
             // TODO: check and see if it's necessary to update refresh token every login
-            user.refresh_token = mUser.refreshToken;
+            user.refresh_token = mUser.refresh_token;
             user.save();
             deferred.resolve(user);
         }
@@ -57,7 +57,7 @@ Db.prototype.createUser = function (mUser) {
 
 /**
  * queries for user and returns user information
- * @param mUser: user object serialized in cookie {name, accessToken, refreshToken}
+ * @param mUser: user object serialized in cookie {name, accessToken, refresh_token}
  * @returns: {Q.Promise|Object} user document information from mongodb
  */
 Db.prototype.getUser = function (mUser) {
@@ -76,7 +76,7 @@ Db.prototype.getUser = function (mUser) {
  * Runs a recursive call to add all artists. We use this technique to add artists in
  * order to preserve the natural order of a user's library. A typical for-loop would cause
  * an async shuffle of a user's artist at little-to-no performance improvement.
- * @param user: user object serialized in cookie {name, accessToken, refreshToken}
+ * @param user: user object serialized in cookie {name, accessToken, refresh_token}
  * @param artists: array of simple artist objects to retrieve detailed information and
  *                 add to db
  * @param socketUtil: this is the socket utility object used by the artist details queue
@@ -126,7 +126,7 @@ Db.prototype.getAllArtists = function () {
 
 /**
  * queries for user information and adds artist to user library
- * @param user: user object serialized in cookie {name, accessToken, refreshToken}
+ * @param user: user object serialized in cookie {name, accessToken, refresh_token}
  * @param artist: simple artist object {spotifyId, name}
  * @param socketUtil: this is the socket utility object that contains the necessary socket.io
  * data to update clients seamlessly when artist details have been found. We pass it to the job
@@ -292,7 +292,7 @@ Db.prototype.artistNewReleaseFound = function (artist) {
 
 /**
  * retrieves the user's library from the db, if they exist
- * @param mUser: user object serialized in cookie {_id, name, accessToken, refreshToken}
+ * @param mUser: user object serialized in cookie {_id, name, accessToken, refresh_token}
  * @returns: {Q.Promise|Array} Promise object with user library artist information
  */
 Db.prototype.getLibrary = function (mUser) {
@@ -316,7 +316,7 @@ Db.prototype.getLibrary = function (mUser) {
 
 /**
  * returns boolean whether user exists in mongodb
- * @param mUser: user object serialized in cookie {name, accessToken, refreshToken}
+ * @param mUser: user object serialized in cookie {name, accessToken, refresh_token}
  * @returns: {Q.Promise|Boolean}
  */
 Db.prototype.userExists = function (mUser) {
@@ -332,7 +332,7 @@ Db.prototype.userExists = function (mUser) {
 
 /**
  * returns boolean based on whether the user has an email in the database
- * @param mUser: user object serialized in cooke {name, accessToken, refreshToken}
+ * @param mUser: user object serialized in cooke {name, accessToken, refresh_token}
  * @returns: {Q.Promise|Boolean}
  */
 Db.prototype.emailExists = function (mUser) {
@@ -348,7 +348,7 @@ Db.prototype.emailExists = function (mUser) {
 
 /**
  * returns boolean based on whether the user has confirmed their email in the database
- * @param mUser: user object serialized in cooke {name, accessToken, refreshToken}
+ * @param mUser: user object serialized in cooke {name, accessToken, refresh_token}
  * @returns {Q.Promise|Boolean}
  */
 Db.prototype.emailConfirmed = function (mUser) {

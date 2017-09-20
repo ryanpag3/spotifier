@@ -53,7 +53,7 @@ const setupApp = function(app, express, socketUtil) {
     function(accessToken, refreshToken, profile, done) {
         process.nextTick(function() {
             // this is what will be serialized in the cookie
-            return done(null, {name: profile.id, accessToken: accessToken, refreshToken: refreshToken});
+            return done(null, {name: profile.id, accessToken: accessToken, refresh_token: refreshToken});
         });
 
     }));
