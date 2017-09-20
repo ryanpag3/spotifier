@@ -32,86 +32,213 @@ var self = module.exports = {
         // ensure fresh token
         self.refreshClientToken()
             .then(function () {
-
-                /**
-                 * releases are organized in this order
-                 * 1. full album releases
-                 * 2. singles
-                 * 3. EPs
-                 */
+                // get releases for parsing
                 self.getArtistReleases(artist)
                     .then(function (releases) {
-                        // console.log(releases);
-                        if (releases.length > 0) {
-                            // get most recent album details
-                            self.getAlbumInfo(releases[0].id)
-                                .then(function (album) {
-                                    var i = 1; // start at one because we already parses 0
-                                    //
-                                    while (i < releases.length && releases[i].album_type === 'album') {
-                                        i++;
-                                    }
-                                    // if artist single exists
-                                    if (releases[i] && releases[i].album_type === 'single') {
-                                        // get most recent single details
-                                        self.getAlbumInfo(releases[i].id)
-                                            .then(function (single) {
-                                                // iterate to artist EPs
-                                                while (i < releases.length && releases[i].album_type === 'single') {
-                                                    i++;
-                                                }
-                                                // if EP exists
-                                                if (releases[i] && releases[i].album_type === 'album') {
-                                                    // console.log(releases[i]);
-                                                    self.getAlbumInfo(releases[i].id)
-                                                        .then(function (ep) {
-                                                            // console.log(ep);
-                                                            var releases = [album, single, ep];
-                                                            // sort releases by date descending
-                                                            releases.sort(function (a, b) {
-                                                                if (a.release_date < b.release_date)
-                                                                    return 1; // assign a to the right of b
-                                                                if (a.release_date > b.release_date)
-                                                                    return -1; // assign a to the left of b
-                                                                else
-                                                                    return 0; // do not change assignment
-                                                            });
-                                                            // return most recent of the three
-                                                            deferred.resolve(releases[0]);
-                                                        })
-                                                } else {
-                                                    // compare album and single
-                                                    var albumDate = Date.parse(album.release_date),
-                                                        singleDate = Date.parse(single.release_date);
-                                                    // check which one was released most recent
-                                                    if (albumDate < singleDate) {
-                                                        deferred.resolve(single);
-                                                    } else {
-                                                        deferred.resolve(album);
-                                                    }
-                                                }
-                                            })
-                                    } else {
-                                        // return most recent album/EP
-                                        deferred.resolve(album);
-                                    }
-                                })
-                                .catch(function (err) {
-                                    deferred.reject(err);
-                                })
-                        } else {
-                            // no albums currently on spotify
-                            deferred.resolve();
-                        }
+                        var releases = self.getReleaseTypes(releases);
+                        self.getMostRecentDetails(releases)
+                            .then(function (mostRecent) {
+                                deferred.resolve(mostRecent);
+                            })
+                            .catch(function (err) {
+                                console.log('get most recent details error')
+                                console.log(err);
+                                deferred.reject(err);
+                            })
                     })
                     .catch(function (err) {
                         console.log(err);
-                        deferred.reject(err);
                     })
             })
-            .catch(function (err) {
-                deferred.reject('**REFRESH CLIENT TOKEN**' + err);
-            });
+
+
+
+        // DEPRECATED
+        // // ensure fresh token
+        // self.refreshClientToken()
+        //     .then(function () {
+
+        //         /**
+        //          * releases are organized in this order
+        //          * 1. full album releases
+        //          * 2. singles
+        //          * 3. EPs
+        //          */
+        //         self.getArtistReleases(artist)
+        //             .then(function (releases) {
+        //                 for (var i = 0; i < releases.length; i++) {
+        //                     console.log(releases[i]);
+        //                 }
+        //                 // process.env.NODE_ENV ? null : console.log(releases);
+        //                 if (releases.length > 0) {
+        //                     // get most recent album details
+        //                     self.getAlbumInfo(releases[0].id)
+        //                         .then(function (album) {
+        //                             process.env.NODE_ENV ? null : console.log('Album found!');
+        //                             // process.env.NODE_ENV ? null : console.log(album);
+
+        //                             var i = 1; // start at one because we already parses 0
+        //                             //
+        //                             while (i < releases.length && releases[i].album_type === 'album') {
+        //                                 i++;
+        //                             }
+        //                             // if artist single exists
+        //                             if (releases[i] && releases[i].album_type === 'single') {
+        //                                 // get most recent single details
+        //                                 self.getAlbumInfo(releases[i].id)
+        //                                     .then(function (single) {
+        //                                         process.env.NODE_ENV ? null : console.log('Single found!');
+        //                                         // process.env.NODE_ENV ? null : console.log(single);
+        //                                         // iterate to artist EPs
+        //                                         while (i < releases.length && releases[i].album_type === 'single') {
+        //                                             i++;
+        //                                         }
+        //                                         // if EP exists
+        //                                         if (releases[i] && releases[i].album_type === 'album') {
+        //                                             // console.log(releases[i]);
+        //                                             self.getAlbumInfo(releases[i].id)
+        //                                                 .then(function (ep) {
+        //                                                     process.env.NODE_ENV ? null : console.log('EP found!');
+        //                                                     // process.env.NODE_ENV ? null : console.log(ep);
+        //                                                     var releases = [album, single, ep];
+        //                                                     // sort releases by date descending
+        //                                                     releases.sort(function (a, b) {
+        //                                                         if (a.release_date < b.release_date)
+        //                                                             return 1; // assign a to the right of b
+        //                                                         if (a.release_date > b.release_date)
+        //                                                             return -1; // assign a to the left of b
+        //                                                         else
+        //                                                             return 0; // do not change assignment
+        //                                                     });
+        //                                                     // return most recent of the three
+        //                                                     deferred.resolve(releases[0]);
+        //                                                 })
+        //                                         } else {
+        //                                             // compare album and single
+        //                                             var albumDate = Date.parse(album.release_date),
+        //                                                 singleDate = Date.parse(single.release_date);
+        //                                             // check which one was released most recent
+        //                                             if (albumDate < singleDate) {
+        //                                                 deferred.resolve(single);
+        //                                             } else {
+        //                                                 deferred.resolve(album);
+        //                                             }
+        //                                         }
+        //                                     })
+        //                             } else {
+        //                                 // return most recent album/EP
+        //                                 deferred.resolve(album);
+        //                             }
+        //                         })
+        //                         .catch(function (err) {
+        //                             deferred.reject(err);
+        //                         })
+        //                 } else {
+        //                     // no albums currently on spotify
+        //                     deferred.resolve();
+        //                 }
+        //             })
+        //             .catch(function (err) {
+        //                 console.log(err);
+        //                 deferred.reject(err);
+        //             })
+        //     })
+        //     .catch(function (err) {
+        //         deferred.reject('**REFRESH CLIENT TOKEN**' + err);
+        //     });
+        return deferred.promise;
+    },
+
+    /**
+     * Chunk the releases by type by iterating through and 
+     * pushing releases to albums based on the pattern Spotify
+     * uses to differentiate their releases. Albums are first,
+     * followed by Singles, then EPs. Returns an array of Objects
+     * with an ID value defining the release type.
+     * @returns Array of Objects [[albums], [singles], [eps]]
+     */
+    getReleaseTypes: function (releases) {
+        var processed = [];
+        var chunks = {
+            albums: [],
+            singles: [],
+            eps: []
+        };
+        var type = 'album';
+        for (var i = 0; i < releases.length; i++) {
+            if (releases[i].album_type === 'album' && type === 'single') {
+                type = 'ep';
+            } else if (releases[i].album_type === 'single') {
+                type = 'single';
+            } else {
+                type = 'album';
+            }
+            switch (type) {
+                case 'album':
+                    {
+                        releases[i].release_type = 'album';
+                        break;
+                    }
+                case 'single':
+                    {
+                        releases[i].release_type = 'single';
+                        break;
+                    }
+                case 'ep':
+                    {
+                        releases[i].release_type = 'ep';
+                        break;
+                    }
+            }
+        }
+        return releases;
+    },
+
+    /**
+     * Iterate through all the releases, if the iterated release has a more recent date
+     * then we replace the most recent release value. The current iteration of this 
+     * function assumes that multiple releases on the same day are linear from more
+     * recent to less recent.
+     * @returns object with details of recent release
+     */
+    getMostRecentDetails: function (releases) {
+        var self = this;
+        var deferred = Q.defer();
+        var recentRelease;
+        var index = 0;
+        run();
+
+        function run() {
+            self.getAlbumInfo(releases[index])
+                .then(function (album) {
+                    if (!recentRelease || recentRelease.release_date < album.release_date) {
+                        recentRelease = album;
+                    }
+
+                })
+                .catch(function (err) {
+                    // TODO: might need to throw err here to have detail job fail correctly
+                    console.log('get album info err')
+                    console.log(err);
+                    deferred.reject(err);
+                })
+            index++;
+            if (index < releases.length) {
+                setTimeout(run, 300);
+                // run();
+            } else {
+                if (recentRelease){
+                    deferred.resolve(recentRelease);
+                } else {
+                    // give a buffer to let api to process
+                    // this happens when artist's have very few releases on spotify
+                    setTimeout(function() {
+                        deferred.resolve(recentRelease);
+                    }, 2000);
+                }
+                
+            }
+        }
         return deferred.promise;
     },
 
@@ -130,10 +257,10 @@ var self = module.exports = {
 
         function run() {
             spotifyApi.getArtistAlbums(artist.spotify_id, ({
-                limit: limit,
-                offset: offset,
-                album_type: 'album,single'
-            }))
+                    limit: limit,
+                    offset: offset,
+                    album_type: 'album,single'
+                }))
                 .then(function (data) {
                     releases = releases.concat(data.body.items);
                     offset += limit;
@@ -152,13 +279,15 @@ var self = module.exports = {
         return deferred.promise;
     },
 
-    getAlbumInfo: function (albumId) {
+    getAlbumInfo: function (album) {
         var deferred = Q.defer();
         self.refreshClientToken()
             .then(function () {
-                spotifyApi.getAlbum(albumId)
+                spotifyApi.getAlbum(album.id)
                     .then(function (data) {
-                        deferred.resolve(data.body);
+                        var mAlbum = data.body;
+                        mAlbum.release_type = album.release_type;
+                        deferred.resolve(mAlbum);
                     })
                     .catch(function (err) {
                         deferred.reject('**GET ALBUM**' + err);
@@ -175,9 +304,9 @@ var self = module.exports = {
         self.refreshClientToken()
             .then(function () {
                 spotifyApi.getArtistAlbums(artist.spotify_id, ({
-                    limit: 1,
-                    offset: 0
-                }))
+                        limit: 1,
+                        offset: 0
+                    }))
                     .then(function (data) {
                         deferred.resolve(data.body.items[0].id);
                     })
@@ -222,9 +351,9 @@ var self = module.exports = {
 
                     function run() {
                         spotifyApi.searchAlbums(query, {
-                            limit: 50,
-                            offset: offset
-                        })
+                                limit: 50,
+                                offset: offset
+                            })
                             .then(function (data) {
                                 for (var i = 0; i < data.body.albums.items.length; i++) {
                                     var album = {
@@ -290,11 +419,10 @@ var self = module.exports = {
             .then(function () {
                 // retrieve most recent release
                 spotifyApi.getArtistAlbums(artist.spotify_id, ({
-                    limit: 9,
-                    offset: 0
-                }))
+                        limit: 9,
+                        offset: 0
+                    }))
                     .then(function (data) {
-                        var albumId;
                         var i = 0;
                         // skip generic artists like 'various artists' who don't have any album releases
                         if (data.body.items.length > 0) {
@@ -306,8 +434,7 @@ var self = module.exports = {
                                     break;
                                 }
                             }
-                            albumId = data.body.items[i].id;
-                            self.getAlbumInfo(albumId)
+                            self.getAlbumInfo(data.body.items[i])
                                 .then(function (data) {
                                     deferred.resolve(data);
                                 })
@@ -329,32 +456,3 @@ var self = module.exports = {
         return deferred.promise;
     }
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
