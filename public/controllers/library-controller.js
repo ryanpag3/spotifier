@@ -178,7 +178,7 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
                     name: artist.name,
                     spotify_id: artist.spotify_id,
                     recent_release: {
-                        title: 'waiting on info from Spotify...' // placeholder text matching server
+                        title: 'release request queued...' // placeholder text matching server
                     }
                 };
                 $scope.data.push(a);
