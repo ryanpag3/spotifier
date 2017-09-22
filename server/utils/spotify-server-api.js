@@ -131,7 +131,6 @@ var self = module.exports = {
                 self.getAlbumInfo(releases[releaseTypeIndex][index])
                     .then(function (album) {
                         if (!recentRelease || recentRelease.release_date < album.release_date) {
-                            console.log('Recent release set to: ' + album.name);
                             recentRelease = album;
                             index++; // move pointer right
                             if (index === releases[releaseTypeIndex].length) {
@@ -171,11 +170,7 @@ var self = module.exports = {
             function moveToNextArray() {
                 releaseTypeIndex++;
                 index = 0;
-                console.log('release index set to: ' + releaseTypeIndex);
-
             }
-
-
         }
         return deferred.promise;
     },
