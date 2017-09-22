@@ -84,8 +84,8 @@ router.get('/callback',
                 console.log(err);
             });
 
-        // // DEBUGGING
-        // res.redirect('/library');
+        // DEBUGGING
+        process.env.NODE_ENV ? null : res.redirect('/library');
     });
 
 /**
