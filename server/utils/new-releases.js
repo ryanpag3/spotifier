@@ -90,7 +90,7 @@ function scan() {
                             var release = releases[releaseSpotifyIds[i]][0].recent_release;
                             if (removeSpecial(release.title).toLowerCase() !==
                                 removeSpecial(artist.recent_release.title).toLowerCase()) {
-                                spotifyApiServer.getAlbumInfo(release.id)
+                                spotifyApiServer.getAlbumInfo(release)
                                     .then(function(album) {
                                         if (album.release_date > artist.recent_release.release_date) {
                                             // todo: move this code block to it's own method
