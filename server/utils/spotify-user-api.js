@@ -72,7 +72,7 @@ Api.prototype.getAccessToken = function (user) {
     // if we havent set the expireDate or if the currentDate is past the expireDate
     if (user.accessToken.expireDate === undefined || user.accessToken.expireDate < currentDate) {
         console.log('creating new token...');
-        api.setRefreshToken(user.refreshToken);
+        api.setRefreshToken(user.refresh_token);
         // refresh token
         api.refreshAccessToken()
             .then(function (data) {
