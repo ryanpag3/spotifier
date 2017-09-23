@@ -219,5 +219,28 @@ Api.prototype.searchArtists = function (user, query) {
     return deferred.promise;
 };
 
+/**
+ * TODO:
+ * Create a playlist for the specified user
+ */
+Api.prototype.createPlaylist = function(user) {
+
+}
+
+/**
+ * TODO:
+ * Delete a playlist for the specified user
+ */
+Api.prototype.deletePlaylist = function(user) {
+
+}
+
+/**
+ * Empty playlist contents for the specified user
+ */
+Api.prototype.emptyPlaylist = function(user) {
+    
+}
+
 module.exports = Api;
 
