@@ -224,7 +224,13 @@ Api.prototype.searchArtists = function (user, query) {
  * Create a playlist for the specified user
  */
 Api.prototype.createPlaylist = function(user) {
-
+    // set access token for user
+    // if the user has a spotifier playlist in their document
+    //  - check to see if the playlist still exists
+    //  - return
+    // else
+    //  - create new playlist for the specified user
+    //  - return
 }
 
 /**
@@ -232,14 +238,46 @@ Api.prototype.createPlaylist = function(user) {
  * Delete a playlist for the specified user
  */
 Api.prototype.deletePlaylist = function(user) {
-
+    // set access token for user
+    // if the user has a spotifier playlist id in their document
+    //  - check to see if playlist still exists for their account
+    // if still exists
+    //  - delete
+    //  - return
+    // else
+    //  - return 
 }
 
 /**
- * Empty playlist contents for the specified user
+ * Set the api token to the user's token and remove
+ * all of the tracks from the user's new release playlist,
+ * if it exists.
  */
 Api.prototype.emptyPlaylist = function(user) {
-    
+    // set access token for user
+    // if the user has a spotifier playlist id in their document
+    //  - check to see if playlist still exists for their account
+    // if still exists
+    //  - empty contents
+    //  - return
+    // else
+    //  - return
+}
+
+/**
+ * Refresh a user's access token if necessary, set the access token 
+ * to the user's api token, then add the releases to the user's playlist. 
+ */
+Api.prototype.addTracksToPlaylist = function(user, releaseIds) {
+    // set access token for user
+    // if the user has a spotifier playlist id in their document
+    // - check to see if playlist still exists for their account
+    // if still exists
+    // - call spotify api add tracks to playlist
+    // -- if success
+    // --- return
+    // -- else 
+    // --- return err
 }
 
 module.exports = Api;
