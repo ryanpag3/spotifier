@@ -12,7 +12,7 @@ mongoose.connect('mongodb://localhost/spotifier_test', {
     useMongoClient: true
 });
 
-describe('playlist handler unit tests', function() {
+describe('playlist handler', function() {
     // runs before each unit test
     beforeEach(function(done) {
         done();
@@ -26,4 +26,7 @@ describe('playlist handler unit tests', function() {
             });
         });
     });
+
+    /** UNIT TESTS **/
+    it ('')
 })

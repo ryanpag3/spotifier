@@ -13,7 +13,9 @@ const spotifyUserApi = require('spotify-user-api');
  */
 var updateNewReleasePlaylists = function() {
     // query for all users who have new releases
-    User.find({'new_releases': {$exists: true, $ne: []}}, 'new_releases', function(users) {
+    User.find({$and: [{'new_releases': {$exists: true, $ne: []}}, 
+                      {'refresh_token': {$exists: true}}]}, 'new_releases', 
+                        function(users) {
         console.log(users.length);
     });
     // query for all users with new releases and have playlist creation enabled
