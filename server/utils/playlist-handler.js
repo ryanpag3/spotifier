@@ -1,14 +1,21 @@
 /**
  * This utility handles creating spotifier playlists for users with new releases.
  */
-
- const Db = require('db');
- const spotifyUserApi = require('spotify-user-api');
+const User = require('../models/user');
+const Db = require('db');
+const spotifyUserApi = require('spotify-user-api');
 
 /**
  * Iterates through all users who have new releases found and update playlists.
+ * TODO:
+ *  - add playlist creation enabled query condition once the settings page has
+ *    been created and the schema has updated.
  */
 var updateNewReleasePlaylists = function() {
+    // query for all users who have new releases
+    User.find({'new_releases': {$exists: true, $ne: []}}, 'new_releases', function(users) {
+        console.log(users.length);
+    });
     // query for all users with new releases and have playlist creation enabled
     // - new releases pending
     // - playlist creation enabled
