@@ -3,6 +3,7 @@ var expect = require('chai').expect,
     mongoose = require('mongoose'),
     testHelper = require('../test-helpers'),
     sampleData = require('../sample-test-data'),
+    spotifyApiUser = require('../../server/utils/spotify-user-api'),
     User = require('../../server/models/user'),
     Artist = require('../../server/models/artist');
     mongoose.Promise = require('bluebird');
