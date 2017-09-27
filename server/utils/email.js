@@ -15,7 +15,7 @@ var nodemailer = require('nodemailer'),
  * @constructor
  */
 var Email = function () {
-    // todo add flag for prod/dev environment
+    // are we in production?
     if (process.env.NODE_ENV) {
         this.transporter = nodemailer.createTransport(ses({
             accessKeyId: configPrivate.awsSecretId,
