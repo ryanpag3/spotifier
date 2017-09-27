@@ -133,6 +133,17 @@ module.exports = {
             email: {},
             saved_artists: []
         }
+    },
+
+    spotifyAuthenticatedUser: function() {
+        return {
+            name: potNames.choose(),
+            email: {
+                address: privateConfig.gmail.username,
+                confirmed: true
+            },
+            refresh_token: privateConfig.spotify.testRefreshToken
+        }
     }
 };
 

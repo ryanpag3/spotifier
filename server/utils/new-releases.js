@@ -170,10 +170,10 @@ var startScan = function (sendEmails) {
     // scan for new releases
     scan()
         .then(function () {
+            //TODO: update user playlists before resuming
             // resume job queues
             syncLibraryQueue.resume();
             getArtistDetailsQueue.resume();
-
             if (sendEmails === true) {
                 // send new release emails
                 emailHandler.sendNewReleaseEmails()
