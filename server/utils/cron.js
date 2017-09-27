@@ -9,7 +9,7 @@ var CronJob = require('cron').CronJob,
 if (process.env.NODE_ENV) {
     // CHECK FOR NEW RELEASES
     // RUNS AT 4AM 7 DAYS A WEEK
-    new CronJob('00 30 04 * * 0-6', function () {
+    new CronJob('00 00 10 * * 0-6', function () {
             console.log('starting new release scan job!');
             releaseScanner.startScan(true); // true flags send emails
         },
