@@ -7,7 +7,19 @@
 var config = {};
 
 config.gmail = {};
+config.spotify = {};
+
+/**
+ * gmail account credentials are used for sending test emails
+ */
 config.gmail.username = 'YOUR EMAIL HERE';
 config.gmail.password = 'YOUR EMAIL PASSWORD';
+
+/**
+ * These are the api tokens used for authenticating the application. 
+ * Create your own here: https://developer.spotify.com/my-applications/#!/applications
+ */
+config.spotify.clientId = 'YOUR CLIENT ID';
+config.spotify.clientSecret = 'YOUR CLIENT SECRET';
 
 module.exports = config;

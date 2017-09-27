@@ -3,9 +3,10 @@ var SpotifyApi = require('spotify-web-api-node'),
     Q = require('q'),
     fs = require('fs'),
     path = require('path'),
+    configPrivate = require('../../private/config-private'),
     credentials = {
-        clientId: '5c3f5262d39e44ec999a8a0a9babac3e',
-        clientSecret: 'a0d232e3a1844de785777c20944f2618'
+        clientId: configPrivate.spotify.clientId,
+        clientSecret: configPrivate.spotify.clientSecret
     },
     spotifyApi = new SpotifyApi(credentials); // instantiate api object
 
