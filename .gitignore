@@ -4,4 +4,4 @@ tests/artist-release-cache.txt
 server/utils/cache/cached-new-releases.txt
 server/sslcert/*
 private/
-.vscode/
+./.vscode/
