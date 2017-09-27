@@ -11,6 +11,11 @@ config.spotify = {};
 
 /**
  * gmail account credentials are used for sending test emails
+ * You will need to go to account->Connected apps & sites and scroll
+ * down to the bottom and turn Allow less secure apps: ON
+ * -----------------------------------------------------------------------------
+ * It is HIGHLY recommended you create a dummy gmail account only for testing. |
+ * -----------------------------------------------------------------------------
  */
 config.gmail.username = 'YOUR EMAIL HERE';
 config.gmail.password = 'YOUR EMAIL PASSWORD';

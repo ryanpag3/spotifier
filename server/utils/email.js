@@ -16,11 +16,22 @@ var nodemailer = require('nodemailer'),
  */
 var Email = function () {
     // todo add flag for prod/dev environment
-    this.transporter = nodemailer.createTransport(ses({
-        accessKeyId: configPrivate.awsSecretId,
-        secretAccessKey: configPrivate.awsSecretKey,
-        region: 'us-west-2'
-    }));
+    if (process.env.NODE_ENV) {
+        this.transporter = nodemailer.createTransport(ses({
+            accessKeyId: configPrivate.awsSecretId,
+            secretAccessKey: configPrivate.awsSecretKey,
+            region: 'us-west-2'
+        }));
+    } else {
+        this.transporter = nodemailer.createTransport({
+            service: 'Gmail',
+            auth: {
+                user: configPrivate.gmail.username,
+                pass: configPrivate.gmail.password
+            }
+        })
+    }
+
 };
 
 /**
@@ -38,8 +49,7 @@ Email.prototype.send = function (options) {
                 deferred.resolve('sent: ' + info.response);
             }
         });
-    }
-    else {
+    } else {
         deferred.resolve('email options incorrectly set.');
     }
     return deferred.promise;
@@ -63,14 +73,28 @@ Email.prototype.sendNewReleaseEmails = function () {
 
     function sendNewReleaseBatch() {
         // query for users with new_release field not empty
-        User.find({'new_releases': {$ne: []}}, function (err, users) {
+        User.find({
+            'new_releases': {
+                $ne: []
+            }
+        }, function (err, users) {
             if (err) {
                 console.log(err);
             }
             if (users && users.length > 0) { // if users still have new_releases pending
                 var master = users[0]; // master is the user we will query for all matching artist patterns with
                 // query for users with an email address and new releases that are equal to the master
-                User.find({$and: [{'email.address': {$ne: null}}, {'new_releases': {$eq: master.new_releases}}]}, function (err, users) {
+                User.find({
+                    $and: [{
+                        'email.address': {
+                            $ne: null
+                        }
+                    }, {
+                        'new_releases': {
+                            $eq: master.new_releases
+                        }
+                    }]
+                }, function (err, users) {
                     var addresses = [];
                     // catch err
                     if (err) {
@@ -82,17 +106,24 @@ Email.prototype.sendNewReleaseEmails = function () {
                         addresses.push(users[i].email.address);
                     }
                     // query for artists with an id in the selected array
-                    Artist.find({'_id': {$in: master.new_releases}}, 'name recent_release', function (err, artists) {
+                    Artist.find({
+                        '_id': {
+                            $in: master.new_releases
+                        }
+                    }, 'name recent_release', function (err, artists) {
                         var templateDir = path.join(__dirname, '../templates', 'new-release-email');
                         var newReleaseEmail = new EmailTemplate(templateDir);
                         // catch err
                         if (err) {
                             console.log(err);
                         }
-                        
+
                         var unsubUrl = process.env.NODE_ENV ? 'https://spotifier.io/unsubscribe' : 'http://localhost:3000/unsubscribe';
                         // render email template
-                        newReleaseEmail.render({artists: artists, url: unsubUrl}, function (err, result) {
+                        newReleaseEmail.render({
+                            artists: artists,
+                            url: unsubUrl
+                        }, function (err, result) {
                             // catch err
                             if (err) {
                                 console.log(err);
@@ -111,17 +142,20 @@ Email.prototype.sendNewReleaseEmails = function () {
                                     .then(function () {
                                         // remove new_release data from users who we just sent email to
                                         User.updateMany({
-                                                'new_releases': {
-                                                    $all: master.new_releases,
-                                                    $size: master.new_releases.length
-                                                }
-                                            },
-                                            {$set: {'new_releases': []}}, function (err) {
-                                                if (err) {
-                                                    console.log(err);
-                                                }
-                                                sendNewReleaseBatch(); // process next release batch and send
-                                            });
+                                            'new_releases': {
+                                                $all: master.new_releases,
+                                                $size: master.new_releases.length
+                                            }
+                                        }, {
+                                            $set: {
+                                                'new_releases': []
+                                            }
+                                        }, function (err) {
+                                            if (err) {
+                                                console.log(err);
+                                            }
+                                            sendNewReleaseBatch(); // process next release batch and send
+                                        });
 
                                     })
                                     .catch(function (err) {
@@ -169,7 +203,9 @@ Email.prototype.sendConfirmationEmail = function (user) {
                 var templateDir = path.join(__dirname, '../templates', 'confirmation-email');
                 var confirmEmail = new EmailTemplate(templateDir);
                 var confirmUrl = (process.env.NODE_ENV ? configPublic.prodUrl : configPublic.url) + '/user/email/confirm?' + query;
-                var templateVals = {url: confirmUrl};
+                var templateVals = {
+                    url: confirmUrl
+                };
                 // render email template
                 confirmEmail.render(templateVals, function (err, result) {
                     if (err) {
@@ -211,7 +247,9 @@ Email.prototype.sendConfirmationEmail = function (user) {
  */
 Email.prototype.confirm = function (query) {
     var deferred = Q.defer();
-    User.findOne({'_id': query.id}, function (err, user) {
+    User.findOne({
+        '_id': query.id
+    }, function (err, user) {
         // mongo err thrown
         if (err) {
             deferred.reject(err);
@@ -220,7 +258,9 @@ Email.prototype.confirm = function (query) {
         if (user) {
             // if user confirm code matches
             if (user.email.confirm_code === query.code) {
-                User.update({'_id': user._id}, {
+                User.update({
+                    '_id': user._id
+                }, {
                     email: {
                         address: user.email.address,
                         confirmed: true,
@@ -234,8 +274,7 @@ Email.prototype.confirm = function (query) {
                         deferred.resolve();
                     }
                 })
-            }
-            else {
+            } else {
                 var error = 'invalid confirm code';
                 console.log(error);
                 deferred.reject(error);
@@ -251,7 +290,9 @@ Email.prototype.confirm = function (query) {
 
 Email.prototype.getStatus = function (user) {
     var deferred = Q.defer();
-    User.findOne({'_id': user._id}, function (err, user) {
+    User.findOne({
+        '_id': user._id
+    }, function (err, user) {
         if (err) {
             deferred.reject(err);
         }
@@ -291,4 +332,3 @@ function validateTemplate(template) {
 function validateEmailOptions(options) {
     return options.from && options.to.length > 0 && options.subject && options.html && options.text;
 }
-
