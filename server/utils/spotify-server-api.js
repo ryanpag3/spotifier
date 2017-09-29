@@ -3,9 +3,10 @@ var SpotifyApi = require('spotify-web-api-node'),
     Q = require('q'),
     fs = require('fs'),
     path = require('path'),
+    configPrivate = require('../../private/config-private'),
     credentials = {
-        clientId: '5c3f5262d39e44ec999a8a0a9babac3e',
-        clientSecret: 'a0d232e3a1844de785777c20944f2618'
+        clientId: configPrivate.spotify.clientId,
+        clientSecret: configPrivate.spotify.clientSecret
     },
     spotifyApi = new SpotifyApi(credentials); // instantiate api object
 
@@ -270,12 +271,13 @@ var self = module.exports = {
             console.log('new releases parsed from cache file.');
             cachedReleases = JSON.parse(cachedReleases);
         } else {
+            console.log('no new release cache file found.');
             cachedReleases = {};
         }
 
         // if syncDate has not been set or syncDate is older than 24 hours from this point
         if (cachedReleases.syncDate === undefined || Date.parse(cachedReleases.syncDate) < checkDate) {
-            console.log('cached releases out of date. Writing new releases...');
+            console.log('getting new releases...')
             cachedReleases.syncDate = new Date();
             self.refreshClientToken()
                 .then(function () {
@@ -314,6 +316,7 @@ var self = module.exports = {
                                     console.log('Last two weeks of releases from Spotify grabbed!');
                                     cachedReleases.releases = releases;
                                     if (!process.env.NODE_ENV) {
+                                        console.log('writing cached releases to file...');
                                         fs.writeFile(path.join(__dirname, './cache/cached-new-releases.txt'), JSON.stringify(cachedReleases, null, 4), {
                                             encoding: 'utf-8',
                                             flag: 'w'

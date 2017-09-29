@@ -40,7 +40,6 @@ app.config(['$routeProvider', '$locationProvider', 'SpotifyProvider',
 
 
         $locationProvider.html5Mode(true);
-        SpotifyProvider.setClientId('180cc653f1f24ae9864d5d718d68f3c6');
     }]);
 
 app.run(function ($http, $rootScope, $location, $route, authService) {

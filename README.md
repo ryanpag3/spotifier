@@ -6,14 +6,15 @@ for running long processes in a queue, and angular for front-end.
 
 ## Getting Started
 
-Getting started developing for spotifier.io is easy. First, `clone` the repository to your development directory
-of choice. Then run `npm install` to initialize the required node modules. You will need to setup a file called
-`config-private.js` in the directory `/private/` and use your own email credentials to to test that functionality. 
-It is highly recommended that you use a dummy gmail account due to the current utility implementation. 
+Getting started developing for spotifier.io is easy. First, `clone` the repository to your development directory of choice. Then run `npm install` to initialize the required node modules. 
+
+You will need to setup a file called `config-private.js` and the directory `./private/` which you create. Use the template `config-private-template.js` in the root folder to easily input your variables.
+
+Follow the directions in the config template to get setup.
 
 You will also need to run your own local mongo and redis servers for the application to run properly. 
 
-##### To setup mongo/redis check out the following links:
+#### To setup mongo/redis check out the following links:
 
 [mongodb](https://www.mongodb.com/download-center#community)
 
