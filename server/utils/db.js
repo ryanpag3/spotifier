@@ -151,11 +151,13 @@ Db.prototype.addArtist = function (user, artist, socketUtil) {
             db.assignArtist(user, qArtist)
                 .then(function () {
                     // if artist details have not been added
-                    if (qArtist.recent_release.id === undefined) {
+                    if (!qArtist.recent_release.id) {
                         // initialize a get details job and pass socketUtil object
                         getArtistDetailsQueue.createJob(qArtist);
                     } else {
-                        socketUtil.alertArtistDetailsChange(qArtist);
+                        if (socketUtil) {
+                            socketUtil.alertArtistDetailsChange(qArtist);
+                        }
                     }
                 })
                 .catch(function (err) {
