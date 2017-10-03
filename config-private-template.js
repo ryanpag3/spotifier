@@ -37,7 +37,7 @@ config.gmail.password = 'YOUR EMAIL PASSWORD';
  *      - OR if you log in using facebook and spotify created an account name for you
  *      - db.users.find({'email.address': 'EMAIL ADDRESS YOU SIGNED UP WITH'}, {refresh_token: 1})
  */
-config.spotify.testRefreshToken = '';
+config.spotify.testRefreshToken = 'REFRESH TOKEN HERE';
 
 /**
  * These are the api tokens used for authenticating the application. 
