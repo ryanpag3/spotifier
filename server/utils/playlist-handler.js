@@ -25,17 +25,18 @@ var updateNewReleasePlaylists = function() {
     // - playlist creation enabled
     // - refresh token in database
     // for each user
-    // - call create and update playlist
+    // - call update playlist
 }
     
 
 /**
+ * FIXME: THIS MIGHT NOT BE NECESSARY
  * Query for user by _id, parse all artist ids in new_release field, check if
  * a user's spotifier playlist exists, clear the user's spotifier playlist,
  * add the release to the user's playlist.
  * @param user mongo doc for each user
  */
-var createAndUpdatePlaylist = function(user) {
+var updatePlaylist = function(user) {
     // query for all artists by array of artist ids in new release field and select release id
     // if user does not have playlist
     // - create playlist
@@ -54,7 +55,7 @@ var addReleasesToPlaylist = function(user, releases) {
 /**
  * Clears a user's spotifier playlist
  */
-var clearPlaylist = function() {
+var clearPlaylist = function(user) {
 
 }
 

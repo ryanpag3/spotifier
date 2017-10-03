@@ -1,6 +1,7 @@
 var Q = require('q'),
     fs = require('fs'),
     path = require('path'),
+    Db = require('../server/utils/db'),
     User = require('../server/models/user'),
     Artist = require('../server/models/artist'),
     sampleData = require('./sample-test-data'),
@@ -322,6 +323,43 @@ module.exports = {
                 });
             })
         });
+        return deferred.promise;
+    },
+
+    /**
+     * stage new releases for the test spotify account
+     */
+    stageSpotifyUser: function(numReleases) {
+        var self = this;
+        var deferred = Q.defer();
+        var db = new Db();
+        // get artist releases from last two weeks
+        this.getArtists()
+            .then(function(releases) {
+                db.createUser(sampleData.spotifyAuthenticatedUser)
+                    .then (function(user) {
+                        // add psuedo new releases
+                        for (var i = 0; i < numReleases; i++) {
+                            var artist = releases[getRandom(releases.length - 1)];
+                            // add artist to database
+                            db.addArtist(user, artist)
+                                .then(function() {
+                                    // flag user for new release
+                                    db.artistNewReleaseFound(artist);
+                                })
+                                .catch(function(err) {
+                                    // TODO:
+                                });
+                        } // for
+                        deferred.resolve();
+                    })
+                    .catch(function(err) {
+                        deferred.reject(err);
+                    });
+            })
+            .catch(function(err) {
+                deferred.reject(err);
+            });
         return deferred.promise;
     }
 };
