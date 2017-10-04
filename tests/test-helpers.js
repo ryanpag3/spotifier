@@ -53,7 +53,7 @@ module.exports = {
     getArtists: function () {
         var deferred = Q.defer();
         var date = new Date();
-        date.setDate(date.getDate() - 1); // move date back 24 hours
+        date.setDate(date.getDate() - 7); // move date back one week
         var p = path.join(__dirname, './artist-release-cache.txt');
         // read file if exists, otherwise define
         var artistCache = fs.existsSync(p) ? fs.readFileSync(p, 'utf-8') : undefined;
@@ -256,11 +256,6 @@ module.exports = {
                 }
 
                 for (var i = 0; i < n; i++) {
-                    // db.assignArtist(users[getRandom(users.length)], artists[getRandom(artists.length)])
-                    //     .catch(function (err) {
-                    //         deferred.reject(err);
-                    //     });
-
                     // update arrays
                     // batch save arrays
                     // get position of random user and random artist
@@ -308,10 +303,14 @@ module.exports = {
      * stage new releases for the test spotify account
      */
     stageSpotifyUser: function (numReleases) {
+        if (!numReleases) {
+            throw 'numReleases cannot be undefined!';
+        }
         var self = this;
         var deferred = Q.defer();
         var db = new Db();
         var spotifyUser = sampleData.spotifyAuthenticatedUser;
+        
         // get artist releases from last two weeks
         this.getArtists()
             .then(function (releases) {

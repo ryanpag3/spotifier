@@ -3,8 +3,8 @@
  */
 const Q = require('q');
 const User = require('../models/user');
-const Db = require('db');
-const spotifyUserApi = require('spotify-user-api');
+const Db = require('../utils/db');
+const spotifyUserApi = require('../utils/spotify-user-api');
 
 /**
  * Iterates through all users who have new releases found and update playlists.
@@ -13,19 +13,24 @@ const spotifyUserApi = require('spotify-user-api');
  *    been created and the schema has updated.
  */
 var updateNewReleasePlaylists = function() {
-    var deferred = Q.defer();
-    // query for all users who have new releases
-    User.find({$and: [{'new_releases': {$exists: true, $ne: []}}, 
-                      {'refresh_token': {$exists: true}}]}, 'new_releases', 
-                        function(users) {
-        console.log(users.length);
-    });
     // query for all users with new releases and have playlist creation enabled
     // - new releases pending
     // - playlist creation enabled
     // - refresh token in database
     // for each user
     // - call update playlist
+    var deferred = Q.defer();
+
+    // query for all users who have new releases
+    User.find({$and: [{'new_releases': {$exists: true, $ne: []}}, 
+                      {'refresh_token': {$exists: true}}]}, 'new_releases', 
+                        function(users) {
+        console.log(users.length);
+        deferred.resolve();
+        
+    });
+
+    return deferred.promise;
 }
     
 
