@@ -31,18 +31,7 @@ describe('test-helper unit tests', function () {
         })
     });
 
-    // it('should add artist ids of artists with new releases found to user docs', function (done) {
-    //     this.timeout(6000);
-    //     testHelper.stageSampleNewReleaseDb()
-    //         .then(function (users) {
-    //             for (var i = 0; i < users.length; i++) {
-    //                 expect(users[i].saved_artists.length).to.be.greaterThan(0);
-    //             }
-    //             done();
-    //         });
-    // });
-
-    it('should grab all artists released in the past two weeks and insert them into a file', function (done) {
+    it('getArtists should grab all artists released in the past two weeks and insert them into a file', function (done) {
         this.timeout(500000);
         testHelper.getArtists()
             .then(function (releases) {
@@ -51,7 +40,7 @@ describe('test-helper unit tests', function () {
             })
     });
 
-    it('should insert n number of artists at random to the artist db', function (done) {
+    it('addRandomArtists should insert n number of artists at random to the artist db', function (done) {
         this.timeout(600000);
         var n = 5;
         testHelper.addRandomArtists(n)
@@ -63,7 +52,7 @@ describe('test-helper unit tests', function () {
             })
     });
 
-    it('should insert n number of users at random to the user db', function (done) {
+    it('addRandomUsers should insert n number of users at random to the user db', function (done) {
         var n = 50;
         testHelper.addRandomUsers(n)
             .then(function (res) {
@@ -75,14 +64,17 @@ describe('test-helper unit tests', function () {
             })
     });
 
-    it('should make n amount of assignments to users and artists', function (done) {
+    it('assignRandom should make n amount of assignments to users and artists', function (done) {
         this.timeout(45000);
-        var n = 100;
-        testHelper.addRandomUsers(30)
+        const numUsers = 1;
+        const numArtists = 5;
+        const numAssigns = 10;
+        
+        testHelper.addRandomUsers(numUsers)
             .then(function () {
-                testHelper.addRandomArtists(30)
+                testHelper.addRandomArtists(numArtists)
                     .then(function () {
-                        testHelper.assignRandom(100)
+                        testHelper.assignRandom(numAssigns)
                             .then(function () {
                                 User.find({}, function (err, users) {
                                     done();
@@ -92,6 +84,23 @@ describe('test-helper unit tests', function () {
                                 console.log(err);
                             })
                     })
+            })
+    });
+
+    it('stageSpotifyUser should add artists to database and assign them to spotify user as new releases', function (done) {
+        this.timeout(5000);
+        var numOfReleases = 20;
+        testHelper.stageSpotifyUser(numOfReleases)
+            .then(function (user) {
+                Artist.find({}, function (err, artists) {
+                    expect(artists).to.have.lengthOf(numOfReleases);
+                    User.findOne({
+                        'name': user.name
+                    }, function (err, user) {
+                        expect(user.new_releases).to.have.lengthOf(numOfReleases);
+                        done();
+                    })
+                })
             })
     })
 });

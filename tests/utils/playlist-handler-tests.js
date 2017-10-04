@@ -29,5 +29,7 @@ describe('playlist handler', function() {
     });
 
     /** UNIT TESTS **/
-    it ('')
+    it ('updateNewReleasePlaylists should properly resolve after all users playlists have been updated', function(done) {
+        
+    })
 })

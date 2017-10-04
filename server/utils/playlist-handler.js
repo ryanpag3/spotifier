@@ -34,7 +34,7 @@ var updateNewReleasePlaylists = function() {
  * Query for user by _id, parse all artist ids in new_release field, check if
  * a user's spotifier playlist exists, clear the user's spotifier playlist,
  * add the release to the user's playlist.
- * @param user mongo doc for each user
+ * @param user mongo doc for user
  */
 var updatePlaylist = function(user) {
     // query for all artists by array of artist ids in new release field and select release id
@@ -48,12 +48,13 @@ var updatePlaylist = function(user) {
 /**
  * Add all songs of a release to the spotifier playlist
  */
-var addReleasesToPlaylist = function(user, releases) {
+var addReleasesToPlaylist = function(playlistId, releases) {
     // call spotify user api add tracks to playlist
 }
 
 /**
  * Clears a user's spotifier playlist
+ * @param user mongo document for user
  */
 var clearPlaylist = function(user) {
 

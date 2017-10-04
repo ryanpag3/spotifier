@@ -23,7 +23,9 @@ var Db = function () {
 Db.prototype.createUser = function (mUser) {
     var deferred = Q.defer(),
         username = mUser.name;
-    User.findOne({'name': mUser.name}, function (err, user) {
+    User.findOne({
+        'name': mUser.name
+    }, function (err, user) {
         if (err) {
             console.log(err);
         }
@@ -62,7 +64,9 @@ Db.prototype.createUser = function (mUser) {
  */
 Db.prototype.getUser = function (mUser) {
     var deferred = Q.defer();
-    User.findOne({'_id': mUser._id}, function (err, user) {
+    User.findOne({
+        '_id': mUser._id
+    }, function (err, user) {
         if (user) {
             deferred.resolve(user);
         } else {
@@ -140,7 +144,9 @@ Db.prototype.addArtist = function (user, artist, socketUtil) {
 
     // query for user
     // define query parameters
-    var query = {'spotify_id': artist.spotify_id};
+    var query = {
+        'spotify_id': artist.spotify_id
+    };
     // query for artist
     Artist.findOne(query, function (err, qArtist) {
         if (err) {
@@ -166,13 +172,14 @@ Db.prototype.addArtist = function (user, artist, socketUtil) {
             deferred.resolve();
         } else {
             // if doesn't exist
-            // create temporary artist document
+            // create temporary artist document if needed
             var update = {
                 name: artist.name,
                 spotify_id: artist.spotify_id,
-                recent_release: {
-                    title: publicConfig.placeholderAlbumTitle
-                }
+                recent_release: artist.recent_release ?
+                    artist.recent_release : {
+                        title: publicConfig.placeholderAlbumTitle
+                    }
             };
             // insert into database
             Artist.create(update, function (err, artist) {
@@ -207,31 +214,45 @@ Db.prototype.removeArtist = function (user, artist) {
 
     var deferred = Q.defer();
     // query for user information
-    User.findOne({'name': user.name}, function (err, user) {
+    User.findOne({
+        'name': user.name
+    }, function (err, user) {
         if (err) {
             console.log(err);
         }
         // query for artist information, remove user objectId from tracking array
-        Artist.findOneAndUpdate({'spotify_id': artist.spotify_id}, {$pull: {'users_tracking': user._id}},
-            function (err, artist) {
-            if (err) {
-                console.log(err);
-            }
-            if (artist){
-                // remove artist ObjectId from user tracking array
-                User.update({'_id': user._id}, {$pull: {'saved_artists': artist._id}},
-                    function (err) {
-                        if (err) {
-                            deferred.reject(err);
-                        } else {
-                            deferred.resolve();
-                        }
-                    });
-                if (err) {
-                    deferred.reject(err);
+        Artist.findOneAndUpdate({
+                'spotify_id': artist.spotify_id
+            }, {
+                $pull: {
+                    'users_tracking': user._id
                 }
-            }
-        })
+            },
+            function (err, artist) {
+                if (err) {
+                    console.log(err);
+                }
+                if (artist) {
+                    // remove artist ObjectId from user tracking array
+                    User.update({
+                            '_id': user._id
+                        }, {
+                            $pull: {
+                                'saved_artists': artist._id
+                            }
+                        },
+                        function (err) {
+                            if (err) {
+                                deferred.reject(err);
+                            } else {
+                                deferred.resolve();
+                            }
+                        });
+                    if (err) {
+                        deferred.reject(err);
+                    }
+                }
+            })
     });
     return deferred.promise;
 };
@@ -241,7 +262,9 @@ Db.prototype.removeArtist = function (user, artist) {
  * @param artist: updated schema values
  */
 Db.prototype.updateArtist = function (artist) {
-    Artist.findOneAndUpdate({'spotify_id': artist.spotify_id}, artist, function (err, artist) {
+    Artist.findOneAndUpdate({
+        'spotify_id': artist.spotify_id
+    }, artist, function (err, artist) {
         if (err) {
             console.log(err);
         }
@@ -258,13 +281,25 @@ Db.prototype.updateArtist = function (artist) {
 Db.prototype.assignArtist = function (user, artist) {
     var deferred = Q.defer();
     // if artist has not already added user, push id to tracking list
-    Artist.update({_id: artist._id}, {$addToSet: {users_tracking: user._id}}, function (err) {
+    Artist.update({
+        _id: artist._id
+    }, {
+        $addToSet: {
+            users_tracking: user._id
+        }
+    }, function (err) {
         if (err) {
             console.log(err);
             deferred.reject(err);
         }
         // if user is not already tracking artist, push id to tracking list
-        User.update({_id: user._id}, {$addToSet: {saved_artists: artist._id}}, function (err) {
+        User.update({
+            _id: user._id
+        }, {
+            $addToSet: {
+                saved_artists: artist._id
+            }
+        }, function (err) {
             if (err) {
                 console.log(err);
                 deferred.reject(err);
@@ -285,7 +320,15 @@ Db.prototype.assignArtist = function (user, artist) {
  * @param artist: mongodb document for an artist
  */
 Db.prototype.artistNewReleaseFound = function (artist) {
-    User.updateMany({'_id': {$in: artist.users_tracking}}, {$addToSet: {'new_releases': artist._id}}, function (err) {
+    User.updateMany({
+        '_id': {
+            $in: artist.users_tracking
+        }
+    }, {
+        $addToSet: {
+            'new_releases': artist._id
+        }
+    }, function (err) {
         if (err) {
             console.log(err);
         }
@@ -299,13 +342,17 @@ Db.prototype.artistNewReleaseFound = function (artist) {
  */
 Db.prototype.getLibrary = function (mUser) {
     var deferred = Q.defer();
-    User.findOne({'_id': mUser._id}, function (err, user) {
+    User.findOne({
+        '_id': mUser._id
+    }, function (err, user) {
         if (err) {
             deferred.reject(err);
         }
         if (user) {
             var artistIds = user.saved_artists;
-            Artist.find({'_id': artistIds}, function (err, artists) {
+            Artist.find({
+                '_id': artistIds
+            }, function (err, artists) {
                 if (err) {
                     deferred.reject(err);
                 }
@@ -323,7 +370,9 @@ Db.prototype.getLibrary = function (mUser) {
  */
 Db.prototype.userExists = function (mUser) {
     var deferred = Q.defer();
-    User.findOne({'_id': mUser._id}, function (err, user) {
+    User.findOne({
+        '_id': mUser._id
+    }, function (err, user) {
         if (err) {
             console.log(err);
         }
@@ -339,7 +388,9 @@ Db.prototype.userExists = function (mUser) {
  */
 Db.prototype.emailExists = function (mUser) {
     var deferred = Q.defer();
-    User.findOne({'_id': mUser._id}, function (err, user) {
+    User.findOne({
+        '_id': mUser._id
+    }, function (err, user) {
         if (err) {
             console.log(err);
         }
@@ -355,7 +406,9 @@ Db.prototype.emailExists = function (mUser) {
  */
 Db.prototype.emailConfirmed = function (mUser) {
     var deferred = Q.defer();
-    User.findOne({'_id': mUser._id}, function (err, user) {
+    User.findOne({
+        '_id': mUser._id
+    }, function (err, user) {
         if (err) {
             console.log(err);
         }
@@ -371,7 +424,14 @@ Db.prototype.emailConfirmed = function (mUser) {
  */
 Db.prototype.addEmail = function (user, emailAddress) {
     var deferred = Q.defer();
-    User.update({'_id': user._id}, {'email': {address: emailAddress, confirmed: false}}, function (err) {
+    User.update({
+        '_id': user._id
+    }, {
+        'email': {
+            address: emailAddress,
+            confirmed: false
+        }
+    }, function (err) {
         if (err) {
             deferred.reject(err);
         } else {
@@ -387,7 +447,13 @@ Db.prototype.addEmail = function (user, emailAddress) {
  */
 Db.prototype.removeEmail = function (user) {
     var deferred = Q.defer();
-    User.update({'_id': user._id}, {$unset: {'email': 1}}, function (err) {
+    User.update({
+        '_id': user._id
+    }, {
+        $unset: {
+            'email': 1
+        }
+    }, function (err) {
         if (err) {
             console.log(err);
             deferred.reject(err);
@@ -406,7 +472,9 @@ Db.prototype.removeEmail = function (user) {
  */
 Db.prototype.confirmEmail = function (user, confirmCode) {
     var deferred = Q.defer();
-    User.findOne({'_id': user._id}, function (err, user) {
+    User.findOne({
+        '_id': user._id
+    }, function (err, user) {
         if (err) {
             deferred.reject(err);
         } else if (user.email.confirm_code !== confirmCode) {
@@ -424,7 +492,11 @@ Db.prototype.confirmEmail = function (user, confirmCode) {
  */
 Db.prototype.setConfirmCode = function (user, confirmCode) {
     var deferred = Q.defer();
-    User.update({'_id': user._id}, {'email.confirm_code': confirmCode}, function (err) {
+    User.update({
+        '_id': user._id
+    }, {
+        'email.confirm_code': confirmCode
+    }, function (err) {
         if (err) {
             deferred.reject(err);
         } else {
@@ -441,7 +513,13 @@ Db.prototype.setConfirmCode = function (user, confirmCode) {
  */
 Db.prototype.unsubscribeEmail = function (email) {
     var deferred = Q.defer();
-    User.update({'email.address': email}, {$unset: {'email': 1}}, function (err) {
+    User.update({
+        'email.address': email
+    }, {
+        $unset: {
+            'email': 1
+        }
+    }, function (err) {
         if (err) {
             console.log(err);
             deferred.reject();
@@ -459,17 +537,38 @@ Db.prototype.unsubscribeEmail = function (email) {
  * todo: not sure if it's worth checking if a job exists for the artist at this point
  *
  */
-Db.prototype.validateArtistDetails = function() {
+Db.prototype.validateArtistDetails = function () {
     var getArtistDetailsQueue = require('./queue-get-artist-details');
     // 1. query for artists that have new releases that are missing any fields
     // 2. create details jobs for all that return
-    Artist.find({$or: [
-        {'recent_release.id' : {$exists: false}},
-        {'recent_release.title' : {$exists: false}},
-        {'recent_release.release_date' : {$exists: false}},
-        {'recent_release.images' : {$exists: false}},
-        {'recent_release.url' : {$exists: false}}
-    ]}, function(err, artists) {
+    Artist.find({
+        $or: [{
+                'recent_release.id': {
+                    $exists: false
+                }
+            },
+            {
+                'recent_release.title': {
+                    $exists: false
+                }
+            },
+            {
+                'recent_release.release_date': {
+                    $exists: false
+                }
+            },
+            {
+                'recent_release.images': {
+                    $exists: false
+                }
+            },
+            {
+                'recent_release.url': {
+                    $exists: false
+                }
+            }
+        ]
+    }, function (err, artists) {
         if (err) {
             console.log(err);
         }
@@ -479,35 +578,3 @@ Db.prototype.validateArtistDetails = function() {
     })
 };
 module.exports = Db;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -17,9 +17,7 @@ module.exports = {
     },
 
     /**
-     * This stages the dummy database with two users who are tracking different artists.
-     * The artists have both new releases and not new releases and users are tracking combinations
-     * of both. It will be used to test the new release email service.
+     * Stage a dummy database by number of users, artists, and assignments
      * @returns {Q.Promise<T>}
      */
     stageSampleNewReleaseDb: function (numUsers, numArtists, numAssigns) {
@@ -31,35 +29,9 @@ module.exports = {
                 self.addRandomArtists(numArtists)
                     .then(function () {
                         self.assignRandom(numAssigns)
-                            .then(function() {
+                            .then(function () {
                                 deferred.resolve();
                             })
-                        // var iterations = 1;
-                        // var index = 0;
-                        // // the db can't really handle 100k requests over a period of a few seconds
-                        // // so check to make sure we don't crash the db with assignment calls
-                        // if (numAssigns > 100000){
-                        //     iterations = numAssigns / 10000;
-                        //     numAssigns = 10000;
-                        // }
-                        // run();
-                        // function run() {
-                        //     setTimeout(function() {
-                        //         self.assignRandom(numAssigns)
-                        //             .then(function () {
-                        //                 User.find({}, function (err, users) {
-                        //                     if (err) {
-                        //                         deferred.reject(err);
-                        //                     }
-                        //                     index++;
-                        //                     index < iterations ? run() : deferred.resolve();
-                        //                 })
-                        //             })
-                        //             .catch(function (err) {
-                        //                 deferred.reject(err);
-                        //             })
-                        //     }, 10000);
-                        // }
                     })
                     .catch(function (err) {
                         deferred.reject(err);
@@ -72,6 +44,7 @@ module.exports = {
     },
 
     /**
+     * TODO: fix wordy documentation
      * For testing, we don't want to query spotify every time we run our methods. In production
      * we will only be querying spotify once a day when we check for new releases, so there is no
      * need to cache artist results. This method caches the results of getNewReleases() into a file
@@ -106,12 +79,14 @@ module.exports = {
                     }
                     artistCache.releases = releases;
                     // write file, create if doesnt exist
-                    fs.writeFile(p, JSON.stringify(artistCache, null, 4), {flag: 'w'} ,function (err) {
+                    fs.writeFile(p, JSON.stringify(artistCache, null, 4), {
+                        flag: 'w'
+                    }, function (err) {
                         if (err) {
                             console.log(err);
                         } else {
-                            console.log('save successful!');
-                            deferred.resolve(artistCache.releases);
+                            console.log('save to file successful!');
+                            deferred.resolve(releases);
                         }
                     });
                 })
@@ -122,6 +97,7 @@ module.exports = {
     },
 
     /**
+     * TODO: fix wordy documentation
      * add n amount of random artists to the artists database. This will grab artists only
      * that have releases in the past two weeks and will assign either their most recent release
      * or their second most recent release to their document by random. Code duplication is due to
@@ -133,7 +109,7 @@ module.exports = {
     addRandomArtists: function (n) {
         var deferred = Q.defer();
         if (n === undefined) {
-           throw new Error('n cannot be undefined!');
+            throw new Error('n cannot be undefined!');
         }
         // get releases from the past two weeks
         this.getArtists()
@@ -167,7 +143,8 @@ module.exports = {
                                         if (err) {
                                             console.log(err);
                                         } else {
-                                            console.log('artist: ' + i++ + '/' + n + ' created.');
+                                            i++;
+                                            // console.log('artist: ' + i++ + '/' + n + ' created.');
                                         }
                                     });
                                 }
@@ -175,6 +152,7 @@ module.exports = {
                                     setTimeout(insertNewArtist, 0);
                                 } else {
                                     setTimeout(function () {
+                                        console.log('artists inserted')
                                         deferred.resolve('job done!')
                                     }, 10);
                                 }
@@ -202,7 +180,8 @@ module.exports = {
                                         if (err) {
                                             console.log(err);
                                         } else {
-                                            console.log('artist: ' + i++ + '/' + n + ' created.');
+                                            i++;
+                                            // console.log('artist: ' + i++ + '/' + n + ' created.');
                                         }
                                     });
                                 }
@@ -237,7 +216,7 @@ module.exports = {
         }
 
         var users = [];
-        for (var i = 0; i < n; i++){
+        for (var i = 0; i < n; i++) {
             if (i % 2 === 0) {
                 users.push(sampleData.passUser());
             } else if (i % 3 === 0) {
@@ -247,13 +226,12 @@ module.exports = {
             }
         }
 
-        User.insertMany(users, function(err) {
-           if (err) {
-               deferred.reject(err);
-           } else {
-               console.log('users inserted!');
-               deferred.resolve();
-           }
+        User.insertMany(users, function (err) {
+            if (err) {
+                deferred.reject(err);
+            } else {
+                deferred.resolve();
+            }
         });
         return deferred.promise;
     },
@@ -299,27 +277,27 @@ module.exports = {
 
                 // not sure if this is the best way to handle this
                 // maybe an updateMany with a filter would be a better approach
-                User.remove({}, function(err) {
+                User.remove({}, function (err) {
                     if (err) {
                         console.log(err);
                     }
-                  User.insertMany(users, function(err) {
-                      if (err) {
-                          console.log(err);
-                      }
-                      Artist.remove({}, function(err) {
-                          if (err) {
-                              console.log(err);
-                          }
-                          Artist.insertMany(artists, function(err) {
-                              if (err) {
-                                  console.log(err);
-                              } else {
-                                  deferred.resolve();
-                              }
-                          })
-                      });
-                  });
+                    User.insertMany(users, function (err) {
+                        if (err) {
+                            console.log(err);
+                        }
+                        Artist.remove({}, function (err) {
+                            if (err) {
+                                console.log(err);
+                            }
+                            Artist.insertMany(artists, function (err) {
+                                if (err) {
+                                    console.log(err);
+                                } else {
+                                    deferred.resolve();
+                                }
+                            })
+                        });
+                    });
                 });
             })
         });
@@ -329,67 +307,55 @@ module.exports = {
     /**
      * stage new releases for the test spotify account
      */
-    stageSpotifyUser: function(numReleases) {
+    stageSpotifyUser: function (numReleases) {
         var self = this;
         var deferred = Q.defer();
         var db = new Db();
+        var spotifyUser = sampleData.spotifyAuthenticatedUser;
         // get artist releases from last two weeks
         this.getArtists()
-            .then(function(releases) {
-                db.createUser(sampleData.spotifyAuthenticatedUser)
-                    .then (function(user) {
+            .then(function (releases) {
+                db.createUser(spotifyUser)
+                    .then(function (user) {
                         // add psuedo new releases
-                        for (var i = 0; i < numReleases; i++) {
+                        var i = 0;
+                        run(); // init
+                        function run() {
                             var artist = releases[getRandom(releases.length - 1)];
                             // add artist to database
                             db.addArtist(user, artist)
-                                .then(function() {
-                                    // flag user for new release
-                                    db.artistNewReleaseFound(artist);
+                                .then(function () {
+                                    Artist.findOne({
+                                        'spotify_id': artist.spotify_id
+                                    }, function (err, artist) {
+                                        // flag user for new release
+                                        db.artistNewReleaseFound(artist);
+                                        if (++i < numReleases) {
+                                            run();
+                                        } else {
+                                            deferred.resolve(spotifyUser);
+                                        }
+
+                                    })
                                 })
-                                .catch(function(err) {
+                                .catch(function (err) {
                                     // TODO:
+                                    // console.log add artist vs throw err?
                                 });
-                        } // for
-                        deferred.resolve();
+                        }
                     })
-                    .catch(function(err) {
+                    .catch(function (err) {
                         deferred.reject(err);
                     });
             })
-            .catch(function(err) {
+            .catch(function (err) {
                 deferred.reject(err);
             });
         return deferred.promise;
     }
-};
+}; // end module.exports
 
 // HELPERS
 function getRandom(n) {
     return Math.floor(Math.random() * n);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
