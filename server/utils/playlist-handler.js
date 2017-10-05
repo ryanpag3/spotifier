@@ -12,7 +12,7 @@ const spotifyUserApi = require('../utils/spotify-user-api');
  *  - add playlist creation enabled query condition once the settings page has
  *    been created and the schema has updated.
  */
-var updateNewReleasePlaylists = function() {
+var updateNewReleasePlaylists = function () {
     // query for all users with new releases and have playlist creation enabled
     // - new releases pending
     // - playlist creation enabled
@@ -22,17 +22,31 @@ var updateNewReleasePlaylists = function() {
     var deferred = Q.defer();
 
     // query for all users who have new releases
-    User.find({$and: [{'new_releases': {$exists: true, $ne: []}}, 
-                      {'refresh_token': {$exists: true}}]}, 'new_releases', 
-                        function(users) {
-        console.log(users.length);
-        deferred.resolve();
-        
-    });
+    User.find({
+            $and: [{
+                    'new_releases': {
+                        $exists: true,
+                        $ne: []
+                    }
+                },
+                {
+                    'refresh_token': {
+                        $exists: true
+                    }
+                }
+            ]
+        }, 'new_releases',
+        function (err, users) {
+            if (err) {
+                deferred.reject(err); // throw err
+            }
+            
+            deferred.resolve();
+        });
 
     return deferred.promise;
 }
-    
+
 
 /**
  * FIXME: THIS MIGHT NOT BE NECESSARY
@@ -41,7 +55,7 @@ var updateNewReleasePlaylists = function() {
  * add the release to the user's playlist.
  * @param user mongo doc for user
  */
-var updatePlaylist = function(user) {
+var updatePlaylist = function (user) {
     // query for all artists by array of artist ids in new release field and select release id
     // if user does not have playlist
     // - create playlist
@@ -53,7 +67,7 @@ var updatePlaylist = function(user) {
 /**
  * Add all songs of a release to the spotifier playlist
  */
-var addReleasesToPlaylist = function(playlistId, releases) {
+var addReleasesToPlaylist = function (playlistId, releases) {
     // call spotify user api add tracks to playlist
 }
 
@@ -61,7 +75,7 @@ var addReleasesToPlaylist = function(playlistId, releases) {
  * Clears a user's spotifier playlist
  * @param user mongo document for user
  */
-var clearPlaylist = function(user) {
+var clearPlaylist = function (user) {
 
 }
 

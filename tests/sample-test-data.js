@@ -124,7 +124,7 @@ module.exports = {
                 address: privateConfig.gmail.username,
                 confirmed: true
             }
-        }
+        };
     },
 
     unsubscribedUser: function () {
@@ -132,7 +132,7 @@ module.exports = {
             name: potNames.choose(),
             email: {},
             saved_artists: []
-        }
+        };
     },
 
     spotifyAuthenticatedUser: function() {
@@ -143,7 +143,7 @@ module.exports = {
                 confirmed: true
             },
             refresh_token: privateConfig.spotify.testRefreshToken
-        }
+        };
     }
 };
 

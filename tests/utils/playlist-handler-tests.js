@@ -34,9 +34,6 @@ describe('playlist handler', function () {
         this.timeout(600000);
         testHelper.stageSpotifyUser(20)
             .then(function () {
-                User.find({}. function(err, users) {
-                    
-                })
                 playlist.updateNewReleasePlaylists()
                     .then(function () {
                         done();

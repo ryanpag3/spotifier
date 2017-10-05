@@ -309,7 +309,7 @@ module.exports = {
         var self = this;
         var deferred = Q.defer();
         var db = new Db();
-        var spotifyUser = sampleData.spotifyAuthenticatedUser;
+        var spotifyUser = sampleData.spotifyAuthenticatedUser();
         
         // get artist releases from last two weeks
         this.getArtists()
