@@ -2,6 +2,7 @@ var SpotifyApi = require('spotify-web-api-node'),
     Q = require('q'),
     Db = require('./db.js'),
     configPrivate = require('../../private/config-private'),
+    configPublic = require('../../config-public'),
     credentials = {
         clientId: configPrivate.spotify.clientId,
         clientSecret: configPrivate.spotify.clientSecret
@@ -9,12 +10,12 @@ var SpotifyApi = require('spotify-web-api-node'),
 
 // constructor
 function Api() {
-     this.spotifyApi = new SpotifyApi(credentials);
-     this.artists = [];
-     this.artistAdded = {};
-     this.offset = 0;
-     this.total = 0;
-     this.searchResults = [];
+    this.spotifyApi = new SpotifyApi(credentials);
+    this.artists = [];
+    this.artistAdded = {};
+    this.offset = 0;
+    this.total = 0;
+    this.searchResults = [];
 }
 
 /** METHODS **/
@@ -27,32 +28,32 @@ function Api() {
  * only happen through this entry point.
  * @returns {Q.Promise<T>}
  */
-Api.prototype.syncLibrary = function(user, socketUtil) {
+Api.prototype.syncLibrary = function (user, socketUtil) {
     var api = this,
         deferred = Q.defer();
 
     api.setAccessToken(user)
-         .then(function() {
-              api.getLibraryArtists(user)
-                  .then(function(artists) {
-                      console.log(artists.length);
-                      var db = new Db();
-                      console.log(user.name + '\'s library is being added.');
-                      db.addAllArtists(user, artists, socketUtil)
-                          .then(function() {
-                              db.getLibrary(user)
-                                  .then(function(library) {
-                                     socketUtil.alertLibraryAdded(user, library);
-                                  });
-                              deferred.resolve();
-                          });
-              })
-                  .catch(function(err) {
-                      console.log(err);
-                      deferred.reject(err);
-                  })
-      })
-        .catch(function(err) {
+        .then(function () {
+            api.getLibraryArtists(user)
+                .then(function (artists) {
+                    console.log(artists.length);
+                    var db = new Db();
+                    console.log(user.name + '\'s library is being added.');
+                    db.addAllArtists(user, artists, socketUtil)
+                        .then(function () {
+                            db.getLibrary(user)
+                                .then(function (library) {
+                                    socketUtil.alertLibraryAdded(user, library);
+                                });
+                            deferred.resolve();
+                        });
+                })
+                .catch(function (err) {
+                    console.log(err);
+                    deferred.reject(err);
+                })
+        })
+        .catch(function (err) {
             console.log(err);
             deferred.reject(err);
         });
@@ -71,7 +72,7 @@ Api.prototype.getAccessToken = function (user) {
         deferred = Q.defer(),
         currentDate = new Date().getTime(); // in millis
     // if we havent set the expireDate or if the currentDate is past the expireDate
-    if (user.accessToken.expireDate === undefined || user.accessToken.expireDate < currentDate) {
+    if (!user.accessToken || user.accessToken.expireDate < currentDate) {
         console.log('creating new token...');
         api.setRefreshToken(user.refresh_token);
         // refresh token
@@ -125,7 +126,7 @@ Api.prototype.getLibraryArtists = function (user) {
         country = null;
     // get country code because from_token doesnt work with is_playable property for some stupid reason
     api.getMe()
-        .then(function(data) {
+        .then(function (data) {
             country = data.body.country;
         });
 
@@ -133,11 +134,11 @@ Api.prototype.getLibraryArtists = function (user) {
     //  recursive wrapper
     function go() {
         self.setAccessToken(user)
-            .then(function() {
+            .then(function () {
                 api.getMySavedTracks({
-                    limit: limit,
-                    offset: offset
-                })
+                        limit: limit,
+                        offset: offset
+                    })
                     .then(function (data) {
                         // iterate through the 50 tracks that are returned
                         for (var i = 0; i < data.body.items.length; i++) {
@@ -148,7 +149,10 @@ Api.prototype.getLibraryArtists = function (user) {
                             if (self.artistAdded[artistId] === undefined) {
                                 var name = track.artists[0].name;
                                 self.artistAdded[artistId] = true; // flag artist added
-                                self.artists.push({spotify_id: artistId, name: name}); // push artist to array
+                                self.artists.push({
+                                    spotify_id: artistId,
+                                    name: name
+                                }); // push artist to array
                             }
                         }
                         // adjust offset to either 50 ahead or to the end of the track list
@@ -167,7 +171,7 @@ Api.prototype.getLibraryArtists = function (user) {
                     });
             })
             // catch get access token error
-            .catch(function(err) {
+            .catch(function (err) {
                 console.log(err);
             });
     }
@@ -189,20 +193,20 @@ Api.prototype.searchArtists = function (user, query) {
         query = query.trim() + '*';
 
     this.setAccessToken(user)
-        .then(function() {
+        .then(function () {
             api.searchArtists(query, ({
-                limit: limit,
-                offset: offset,
-                from_token: user.accessToken.token
-            }))
-                .then(function(res) {
+                    limit: limit,
+                    offset: offset,
+                    from_token: user.accessToken.token
+                }))
+                .then(function (res) {
                     var results = [];
                     for (var i = 0; i < res.body.artists.items.length; i++) {
                         var artist = res.body.artists.items[i];
                         var url =
-                            res.body.artists.items[i].images.length > 0
-                                ? res.body.artists.items[i].images[res.body.artists.items[i].images.length - 1].url
-                                : '';
+                            res.body.artists.items[i].images.length > 0 ?
+                            res.body.artists.items[i].images[res.body.artists.items[i].images.length - 1].url :
+                            '';
 
                         results.push({
                             name: artist.name,
@@ -212,7 +216,7 @@ Api.prototype.searchArtists = function (user, query) {
                     }
                     deferred.resolve(results);
                 })
-                .catch(function(err) {
+                .catch(function (err) {
                     console.log(err);
                     deferred.reject(err);
                 })
@@ -222,31 +226,40 @@ Api.prototype.searchArtists = function (user, query) {
 
 /**
  * TODO:
- * Create a playlist for the specified user
+ * MOVE PLAYLIST TITLE TO CONFIG FILE
+ * ADD MOST RECENT MONDAY AS WEEK OF XXXXX
  */
-Api.prototype.createPlaylist = function(user) {
-    // set access token for user
-    // if the user has a spotifier playlist in their document
-    //  - check to see if the playlist still exists
-    //  - return
-    // else
-    //  - create new playlist for the specified user
-    //  - return
+Api.prototype.createPlaylist = function (user) {
+    var api = this.spotifyApi;
+    var deferred = Q.defer();
+    var playlistName = configPublic.spotify.playlistTitle;
+    var playlistOptions = {
+        'public': false,
+        'description': configPublic.spotify.playlistDescription
+    }
+    this.getAccessToken(user)
+        .then(function (accessToken) {
+            return api.setAccessToken(accessToken.token);
+        })
+        .then(function () {
+            return api.createPlaylist(user.name, playlistName, playlistOptions);
+        })
+        .then(function (playlistInfo) {
+            deferred.resolve(playlistInfo.body.id);
+        })
+        .catch(function(err) {
+            console.log('we here!!');
+            console.log(err);
+            deferred.reject(err);
+        })
+    return deferred.promise;
 }
 
 /**
  * TODO:
- * Delete a playlist for the specified user
  */
-Api.prototype.deletePlaylist = function(user) {
-    // set access token for user
-    // if the user has a spotifier playlist id in their document
-    //  - check to see if playlist still exists for their account
-    // if still exists
-    //  - delete
-    //  - return
-    // else
-    //  - return 
+Api.prototype.updatePlaylistTitle = function (user) {
+
 }
 
 /**
@@ -254,7 +267,7 @@ Api.prototype.deletePlaylist = function(user) {
  * all of the tracks from the user's new release playlist,
  * if it exists.
  */
-Api.prototype.emptyPlaylist = function(user) {
+Api.prototype.emptyPlaylist = function (user) {
     // set access token for user
     // if the user has a spotifier playlist id in their document
     //  - check to see if playlist still exists for their account
@@ -269,7 +282,7 @@ Api.prototype.emptyPlaylist = function(user) {
  * Refresh a user's access token if necessary, set the access token 
  * to the user's api token, then add the releases to the user's playlist. 
  */
-Api.prototype.addTracksToPlaylist = function(user, releaseIds) {
+Api.prototype.addTracksToPlaylist = function (user, releaseIds) {
     // set access token for user
     // if the user has a spotifier playlist id in their document
     // - check to see if playlist still exists for their account
@@ -282,4 +295,3 @@ Api.prototype.addTracksToPlaylist = function(user, releaseIds) {
 }
 
 module.exports = Api;
-

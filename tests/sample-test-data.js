@@ -137,7 +137,7 @@ module.exports = {
 
     spotifyAuthenticatedUser: function() {
         return {
-            name: potNames.choose(),
+            name: privateConfig.spotify.testUserId,
             email: {
                 address: privateConfig.gmail.username,
                 confirmed: true

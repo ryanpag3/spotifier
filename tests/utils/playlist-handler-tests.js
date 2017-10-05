@@ -35,8 +35,12 @@ describe('playlist handler', function () {
         testHelper.stageSpotifyUser(20)
             .then(function () {
                 playlist.updateNewReleasePlaylists()
-                    .then(function () {
+                    .then(function (promises) {
+                        console.log(promises);
                         done();
+                    })
+                    .catch(function() {
+                        console.log('err thrown');
                     })
             })
     })
