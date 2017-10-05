@@ -31,9 +31,12 @@ describe('playlist handler', function () {
 
     /** UNIT TESTS **/
     it('updateNewReleasePlaylists should properly resolve after all users playlists have been updated', function (done) {
-        this.timeout(60000);
+        this.timeout(600000);
         testHelper.stageSpotifyUser(20)
             .then(function () {
+                User.find({}. function(err, users) {
+                    
+                })
                 playlist.updateNewReleasePlaylists()
                     .then(function () {
                         done();
