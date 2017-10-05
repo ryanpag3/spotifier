@@ -182,7 +182,7 @@ router.post('/email/unsubscribe', function(req, res) {
  * Will call db handler and remove user emails that bounce.
  */
 router.post('/email/bounce', function(req, res) {
-    // todo
+    // TODO:
 });
 
 /**
@@ -190,14 +190,14 @@ router.post('/email/bounce', function(req, res) {
  * Will call db handler and remove user email's who return complaints.
  */
 router.post('/email/complaint', function(req, res) {
-    // todo
+    // TODO:
 });
 
 /**
  * API endpoint for getting notifications for Amazon SES deliveries.
  */
 router.post('/email/delivery', function(req, res) {
-   // todo
+   // TODO:
 });
 
 

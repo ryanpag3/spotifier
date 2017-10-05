@@ -4,30 +4,43 @@ var expect = require('chai').expect,
     testHelper = require('../test-helpers'),
     sampleData = require('../sample-test-data'),
     spotifyApiUser = require('../../server/utils/spotify-user-api'),
+    playlist = require('../../server/utils/playlist-handler'),
     User = require('../../server/models/user'),
     Artist = require('../../server/models/artist');
-    mongoose.Promise = require('bluebird');
+mongoose.Promise = require('bluebird');
 
 // connect to dummy database
 mongoose.connect('mongodb://localhost/spotifier_test', {
     useMongoClient: true
 });
 
-describe('playlist handler', function() {
+describe('playlist handler', function () {
     // runs before each unit test
-    beforeEach(function(done) {
+    beforeEach(function (done) {
         done();
     })
 
     // runs after each unit test
-    afterEach(function(done) {
-        User.remove({}, function() { // drop user collection
-            Artist.remove({}, function() { // drop artist collection
+    afterEach(function (done) {
+        User.remove({}, function () { // drop user collection
+            Artist.remove({}, function () { // drop artist collection
                 done();
             });
         });
     });
 
     /** UNIT TESTS **/
-    it ('')
+    it('updateNewReleasePlaylists should properly resolve after all users playlists have been updated', function (done) {
+        this.timeout(600000);
+        testHelper.stageSpotifyUser(20)
+            .then(function () {
+                User.find({}. function(err, users) {
+                    
+                })
+                playlist.updateNewReleasePlaylists()
+                    .then(function () {
+                        done();
+                    })
+            })
+    })
 })
