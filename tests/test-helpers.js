@@ -65,6 +65,7 @@ module.exports = {
         }
 
         if (artistCache.syncDate === undefined || Date.parse(artistCache.syncDate) < date) {
+            console.log('Refreshing release cache, this may take up to ten minutes!');
             artistCache.syncDate = new Date();
             spotifyServerApi.getNewReleases()
                 .then(function (releasesObj) {
@@ -218,11 +219,11 @@ module.exports = {
         var users = [];
         for (var i = 0; i < n; i++) {
             if (i % 2 === 0) {
-                users.push(sampleData.passUser());
+                users.push(sampleData.getPassUser());
             } else if (i % 3 === 0) {
-                users.push(sampleData.passUser2());
+                users.push(sampleData.getPassUser2());
             } else {
-                users.push(sampleData.unconfirmedUser());
+                users.push(sampleData.getUnconfirmedUser());
             }
         }
 
@@ -301,6 +302,7 @@ module.exports = {
 
     /**
      * stage new releases for the test spotify account
+     * TODO: refactor to use promise chaining instead of recursion
      */
     stageSpotifyUser: function (numReleases) {
         if (!numReleases) {
@@ -309,13 +311,12 @@ module.exports = {
         var self = this;
         var deferred = Q.defer();
         var db = new Db();
-        var spotifyUser = sampleData.spotifyAuthenticatedUser();
-        
+        var spotifyUser = sampleData.getSpotifyAuthenticatedUserPlaylistCreated();
+
         // get artist releases from last two weeks
         this.getArtists()
             .then(function (releases) {
-                db.createUser(spotifyUser)
-                    .then(function (user) {
+                var user = new User(spotifyUser).save(function (err, user) {
                         // add psuedo new releases
                         var i = 0;
                         run(); // init
@@ -332,9 +333,12 @@ module.exports = {
                                         if (++i < numReleases) {
                                             run();
                                         } else {
-                                            deferred.resolve(spotifyUser);
+                                            User.findOne({
+                                                '_id': user._id
+                                            }, function (err, user) {
+                                                deferred.resolve(user);
+                                            });
                                         }
-
                                     })
                                 })
                                 .catch(function (err) {

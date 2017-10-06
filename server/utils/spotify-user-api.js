@@ -1,6 +1,8 @@
 var SpotifyApi = require('spotify-web-api-node'),
+    spotifyServerApi = require('./spotify-server-api'),
     Q = require('q'),
     Db = require('./db.js'),
+    Artist = require('../models/artist'),
     configPrivate = require('../../private/config-private'),
     configPublic = require('../../config-public'),
     credentials = {
@@ -73,7 +75,6 @@ Api.prototype.getAccessToken = function (user) {
         currentDate = new Date().getTime(); // in millis
     // if we havent set the expireDate or if the currentDate is past the expireDate
     if (!user.accessToken || user.accessToken.expireDate < currentDate) {
-        console.log('creating new token...');
         api.setRefreshToken(user.refresh_token);
         // refresh token
         api.refreshAccessToken()
@@ -225,8 +226,38 @@ Api.prototype.searchArtists = function (user, query) {
 };
 
 /**
+ * Returns boolean based on whether the playlist exists for the user
+ * @param user document
+ * @returns Promise<Boolean> playlist exists
+ */
+Api.prototype.playlistExists = function (user) {
+    var api = this.spotifyApi;
+    var deferred = Q.defer();
+
+    this.getAccessToken(user)
+        .then(function (accessToken) {
+            return api.setAccessToken(accessToken.token);
+        })
+        .then(function () {
+            return api.getPlaylist(user.name, user.playlist.id);
+        })
+        .then(function (result) {
+            result ? deferred.resolve(true) : deferred.resolve(false);
+        })
+        .catch(function (err) {
+            deferred.resolve(false);
+        })
+    return deferred.promise;
+}
+
+/**
+ * Create a spotifier.io playlist for the specified user.
+ * This is run when the user's cookie isn't serialized, so we need to retrieve it 
+ * from the refresh_token saved in the user's object.
+ * @param user user document
+ * @returns Promise<string> the id of the created playlist
  * TODO:
- * MOVE PLAYLIST TITLE TO CONFIG FILE
+ * SET PLAYLIST DETAIL IN IT'S OWN METHOD
  * ADD MOST RECENT MONDAY AS WEEK OF XXXXX
  */
 Api.prototype.createPlaylist = function (user) {
@@ -237,6 +268,7 @@ Api.prototype.createPlaylist = function (user) {
         'public': false,
         'description': configPublic.spotify.playlistDescription
     }
+
     this.getAccessToken(user)
         .then(function (accessToken) {
             return api.setAccessToken(accessToken.token);
@@ -247,19 +279,17 @@ Api.prototype.createPlaylist = function (user) {
         .then(function (playlistInfo) {
             deferred.resolve(playlistInfo.body.id);
         })
-        .catch(function(err) {
-            console.log('we here!!');
-            console.log(err);
+        .catch(function (err) {
             deferred.reject(err);
         })
     return deferred.promise;
 }
 
 /**
- * TODO:
+ * Update an existing playlist's details to show current weeks date. 
  */
-Api.prototype.updatePlaylistTitle = function (user) {
-
+Api.prototype.updatePlaylistDetails = function (user) {
+    // TODO:
 }
 
 /**
@@ -268,21 +298,69 @@ Api.prototype.updatePlaylistTitle = function (user) {
  * if it exists.
  */
 Api.prototype.emptyPlaylist = function (user) {
-    // set access token for user
-    // if the user has a spotifier playlist id in their document
-    //  - check to see if playlist still exists for their account
-    // if still exists
-    //  - empty contents
-    //  - return
-    // else
-    //  - return
+    var api = this.spotifyApi;
+    var deferred = Q.defer();
+
+    this.getAccessToken(user)
+        .then(function (accessToken) {
+            return api.setAccessToken(accessToken.token);
+        })
+        .then(function () {
+            return api.getPlaylist(user.name, user.playlist.id);
+        })
+        .then(function (playlist) {
+            var positions = getPositions(playlist.body.tracks.total);
+            if (positions.length > 0) {
+                deferred.resolve(api.removeTracksFromPlaylistByPosition(user.name, user.playlist.id, positions, playlist.body.snapshot_id));
+            } else {
+                deferred.resolve();
+            }
+        })
+        .catch(function (err) {
+            deferred.reject(err);
+        })
+    return deferred.promise;
+}
+
+/**
+ * Helper function for emptyPlaylist. Generates an array of indices used by the web api.
+ * @param {Number} n amount of positions 
+ */
+function getPositions(n) {
+    var positions = [];
+    for (var i = 0; i < n; i++) {
+        positions.push(i);
+    }
+    return positions;
+}
+
+/**
+ * get track information for the user's playlist
+ * @param user user document
+ * @returns Promise<JSON> spotify playlist track information
+ */
+Api.prototype.getPlaylistTracks = function (user) {
+    var api = this.spotifyApi;
+    var deferred = Q.defer();
+
+    this.getAccessToken(user)
+        .then(function (accessToken) {
+            return api.setAccessToken(accessToken.token);
+        })
+        .then(function () {
+            deferred.resolve(api.getPlaylistTracks(user.name, user.playlist.id));
+        })
+        .catch(function (err) {
+            deferred.reject(err);
+        })
+    return deferred.promise;
 }
 
 /**
  * Refresh a user's access token if necessary, set the access token 
  * to the user's api token, then add the releases to the user's playlist. 
  */
-Api.prototype.addTracksToPlaylist = function (user, releaseIds) {
+Api.prototype.addTracksToPlaylist = function (user) {
     // set access token for user
     // if the user has a spotifier playlist id in their document
     // - check to see if playlist still exists for their account
@@ -292,6 +370,100 @@ Api.prototype.addTracksToPlaylist = function (user, releaseIds) {
     // --- return
     // -- else 
     // --- return err
+    var api = this.spotifyApi;
+    var deferred = Q.defer();
+    this.getAccessToken(user)
+        .then(function(accessToken) {
+            return api.setAccessToken(accessToken.token);
+        })
+        .then(function() {
+            return getTrackUris(user.new_releases);
+        })
+        .then(function(uris) {
+            console.log(uris);
+            api.addTracksToPlaylist(user.name, user.playlist.id, uris)
+                .then(function(data) {
+                })
+                .catch(function(err) {
+                    console.log(err);
+                });
+        })
+        .catch(function(err) {
+            deferred.reject(err);
+        })
+    return deferred.promise;
 }
+
+/**
+ * Helper function for addTracksToPlaylist
+ * Get's the track uri values for the specified artists recent release.
+ * @param {array} artistIds mongo document ids of artists 
+ */
+function getArtistTrackUris(artistIds) {
+    var deferred = Q.defer();
+    getArtistRecentAlbumIds(artistIds)
+        .then(function() {
+            return getTrackUris(albumIds);
+        })
+        .then(function(uris) {
+            deferred.resolve(uris);
+        })
+        .catch(function(err) {
+            deferred.reject(err);
+        })
+    return deferred.promise;
+}
+
+function getTrackUris(artistIds) {
+    var deferred = Q.defer();
+    getAlbumIds(artistIds)
+        .then(function(albumIds) {
+            getTrackUrisFromAlbums(albumIds)
+                .then(function(uris) {
+                    console.log(uris);
+                });
+        })
+        .catch(function(err) {
+            deferred.reject(err);
+        })
+    return deferred.promise;
+}
+
+/**
+ * Helper function for addTracksToPlaylist which generates an array
+ * of uri values for calling the spotify api.
+ * @param {Array} artistIds array of document ids
+ */
+function getAlbumIds(artistIds) {
+    var deferred = Q.defer();
+    Artist.find({
+        '_id': artistIds
+    }, 'recent_release.uri', function(err, artists) {
+        if (err) {
+            deferred.reject(err);
+        }
+        var ids = artists.map(function(artist) {
+            return artist.recent_release.id;
+        });
+        deferred.resolve(ids);
+    })
+    return deferred.promise;
+}
+
+function getTrackUrisFromAlbums(albumIds) {
+    var deferred = Q.defer();
+    var api = this.spotifyApi;
+    var promises = [];
+    for (var i = 0; i < albumIds.length; i++) {
+        console.log('here?');
+        promises.push(api.getAlbum(albumIds[i]));
+    }
+    deferred.resolve(Q.all(promises));
+    return deferred.promise;
+}
+
+
+
+
 
 module.exports = Api;

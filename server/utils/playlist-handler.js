@@ -85,6 +85,8 @@ function updatePlaylist(userId) {
 }
 
 // TODO: document
+// this needs to be refactored
+// check if playlistExists on spotify as well
 function playlistExists(userId) {
     var deferred = Q.defer();
     User.findOne({
@@ -103,7 +105,9 @@ function playlistExists(userId) {
     return deferred.promise;
 }
 
-// TODO: document
+
+
+// TODO: save playlist ID to document
 function createPlaylist(userId) {
     var deferred = Q.defer();
     var spotifyUserApi = new SpotifyUserApi();
@@ -121,6 +125,15 @@ function createPlaylist(userId) {
 }
 
 /**
+ * Clears a user's spotifier playlist
+ * @param user mongo document for user
+ */
+function clearPlaylist(user) {
+
+}
+
+
+/**
  * Add all songs of a release to the spotifier playlist
  */
 function addReleasesToPlaylist(playlistId, releases) {
@@ -129,13 +142,7 @@ function addReleasesToPlaylist(playlistId, releases) {
 
 
 
-/**
- * Clears a user's spotifier playlist
- * @param user mongo document for user
- */
-function clearPlaylist(user) {
 
-}
 
 // expose top level function
 module.exports = {

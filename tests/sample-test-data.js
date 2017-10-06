@@ -7,7 +7,7 @@ var privateConfig = require('../private/config-private'),
     potNames = moniker.generator([moniker.noun]);
 module.exports = {
 
-    failArtist: function () {
+    getFailArtist: function () {
         return {};
     },
 
@@ -24,11 +24,11 @@ module.exports = {
         }
     },
 
-    failArtists: function () {
+    getFailArtists: function () {
         return [{}, {}, {}, {}];
     },
 
-    passArtists: function () {
+    getPassArtists: function () {
         return [{
             spotify_id: '123456789',
             name: 'passArtists',
@@ -41,9 +41,8 @@ module.exports = {
         }]
     },
     // has two artists with new releases pending and two artists that are current
-    newReleaseArtists: function () {
-        return [
-            { // out of date
+    getNewReleaseArtists: function () {
+        return [{ // out of date
                 spotify_id: '6l3HvQ5sa6mXTsMTB19rO5',
                 name: 'J. Cole',
                 recent_release: {
@@ -83,19 +82,19 @@ module.exports = {
     },
 
     // fail all user tests
-    failUser: function () {
+    getFailUser: function () {
         return {}
     },
 
     // pass creation but fail email checks
-    failEmailUser: function () {
+    getFailEmailUser: function () {
         return {
             name: 'emailFailUser'
         }
     },
 
     // pass email created but fail confirmed
-    unconfirmedUser: function () {
+    getUnconfirmedUser: function () {
         return {
             name: 'unconfirmed-user',
             email: {
@@ -106,7 +105,7 @@ module.exports = {
     },
 
     // pass all user tests
-    passUser: function () {
+    getPassUser: function () {
         return {
             name: potNames.choose(),
             email: {
@@ -117,7 +116,7 @@ module.exports = {
     },
 
     // pass all user tests and check for multiple email functionality
-    passUser2: function () {
+    getPassUser2: function () {
         return {
             name: potNames.choose(),
             email: {
@@ -127,7 +126,7 @@ module.exports = {
         };
     },
 
-    unsubscribedUser: function () {
+    getUnsubscribedUser: function () {
         return {
             name: potNames.choose(),
             email: {},
@@ -135,7 +134,7 @@ module.exports = {
         };
     },
 
-    spotifyAuthenticatedUser: function() {
+    getSpotifyAuthenticatedUser: function () {
         return {
             name: privateConfig.spotify.testUserId,
             email: {
@@ -144,6 +143,20 @@ module.exports = {
             },
             refresh_token: privateConfig.spotify.testRefreshToken
         };
+    },
+
+    getSpotifyAuthenticatedUserPlaylistCreated: function () {
+        return {
+            name: privateConfig.spotify.testUserId,
+            email: {
+                address: privateConfig.gmail.username,
+                confirmed: true
+            },
+            refresh_token: privateConfig.spotify.testRefreshToken,
+            playlist: {
+                id: privateConfig.spotify.testPlaylistId,
+                snapshot_id: '' // TODO:
+            }
+        };
     }
 };
-

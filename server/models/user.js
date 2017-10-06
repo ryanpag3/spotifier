@@ -18,7 +18,10 @@ var User = new Schema({
     refresh_token: String,
     saved_artists: [Schema.ObjectId],
     new_releases: [Schema.ObjectId],
-    playlist_id: String,
+    playlist: {
+        id: String,
+        snapshot_id: String
+    },
     sync_queue: {
         id: Number,
         status: String
