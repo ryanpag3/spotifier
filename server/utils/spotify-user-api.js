@@ -311,7 +311,10 @@ Api.prototype.emptyPlaylist = function (user) {
         .then(function (playlist) {
             var positions = getPositions(playlist.body.tracks.total);
             if (positions.length > 0) {
-                deferred.resolve(api.removeTracksFromPlaylistByPosition(user.name, user.playlist.id, positions, playlist.body.snapshot_id));
+                api.removeTracksFromPlaylistByPosition(user.name, user.playlist.id, positions, playlist.body.snapshot_id)
+                    .then(function () {
+                        deferred.resolve();
+                    });
             } else {
                 deferred.resolve();
             }
@@ -363,6 +366,7 @@ Api.prototype.getPlaylistTracks = function (user) {
 Api.prototype.addTracksToPlaylist = function (user) {
     var api = this.spotifyApi;
     var deferred = Q.defer();
+
     this.getAccessToken(user)
         .then(function (accessToken) {
             return api.setAccessToken(accessToken.token);
@@ -373,10 +377,10 @@ Api.prototype.addTracksToPlaylist = function (user) {
         .then(function (uris) {
             api.addTracksToPlaylist(user.name, user.playlist.id, uris)
                 .then(function (data) {
-                    console.log(data);
+                    deferred.resolve(data);
                 })
                 .catch(function (err) {
-                    console.log(err);
+                    deferred.reject(err);
                 });
         })
         .catch(function (err) {
@@ -386,7 +390,6 @@ Api.prototype.addTracksToPlaylist = function (user) {
 }
 
 /**
- * Helper function for addTracksToPlaylist
  * Get's the track uri values for the specified artists recent release.
  * @param {array} artistIds mongo document ids of artists 
  */
@@ -406,8 +409,7 @@ function getArtistTrackUris(artistIds) {
 }
 
 /**
- * Helper function for addTracksToPlaylist which generates an array
- * of id values for calling the spotify api.
+ * Generates an array of album spotify ids for the specified artists
  * @param {Array} artistIds array of document ids
  * @returns {Promise<Array>} array of spotify_ids
  */
@@ -427,48 +429,78 @@ function getAlbumIds(artistIds) {
     return deferred.promise;
 }
 
+
+/**
+ * Gets track URIs for the specified albums
+ * @param {Array} albumIds spotify album ids
+ */
 function getTrackUrisFromAlbums(albumIds) {
     var deferred = Q.defer();
     var api = this.spotifyApi;
     var promises = [];
 
-    console.log(albumIds.length);
     for (var i = 0; i < albumIds.length; i++) {
-        promises.concat(getAlbumTrackUris(albumIds[i]));
+        promises.push(getAlbumsTrackUris(albumIds[i]));
     }
-    Q.all(promises).then(function (uris) {
-        console.log(uris);
-    })
-}
-
-/**
- * Iterate through track body and get all uri values
- * @param {} album 
- */
-function getAlbumTrackUris(albumId) {
-    var deferred = Q.defer();
-    spotifyServerApi.getAlbumTracks(albumId)
-        .then(function (tracks) {            
-            var totalTracksLength = tracks.items.total;
-            var tracks = tracks.items.slice();
-
-            if (totalTracksLength > 50) {
-                for (var offset = 50; offset < totalTracksLength; offset += 50) {
-                    tracks.push(spotifyServerApi.getAlbumTracksItems(albumId, offset));
-                }
-            }
-
-            var uris = tracks.map(function (track) {
-                return track.uri;
-            });
-            
+    Q.all(promises)
+        .then(function (uris) {
+            var uris = uris.reduce(function (a, b) {
+                return a.concat(b);
+            })
             deferred.resolve(uris);
         })
         .catch(function (err) {
-            console.log(err);
             deferred.reject(err);
         })
     return deferred.promise;
+}
+
+/**
+ * Gets all track URI values for the specified album
+ * @param {Object} album spotify album object
+ */
+function getAlbumsTrackUris(albumId) {
+    var deferred = Q.defer();
+    spotifyServerApi.getAlbumTracks(albumId)
+        .then(function (tracks) {
+            var totalTracksLength = tracks.items.total;
+            var tracks = tracks.items.slice();
+            var promises = [];
+            var iterated = false;
+
+            if (totalTracksLength > 50) { // if album tracks larger than spotify limit, iterate
+                iterated = true;
+                for (var offset = 50; offset < totalTracksLength; offset += 50) {
+                    promises.push(spotifyServerApi.getAlbumTracksItems(albumId, offset));
+                }
+            }
+
+            if (iterated === true) {
+                Q.all(promises).then(function (iteratedTracks) {
+                    tracks.push(iteraredTracks); // push first block
+                    var uris = mapUrisFromTracks(tracks);
+                    deferred.resolve(uris);
+                })
+            } else {
+                var uris = mapUrisFromTracks(tracks);
+                deferred.resolve(uris);
+            }
+        })
+        .catch(function (err) {
+            deferred.reject(err);
+        })
+    return deferred.promise;
+}
+
+/**
+ * Maps the track objects to an array of uri values
+ * @param {Array} tracks arr of json objects returned from spotify 
+ */
+function mapUrisFromTracks(tracks) {
+    var uris = tracks.map(function (track) {
+        return track.uri;
+    });
+    return uris;
 }
 
 module.exports = Api;

@@ -151,10 +151,26 @@ describe('spotify-user-api.js unit tests', function () {
             this.timeout(5000);
             var api = new SpotifyApiUser();
             api.addTracksToPlaylist(spotifyUser)
-                .then(function(uris) {
-                    console.log(uris);
+                .then(function (data) {
+                    expect(data).to.exist;
+                    // clear playlist after test run
+                    api.emptyPlaylist(spotifyUser)
+                        .then(function () {
+                            done();
+                        });
+                });
+        });
+
+        it('should throw err when invalid playlist is passed', function(done) {
+            this.timeout(5000);
+            var api = new SpotifyApiUser();
+            var user = sampleData.getSpotifyAuthenticatedUser();
+            user.playlist = {id: '1234'}; // invalidate
+            api.addTracksToPlaylist(user)
+                .catch(function(err) {
+                    expect(err).to.exist;
                     done();
                 });
         });
-    })
-})
+    });
+});
