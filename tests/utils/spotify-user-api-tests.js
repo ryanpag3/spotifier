@@ -148,7 +148,7 @@ describe('spotify-user-api.js unit tests', function () {
 
     describe('addTracksToPlaylist', function () {
         it('should add all tracks and resolve', function (done) {
-            this.timeout(60000);
+            this.timeout(5000);
             var api = new SpotifyApiUser();
             api.addTracksToPlaylist(spotifyUser)
                 .then(function(uris) {

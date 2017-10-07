@@ -233,6 +233,52 @@ var self = module.exports = {
         return deferred.promise;
     },
 
+    /**
+     * Returns an albums track array
+     */
+    getAlbumTracksItems: function(albumId, offset) {
+        var deferred = Q.defer();
+        this.getAlbumTracks(albumId, offset)
+            .then(function(tracks) {
+                deferred.resolve(tracks.items);
+            })
+            .catch(function(err) {
+                deferred.reject(err);
+            })
+        return deferred.promise;
+    },
+
+    /**
+     * Returns tracks and body information for the specified album
+     * TODO: document & test
+     */
+    getAlbumTracks: function(albumId, offset) {
+        var deferred = Q.defer();
+        var limit = 50;
+
+        if (!offset) {
+            offset = 0;
+        }
+
+        self.refreshClientToken()
+            .then(function() {
+                spotifyApi.getAlbumTracks(albumId, {
+                    limit: limit,
+                    offset: offset
+                })
+                .then(function(data) {
+                    deferred.resolve(data.body);
+                })
+                .catch(function(err) {
+                    deferred.reject(err);
+                })
+            })
+            .catch(function(err) {
+                deferred.reject(err);
+            })
+        return deferred.promise;
+    },
+
     getRecentReleaseId: function (artist) {
         var deferred = Q.defer();
         self.refreshClientToken()

@@ -361,34 +361,25 @@ Api.prototype.getPlaylistTracks = function (user) {
  * to the user's api token, then add the releases to the user's playlist. 
  */
 Api.prototype.addTracksToPlaylist = function (user) {
-    // set access token for user
-    // if the user has a spotifier playlist id in their document
-    // - check to see if playlist still exists for their account
-    // if still exists
-    // - call spotify api add tracks to playlist
-    // -- if success
-    // --- return
-    // -- else 
-    // --- return err
     var api = this.spotifyApi;
     var deferred = Q.defer();
     this.getAccessToken(user)
-        .then(function(accessToken) {
+        .then(function (accessToken) {
             return api.setAccessToken(accessToken.token);
         })
-        .then(function() {
-            return getTrackUris(user.new_releases);
+        .then(function () {
+            return getArtistTrackUris(user.new_releases);
         })
-        .then(function(uris) {
-            console.log(uris);
+        .then(function (uris) {
             api.addTracksToPlaylist(user.name, user.playlist.id, uris)
-                .then(function(data) {
+                .then(function (data) {
+                    console.log(data);
                 })
-                .catch(function(err) {
+                .catch(function (err) {
                     console.log(err);
                 });
         })
-        .catch(function(err) {
+        .catch(function (err) {
             deferred.reject(err);
         })
     return deferred.promise;
@@ -401,29 +392,14 @@ Api.prototype.addTracksToPlaylist = function (user) {
  */
 function getArtistTrackUris(artistIds) {
     var deferred = Q.defer();
-    getArtistRecentAlbumIds(artistIds)
-        .then(function() {
-            return getTrackUris(albumIds);
+    getAlbumIds(artistIds)
+        .then(function (albumIds) {
+            return getTrackUrisFromAlbums(albumIds);
         })
-        .then(function(uris) {
+        .then(function (uris) {
             deferred.resolve(uris);
         })
-        .catch(function(err) {
-            deferred.reject(err);
-        })
-    return deferred.promise;
-}
-
-function getTrackUris(artistIds) {
-    var deferred = Q.defer();
-    getAlbumIds(artistIds)
-        .then(function(albumIds) {
-            getTrackUrisFromAlbums(albumIds)
-                .then(function(uris) {
-                    console.log(uris);
-                });
-        })
-        .catch(function(err) {
+        .catch(function (err) {
             deferred.reject(err);
         })
     return deferred.promise;
@@ -431,19 +407,20 @@ function getTrackUris(artistIds) {
 
 /**
  * Helper function for addTracksToPlaylist which generates an array
- * of uri values for calling the spotify api.
+ * of id values for calling the spotify api.
  * @param {Array} artistIds array of document ids
+ * @returns {Promise<Array>} array of spotify_ids
  */
 function getAlbumIds(artistIds) {
     var deferred = Q.defer();
     Artist.find({
         '_id': artistIds
-    }, 'recent_release.uri', function(err, artists) {
+    }, 'recent_release.id', function (err, artists) {
         if (err) {
             deferred.reject(err);
         }
-        var ids = artists.map(function(artist) {
-            return artist.recent_release.id;
+        var ids = artists.map(function (a) {
+            return a.recent_release.id;
         });
         deferred.resolve(ids);
     })
@@ -454,16 +431,44 @@ function getTrackUrisFromAlbums(albumIds) {
     var deferred = Q.defer();
     var api = this.spotifyApi;
     var promises = [];
+
+    console.log(albumIds.length);
     for (var i = 0; i < albumIds.length; i++) {
-        console.log('here?');
-        promises.push(api.getAlbum(albumIds[i]));
+        promises.concat(getAlbumTrackUris(albumIds[i]));
     }
-    deferred.resolve(Q.all(promises));
-    return deferred.promise;
+    Q.all(promises).then(function (uris) {
+        console.log(uris);
+    })
 }
 
+/**
+ * Iterate through track body and get all uri values
+ * @param {} album 
+ */
+function getAlbumTrackUris(albumId) {
+    var deferred = Q.defer();
+    spotifyServerApi.getAlbumTracks(albumId)
+        .then(function (tracks) {            
+            var totalTracksLength = tracks.items.total;
+            var tracks = tracks.items.slice();
 
+            if (totalTracksLength > 50) {
+                for (var offset = 50; offset < totalTracksLength; offset += 50) {
+                    tracks.push(spotifyServerApi.getAlbumTracksItems(albumId, offset));
+                }
+            }
 
-
+            var uris = tracks.map(function (track) {
+                return track.uri;
+            });
+            
+            deferred.resolve(uris);
+        })
+        .catch(function (err) {
+            console.log(err);
+            deferred.reject(err);
+        })
+    return deferred.promise;
+}
 
 module.exports = Api;
