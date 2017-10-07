@@ -390,6 +390,9 @@ Api.prototype.addTracksToPlaylist = function (user) {
 }
 
 /**
+ * ------------------------------------------
+ * | Private helper for addTracksToPlaylist |
+ * ------------------------------------------
  * Get's the track uri values for the specified artists recent release.
  * @param {array} artistIds mongo document ids of artists 
  */
@@ -409,6 +412,9 @@ function getArtistTrackUris(artistIds) {
 }
 
 /**
+ * ------------------------------------------
+ * | Private helper for addTracksToPlaylist |
+ * ------------------------------------------
  * Generates an array of album spotify ids for the specified artists
  * @param {Array} artistIds array of document ids
  * @returns {Promise<Array>} array of spotify_ids
@@ -431,6 +437,9 @@ function getAlbumIds(artistIds) {
 
 
 /**
+ * -----------------------------------------
+ * | Private helper for getArtistTrackUris |
+ * -----------------------------------------
  * Gets track URIs for the specified albums
  * @param {Array} albumIds spotify album ids
  */
@@ -456,6 +465,9 @@ function getTrackUrisFromAlbums(albumIds) {
 }
 
 /**
+ * ---------------------------------------------
+ * | Private helper for getTrackUrisFromAlbums |
+ * ---------------------------------------------
  * Gets all track URI values for the specified album
  * @param {Object} album spotify album object
  */
@@ -493,6 +505,9 @@ function getAlbumsTrackUris(albumId) {
 }
 
 /**
+ * -----------------------------------------
+ * | Private helper for getAlbumsTrackUris |
+ * -----------------------------------------
  * Maps the track objects to an array of uri values
  * @param {Array} tracks arr of json objects returned from spotify 
  */
