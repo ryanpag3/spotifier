@@ -250,15 +250,15 @@ Api.prototype.playlistExists = function (user) {
     return deferred.promise;
 }
 
-/**
- * Create a spotifier.io playlist for the specified user.
- * This is run when the user's cookie isn't serialized, so we need to retrieve it 
- * from the refresh_token saved in the user's object.
- * @param user user document
- * @returns Promise<string> the id of the created playlist
+/** 
  * TODO:
  * SET PLAYLIST DETAIL IN IT'S OWN METHOD
  * ADD MOST RECENT MONDAY AS WEEK OF XXXXX
+ * Create a spotifier.io playlist for the specified user.
+ * This is run when the user's cookie isn't serialized, so we need to retrieve it 
+ * from the refresh_token saved in the user's object.
+ * @param {object} user user document
+ * @returns {Promise<string>} the id of the created playlist
  */
 Api.prototype.createPlaylist = function (user) {
     var api = this.spotifyApi;
@@ -362,6 +362,8 @@ Api.prototype.getPlaylistTracks = function (user) {
 /**
  * Refresh a user's access token if necessary, set the access token 
  * to the user's api token, then add the releases to the user's playlist. 
+ * @param user user mongo document
+ * @returns {Promise<JSON>} Object containing snapshot data of playlist
  */
 Api.prototype.addTracksToPlaylist = function (user) {
     var api = this.spotifyApi;
@@ -395,6 +397,7 @@ Api.prototype.addTracksToPlaylist = function (user) {
  * ------------------------------------------
  * Get's the track uri values for the specified artists recent release.
  * @param {array} artistIds mongo document ids of artists 
+ * @returns {Promise<Array>} array of URI values for the artists
  */
 function getArtistTrackUris(artistIds) {
     var deferred = Q.defer();
@@ -442,6 +445,7 @@ function getAlbumIds(artistIds) {
  * -----------------------------------------
  * Gets track URIs for the specified albums
  * @param {Array} albumIds spotify album ids
+ * @returns {Promise<Array>} array of uri values
  */
 function getTrackUrisFromAlbums(albumIds) {
     var deferred = Q.defer();
@@ -470,6 +474,7 @@ function getTrackUrisFromAlbums(albumIds) {
  * ---------------------------------------------
  * Gets all track URI values for the specified album
  * @param {Object} album spotify album object
+ * @returns {Promise<Array>} array of track uri values for album
  */
 function getAlbumsTrackUris(albumId) {
     var deferred = Q.defer();
@@ -509,7 +514,8 @@ function getAlbumsTrackUris(albumId) {
  * | Private helper for getAlbumsTrackUris |
  * -----------------------------------------
  * Maps the track objects to an array of uri values
- * @param {Array} tracks arr of json objects returned from spotify 
+ * @param {Array} tracks arr of json objects returned from spotify
+ * @returns {Array} array of uri values 
  */
 function mapUrisFromTracks(tracks) {
     var uris = tracks.map(function (track) {
