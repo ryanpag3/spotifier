@@ -112,33 +112,38 @@ function playlistResetNeeded(user) {
     var deferred = Q.defer();
     var globalResetDate = getPlaylistResetDate();
     var userResetDate = user.playlist.last_reset;
-    var validResetTime = new Date(globalResetDate + 7);
+    var validResetTime = new Date(globalResetDate);
+    validResetTime = new Date(validResetTime.setDate(validResetTime.getDate() + 7));
     var currentDateTime = new Date();
+    console.log('globalResetDate: ' + globalResetDate);
+    console.log('validResetTime: ' + validResetTime);
 
-    if (!userResetDate) { // if first reset, serialize date and skip for user
-        var current = new Date();
-        serializeUserResetDate(user, current)
+    if (!userResetDate) { // if first rese, serialize date and skip for user
+        serializeUserResetDate(user)
             .then(function () {
                 deferred.resolve(false); // skip this weeks reset
+            })
+            .catch(function (err) {
+                console.log(err);
             });
     } else {
-
+        // console.log(globalResetDate);
+        //console.log(currentDateTime);
         // if current date time is more recent than last global reset time plus one week
         if (validResetTime < currentDateTime) {
             // it's been over a week since the last reset
-            serializeUserResetDate(user, current)
-                .then(function() {
+            serializeUserResetDate(user)
+                .then(function () {
                     deferred.resolve(true);
+                })
+                .catch(function (err) {
+                    console.log(err);
                 })
         } else {
             // it has not been over a week since last reset
             deferred.resolve(false);
         }
-        return deferred.promise;
     }
-    var sunday = new Date(current.setDate(current.getDate() - current.getDay()));
-    sunday.setHours(23, 59, 59, 0); // set midnight
-    console.log(sunday.getDate());
 
     return deferred.promise;
 }
@@ -148,12 +153,13 @@ function playlistResetNeeded(user) {
  * @param {JSON} user mongodb user document
  * @param {string} newDate new date value to be serialized
  */
-function serializeUserResetDate(user, newDate) {
+function serializeUserResetDate(user) {
     var deferred = Q.defer();
+    var currentDateTime = new Date();
     User.update({
         '_id': user._id
     }, {
-        'last_reset': newDate
+        'last_reset': currentDateTime
     }, function (err) {
         if (err) {
             deferred.reject(err);
@@ -172,21 +178,11 @@ function getPlaylistResetDate() {
     const filePath = path.join(__dirname + '/utils-resources/', file);
     var fileData = fs.readFileSync(filePath, 'utf-8');
     fileData = JSON.parse(fileData);
-    if (!fileData) { // if none set yet
+    if (!fileData.last_reset) { // if none set yet
         saveNewGlobalPlaylistResetDate();
         return getLastSundayMidnight();
     }
-    return fileData.last_reset;
-}
-
-/**
- * @returns {Date} date object of last sunday compared to current date
- */
-function getLastSundayMidnight() {
-    var currentDateTime = new Date();
-    var lastSunday = new Date(currentDateTime.setDate(currentDateTime.getDate() - currentDateTime.getDay()));
-    lastSunday.setHours(23, 59, 59, 0); // set midnight
-    return lastSunday.getDate();
+    return new Date(fileData.last_reset);
 }
 
 /**
@@ -194,12 +190,12 @@ function getLastSundayMidnight() {
  */
 function saveNewGlobalPlaylistResetDate() {
     const file = 'playlist-reset-date.json';
-    const filePath = path.join(__direname + '/utils-resources/', file);
+    const filePath = path.join(__dirname + '/utils-resources/', file);
     var deferred = Q.defer();
     var fileContents = {
         "last_reset": getLastSundayMidnight()
     }
-    JSON.stringify(fileContents, null, 4);
+    fileContents = JSON.stringify(fileContents, null, 4);
     fs.writeFile(filePath, fileContents, 'utf-8', function (err) {
         if (err) {
             deferred.reject(err);
@@ -209,7 +205,15 @@ function saveNewGlobalPlaylistResetDate() {
     return deferred.promise;
 }
 
-
+/**
+ * @returns {Date} date object of last sunday compared to current date
+ */
+function getLastSundayMidnight() {
+    var currentDateTime = new Date();
+    var lastSunday = new Date(currentDateTime.setDate(currentDateTime.getDate() - currentDateTime.getDay()));
+    lastSunday.setHours(23, 59, 59, 0); // set right before midnight
+    return lastSunday;
+}
 
 // TODO: save playlist ID to document
 function createPlaylist(userId) {

@@ -2,6 +2,8 @@ var expect = require('chai').expect,
     sinon = require('sinon'),
     mongoose = require('mongoose'),
     rewire = require('rewire'),
+    fs = require('fs'),
+    path = require('path'),
     testHelper = require('../test-helpers'),
     sampleData = require('../sample-test-data'),
     spotifyApiUser = require('../../server/utils/spotify-user-api'),
@@ -37,6 +39,16 @@ describe('playlist handler', function () {
                 done();
             });
         });
+
+        var emptyJson = JSON.stringify({}, null, 4);
+        var fileName = 'playlist-reset-date.json';
+        var filePath = path.join(__dirname, '../../server/utils/utils-resources/' + fileName);
+        fs.writeFileSync(emptyJson, filePath, function(err) {
+            if (err) {
+                console.log(err);
+            }
+        });
+        // console.log(fs.readFileSync(filePath, 'utf-8'));
     });
 
     /** UNIT TESTS **/
@@ -87,9 +99,26 @@ describe('playlist handler', function () {
 
     describe('playlistResetNeeded', function () {
         var playlistResetNeeded = playlist.__get__('playlistResetNeeded');
+
+        it('should return false when no reset time has been recorded for a user', function(done) {
+            var user = sampleData.getSpotifyAuthenticatedUserPlaylistCreated();
+            
+            playlistResetNeeded(user)
+                .then(function(resetNeeded) {
+                    expect(resetNeeded).to.be.false;
+                    done();
+                });
+        });
+
         it('should return true when it is time to reset the playlist', function(done) {
-            playlistResetNeeded(spotifyUser)
-                .then(function() {
+            this.timeout(3000);
+            var user = sampleData.getSpotifyAuthenticatedUserPlaylistCreated();
+            var resetDate = new Date();
+            resetDate.setDate(resetDate.getDate() + 7); // advance one week
+            user.playlist.last_reset = resetDate;
+            playlistResetNeeded(user)
+                .then(function(resetNeeded) {
+                    expect(resetNeeded).to.be.true;
                     done();
                 });
         });

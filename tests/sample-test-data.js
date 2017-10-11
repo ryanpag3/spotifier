@@ -155,7 +155,7 @@ module.exports = {
             refresh_token: privateConfig.spotify.testRefreshToken,
             playlist: {
                 id: privateConfig.spotify.testPlaylistId,
-                snapshot_id: '' // TODO:
+                last_reset: '' // TODO:
             }
         };
     }
