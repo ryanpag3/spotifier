@@ -123,17 +123,9 @@ function playlistResetNeeded(user) {
                 console.log(err);
             });
     } else {
-        // FIXME:
-        // what is a valid time to reset a user's playlist?
-        // 1. at least a week has passed since the user's last reset
-        // 2. the current time is later than the last global reset gate
-        // difference of days between user's reset and the last global reset
-        userResetDate = new Date(userResetDate);
-        var diff = numDaysBetween(userResetDate, globalResetDate);
-        console.log(diff);
-        console.log('userResetDate: ' + userResetDate);
-        console.log('globalResetDate: ' +  globalResetDate);
-        if (diff >= 7 && globalResetDate < currentDateTime) {
+        userResetDate = new Date(userResetDate); // instantiate for comparator
+        var diffOfDays = numDaysBetween(userResetDate, globalResetDate);
+        if (diffOfDays >= 7 && globalResetDate < currentDateTime) {
             serializeUserResetDate(user)
                 .then(function () {
                     deferred.resolve(true);
@@ -142,8 +134,6 @@ function playlistResetNeeded(user) {
                     console.log(err);
                 })
         } else {
-            console.log('que?');
-            // it has not been over a week since last reset
             deferred.resolve(false);
         }
     }
@@ -194,29 +184,25 @@ function getPlaylistResetDate() {
     fileData = JSON.parse(fileData);
     if (!fileData.last_reset) { // if none set yet
         console.log('no global playlist reset date set');
-        saveNewGlobalPlaylistResetDate();
+        saveDefaultGlobalPlaylistResetDate();
         return getLastSundayMidnight();
     }
     return new Date(fileData.last_reset);
 }
 
 /**
- * Set the last_reset data field in the reset date file to the most recent sunday at midnight
+ * Save a default global reset date to the most previous Sunday.
  */
-function saveNewGlobalPlaylistResetDate() {
-    const file = 'playlist-reset-date.json';
-    const filePath = path.join(__dirname + '/utils-resources/', file);
+function saveDefaultGlobalPlaylistResetDate() {
     var deferred = Q.defer();
-    var fileContents = {
-        "last_reset": getLastSundayMidnight()
-    }
-    fileContents = JSON.stringify(fileContents, null, 4);
-    fs.writeFile(filePath, fileContents, 'utf-8', function (err) {
-        if (err) {
+    var defaultResetDate = getLastSundayMidnight();
+    saveGlobalPlaylistResetDate(defaultResetDate)
+        .then(function() {
+            deferred.resolve();
+        })
+        .catch(function(err){
             deferred.reject(err);
-        }
-        deferred.resolve();
-    });
+        });
     return deferred.promise;
 }
 
@@ -227,7 +213,56 @@ function getLastSundayMidnight() {
     var currentDateTime = new Date();
     var lastSunday = new Date(currentDateTime.setDate(currentDateTime.getDate() - currentDateTime.getDay()));
     lastSunday.setHours(23, 59, 59, 0); // set right before midnight
-    return lastSunday;
+    return new Date(lastSunday);
+}
+
+/**
+ * Save a new global reset date by moving forward one week.
+ */
+function saveNewGlobalPlaylistResetDate() {
+    var deferred = Q.defer();
+    var oldDate = getPlaylistResetDate();
+    var newDate = moveDateForwardOneWeek(oldDate);
+    saveGlobalPlaylistResetDate(newDate)
+        .then(function() {
+            deferred.resolve();
+        })
+        .catch(function(err) {
+            deferred.reject(err);
+        });
+    return deferred.promise;
+}
+
+/**
+ * Move a date forward one week
+ * @param {Date} date 
+ */
+function moveDateForwardOneWeek(date) {
+    var resetDate = new Date(date);
+    // resetDate.setHours(23, 59, 59, 00);
+    resetDate = new Date(resetDate.setDate(date.getDate() + 7));
+    return resetDate;
+}
+
+/**
+ * TODO:
+ * 1. what happens if no date is provided?
+ */
+function saveGlobalPlaylistResetDate(date) {
+    const file = 'playlist-reset-date.json';
+    const filePath = path.join(__dirname + '/utils-resources/', file);
+    var deferred = Q.defer();
+    var fileContents = {
+        "last_reset": date
+    }
+    fileContents = JSON.stringify(fileContents, null, 4);
+    fs.writeFile(filePath, fileContents, 'utf-8', function (err) {
+        if (err) {
+            deferred.reject(err);
+        }
+        deferred.resolve();
+    });
+    return deferred.promise;
 }
 
 // TODO: save playlist ID to document
