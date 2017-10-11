@@ -110,13 +110,9 @@ function playlistResetNeeded(user) {
      * AND IS IT PAST THE DATE OF THE LAST GLOBAL RESET?
      */
     var deferred = Q.defer();
-    var globalResetDate = getPlaylistResetDate();
-    var userResetDate = user.playlist.last_reset;
-    var validResetTime = new Date(globalResetDate);
-    validResetTime = new Date(validResetTime.setDate(validResetTime.getDate() + 7));
-    var currentDateTime = new Date();
-    console.log('globalResetDate: ' + globalResetDate);
-    console.log('validResetTime: ' + validResetTime);
+    var globalResetDate = getPlaylistResetDate(); // last global reset
+    var userResetDate = user.playlist.last_reset; // user's last reset
+    var currentDateTime = new Date(); // current date
 
     if (!userResetDate) { // if first rese, serialize date and skip for user
         serializeUserResetDate(user)
@@ -127,11 +123,17 @@ function playlistResetNeeded(user) {
                 console.log(err);
             });
     } else {
-        // console.log(globalResetDate);
-        //console.log(currentDateTime);
-        // if current date time is more recent than last global reset time plus one week
-        if (validResetTime < currentDateTime) {
-            // it's been over a week since the last reset
+        // FIXME:
+        // what is a valid time to reset a user's playlist?
+        // 1. at least a week has passed since the user's last reset
+        // 2. the current time is later than the last global reset gate
+        // difference of days between user's reset and the last global reset
+        userResetDate = new Date(userResetDate);
+        var diff = numDaysBetween(userResetDate, globalResetDate);
+        console.log(diff);
+        console.log('userResetDate: ' + userResetDate);
+        console.log('globalResetDate: ' +  globalResetDate);
+        if (diff >= 7 && globalResetDate < currentDateTime) {
             serializeUserResetDate(user)
                 .then(function () {
                     deferred.resolve(true);
@@ -140,6 +142,7 @@ function playlistResetNeeded(user) {
                     console.log(err);
                 })
         } else {
+            console.log('que?');
             // it has not been over a week since last reset
             deferred.resolve(false);
         }
@@ -147,6 +150,17 @@ function playlistResetNeeded(user) {
 
     return deferred.promise;
 }
+
+/**
+ * How many days are between the two dates?
+ * Solution found @ https://stackoverflow.com/questions/6154689/how-to-check-if-date-is-within-30-days
+ * @param {Date} d1 
+ * @param {Date} d2 
+ */
+var numDaysBetween = function (d1, d2) {
+    var diff = Math.abs(d1.getTime() - d2.getTime());
+    return diff / (1000 * 60 * 60 * 24);
+};
 
 /**
  * Serialize the last playlist date into database for user
@@ -179,6 +193,7 @@ function getPlaylistResetDate() {
     var fileData = fs.readFileSync(filePath, 'utf-8');
     fileData = JSON.parse(fileData);
     if (!fileData.last_reset) { // if none set yet
+        console.log('no global playlist reset date set');
         saveNewGlobalPlaylistResetDate();
         return getLastSundayMidnight();
     }

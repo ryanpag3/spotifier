@@ -43,11 +43,7 @@ describe('playlist handler', function () {
         var emptyJson = JSON.stringify({}, null, 4);
         var fileName = 'playlist-reset-date.json';
         var filePath = path.join(__dirname, '../../server/utils/utils-resources/' + fileName);
-        fs.writeFileSync(emptyJson, filePath, function(err) {
-            if (err) {
-                console.log(err);
-            }
-        });
+        fs.writeFileSync(filePath, emptyJson, 'utf-8');
         // console.log(fs.readFileSync(filePath, 'utf-8'));
     });
 
@@ -111,14 +107,20 @@ describe('playlist handler', function () {
         });
 
         it('should return true when it is time to reset the playlist', function(done) {
-            this.timeout(3000);
-            var user = sampleData.getSpotifyAuthenticatedUserPlaylistCreated();
+            this.timeout(5000);
+            // var user = sampleData.getSpotifyAuthenticatedUserPlaylistCreated();
             var resetDate = new Date();
-            resetDate.setDate(resetDate.getDate() + 7); // advance one week
-            user.playlist.last_reset = resetDate;
-            playlistResetNeeded(user)
+            resetDate.setDate(resetDate.getDate() - 7); // advance one week
+            console.log(resetDate);
+            spotifyUser.playlist.last_reset = resetDate;
+            playlistResetNeeded(spotifyUser)
                 .then(function(resetNeeded) {
                     expect(resetNeeded).to.be.true;
+                    done();
+                })
+                .catch(function(err){
+                    console.log(err);
+                    expect(err).to.be.undefined;
                     done();
                 });
         });
@@ -128,7 +130,7 @@ describe('playlist handler', function () {
         var getPlaylistResetDate = playlist.__get__('getPlaylistResetDate');
         it('should return the playlist reset date from the serialized json file', function (done) {
             var date = getPlaylistResetDate();
-            console.log(date);
+            // console.log(date);
             expect(date).to.exist;
             done();
         })
