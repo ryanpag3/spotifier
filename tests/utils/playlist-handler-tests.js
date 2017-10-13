@@ -6,7 +6,7 @@ var expect = require('chai').expect,
     path = require('path'),
     testHelper = require('../test-helpers'),
     sampleData = require('../sample-test-data'),
-    spotifyApiUser = require('../../server/utils/spotify-user-api'),
+    SpotifyApiUser = require('../../server/utils/spotify-user-api'),
     User = require('../../server/models/user'),
     Artist = require('../../server/models/artist');
 
@@ -67,7 +67,19 @@ describe('playlist handler', function () {
     });
 
     describe('updatePlaylist', function () {
-        // TODO:
+        it('should properly resolve after updating a users playlist', function(done) {
+            this.timeout(5000);
+            var updatePlaylist = playlist.__get__('updatePlaylist');
+            var api = new SpotifyApiUser();
+            var twoWeeksAgo = new Date();
+            twoWeeksAgo = new Date(twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14));
+            spotifyUser.playlist.last_reset = twoWeeksAgo; // ensure playlist reset
+            updatePlaylist(spotifyUser)
+                .then(function() {
+                    api.emptyPlaylist(spotifyUser);
+                    done();
+                })
+        });
     });
 
     describe('playlistExists', function () {

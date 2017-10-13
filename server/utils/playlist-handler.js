@@ -56,13 +56,15 @@ var updateNewReleasePlaylists = function () {
  */
 function updatePlaylist(user) {
     var deferred = Q.defer();
+    var api = new SpotifyUserApi();
 
     playlistExists(user)
         .then(function (exists) {
             if (!exists) {
                 return createPlaylist(user);
+            } else {
+                return;
             }
-            return;
         })
         .then(function () {
             // is current date later than reset date?
@@ -71,14 +73,28 @@ function updatePlaylist(user) {
         .then(function (reset) {
             console.log(reset);
             // if reset, empty playlist
+            if (reset) {
+                console.log('playlist reset needed for ' + user.name + '. Emptying...');
+                return api.emptyPlaylist(user);
+            } else {
+                console.log('playlist reset not needed for ' + user.name);
+                return;
+            }
         })
         .then(function () {
+            console.log('adding releases to playlist');
             // add releases
+            api.addReleaseTracksToPlaylist(user)
+                .then(function() {
+                    deferred.resolve();
+                })
+                .catch(function(err) {
+                    deferred.reject(err);
+                });
         })
         .catch(function (err) {
             deferred.reject(err);
         })
-
     return deferred.promise;
 }
 
@@ -105,10 +121,7 @@ function playlistExists(user) {
  * @returns {Boolean} new playlist week?
  */
 function playlistResetNeeded(user) {
-    /**
-     * HAS IT BEEN OVER A WEEK SINCE THE USER'S LAST RESET
-     * AND IS IT PAST THE DATE OF THE LAST GLOBAL RESET?
-     */
+
     var deferred = Q.defer();
     var globalResetDate = getPlaylistResetDate(); // last global reset
     var userResetDate = user.playlist.last_reset; // user's last reset
@@ -137,7 +150,6 @@ function playlistResetNeeded(user) {
             deferred.resolve(false);
         }
     }
-
     return deferred.promise;
 }
 
@@ -197,10 +209,10 @@ function saveDefaultGlobalPlaylistResetDate() {
     var deferred = Q.defer();
     var defaultResetDate = getLastSundayMidnight();
     saveGlobalPlaylistResetDate(defaultResetDate)
-        .then(function() {
+        .then(function () {
             deferred.resolve();
         })
-        .catch(function(err){
+        .catch(function (err) {
             deferred.reject(err);
         });
     return deferred.promise;
@@ -224,10 +236,10 @@ function saveNewGlobalPlaylistResetDate() {
     var oldDate = getPlaylistResetDate();
     var newDate = moveDateForwardOneWeek(oldDate);
     saveGlobalPlaylistResetDate(newDate)
-        .then(function() {
+        .then(function () {
             deferred.resolve();
         })
-        .catch(function(err) {
+        .catch(function (err) {
             deferred.reject(err);
         });
     return deferred.promise;
@@ -289,18 +301,6 @@ function createPlaylist(userId) {
 function clearPlaylist(user) {
 
 }
-
-
-/**
- * Add all songs of a release to the spotifier playlist
- */
-function addReleasesToPlaylist(playlistId, releases) {
-    // call spotify user api add tracks to playlist
-}
-
-
-
-
 
 // expose top level function
 module.exports = {
