@@ -67,7 +67,7 @@ describe('playlist handler', function () {
     });
 
     describe('updatePlaylist', function () {
-        // TODO:
+        var updatePlaylist = playlist.__get__('updatePlaylist');
     });
 
     describe('playlistExists', function () {

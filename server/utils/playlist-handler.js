@@ -183,7 +183,7 @@ function getPlaylistResetDate() {
     var fileData = fs.readFileSync(filePath, 'utf-8');
     fileData = JSON.parse(fileData);
     if (!fileData.last_reset) { // if none set yet
-        console.log('no global playlist reset date set');
+        // console.log('no global playlist reset date set');
         saveDefaultGlobalPlaylistResetDate();
         return getLastSundayMidnight();
     }
@@ -239,7 +239,6 @@ function saveNewGlobalPlaylistResetDate() {
  */
 function moveDateForwardOneWeek(date) {
     var resetDate = new Date(date);
-    // resetDate.setHours(23, 59, 59, 00);
     resetDate = new Date(resetDate.setDate(date.getDate() + 7));
     return resetDate;
 }
@@ -281,26 +280,6 @@ function createPlaylist(userId) {
     })
     return deferred.promise;
 }
-
-/**
- * Clears a user's spotifier playlist
- * @param user mongo document for user
- */
-function clearPlaylist(user) {
-
-}
-
-
-/**
- * Add all songs of a release to the spotifier playlist
- */
-function addReleasesToPlaylist(playlistId, releases) {
-    // call spotify user api add tracks to playlist
-}
-
-
-
-
 
 // expose top level function
 module.exports = {
