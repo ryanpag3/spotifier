@@ -365,7 +365,7 @@ Api.prototype.getPlaylistTracks = function (user) {
  * @param user user mongo document
  * @returns {Promise<JSON>} Object containing snapshot data of playlist
  */
-Api.prototype.addTracksToPlaylist = function (user) {
+Api.prototype.addReleaseTracksToPlaylist = function (user) {
     var api = this.spotifyApi;
     var deferred = Q.defer();
 

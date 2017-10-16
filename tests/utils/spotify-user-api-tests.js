@@ -150,7 +150,7 @@ describe('spotify-user-api.js unit tests', function () {
         it('should add all tracks and resolve', function (done) {
             this.timeout(5000);
             var api = new SpotifyApiUser();
-            api.addTracksToPlaylist(spotifyUser)
+            api.addReleaseTracksToPlaylist(spotifyUser)
                 .then(function (data) {
                     expect(data).to.exist;
                     // clear playlist after test run
@@ -166,7 +166,7 @@ describe('spotify-user-api.js unit tests', function () {
             var api = new SpotifyApiUser();
             var user = sampleData.getSpotifyAuthenticatedUser();
             user.playlist = {id: '1234'}; // invalidate
-            api.addTracksToPlaylist(user)
+            api.addReleaseTracksToPlaylist(user)
                 .catch(function(err) {
                     expect(err).to.exist;
                     done();
