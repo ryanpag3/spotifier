@@ -4,6 +4,7 @@ var expect = require('chai').expect,
     rewire = require('rewire'),
     fs = require('fs'),
     path = require('path'),
+    Q = require('q'),
     testHelper = require('../test-helpers'),
     sampleData = require('../sample-test-data'),
     SpotifyApiUser = require('../../server/utils/spotify-user-api'),
@@ -64,11 +65,28 @@ describe('playlist handler', function () {
         //                 });
         //         });
         // });
+        it ('should be able to handle a large amount of user playlists to update', function(done) {
+            this.timeout(5000);
+            var promises = [];
+            var users = [];
+            for (var i = 0; i < 10; i++) {
+                console.log('hjere?');
+                testHelper.stageSpotifyUser(20)
+                .then(function(user) {
+                    users.push(user);
+                });
+            }
+            Q.all(promises).then(function(promises) {
+                console.log(promises);
+                console.log(users);
+                done();
+            });
+        });
     });
 
     describe('updatePlaylist', function () {
         it('should properly resolve after updating a users playlist', function(done) {
-            this.timeout(5000);
+            this.timeout(7000); // allow extra time if spotify api is slow
             var updatePlaylist = playlist.__get__('updatePlaylist');
             var api = new SpotifyApiUser();
             var twoWeeksAgo = new Date();
