@@ -18,6 +18,7 @@ var updateNewReleasePlaylists = function () {
     var self = this;
     var promises = [];
     var deferred = Q.defer();
+    var p = Q();
 
     User.find({
             $and: [{ // query filter
@@ -37,10 +38,20 @@ var updateNewReleasePlaylists = function () {
             if (err) {
                 throw new Error(err);
             }
-            for (var i = 0; i < users.length; i++) {
-                promises.push(updatePlaylist(users[i]));
-            }
-            deferred.resolve(Q.allSettled(promises));
+            console.log(users.length);
+
+            users.forEach(function (user) {
+                p = p.then(function () {
+                    return updatePlaylist(user)
+                });
+            });
+            deferred.resolve(p);
+
+            // for (var i = 0; i < users.length; i++) {
+            //     console.log(i);
+            //     promises.push(updatePlaylist(users[i]));
+            // }
+            // deferred.resolve(Q.allSettled(promises));
         });
     return deferred.promise;
 }
@@ -71,7 +82,6 @@ function updatePlaylist(user) {
             return playlistResetNeeded(user);
         })
         .then(function (reset) {
-            console.log(reset);
             // if reset, empty playlist
             if (reset) {
                 console.log('playlist reset needed for ' + user.name + '. Emptying...');
@@ -85,10 +95,13 @@ function updatePlaylist(user) {
             console.log('adding releases to playlist');
             // add releases
             api.addReleaseTracksToPlaylist(user)
-                .then(function() {
+                .then(function () {
+                    console.log('finished adding releases');
                     deferred.resolve();
                 })
-                .catch(function(err) {
+                .catch(function (err) {
+                    console.log('error adding releases');
+                    console.log(err);
                     deferred.reject(err);
                 });
         })

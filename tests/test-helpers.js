@@ -354,6 +354,26 @@ module.exports = {
                 deferred.reject(err);
             });
         return deferred.promise;
+    },
+
+    /**
+     * TODO: docs
+     * @param {*} numUsers 
+     * @param {*} numReleases 
+     */
+    stageSpotifyUsers(numUsers, numReleases) {
+        var deferred = Q.defer();
+        var promises = [];
+        var currTime = new Date();
+        for (var i = 0; i < numUsers; i++) {
+            var newTime = new Date();
+            // output time for each user creation
+            // console.log(newTime - currTime);
+            currTime = newTime;
+            promises.push(this.stageSpotifyUser(numReleases));
+        }
+        deferred.resolve(Q.all(promises));
+        return deferred.promise;
     }
 }; // end module.exports
 
