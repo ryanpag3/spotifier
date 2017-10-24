@@ -371,17 +371,21 @@ Api.prototype.addReleaseTracksToPlaylist = function (user) {
 
     this.getAccessToken(user)
         .then(function (accessToken) {
+            console.log('setting access token.')
             return api.setAccessToken(accessToken.token);
         })
         .then(function () {
+            console.log('converting to uri values.');
             return getArtistTrackUris(user.new_releases);
         })
         .then(function (uris) {
+            console.log('adding tracks to playlist')
             api.addTracksToPlaylist(user.name, user.playlist.id, uris)
                 .then(function (data) {
                     deferred.resolve(data);
                 })
                 .catch(function (err) {
+                    console.log('addTracksToPlaylist Error Thrown');
                     deferred.reject(err);
                 });
         })
@@ -403,12 +407,14 @@ function getArtistTrackUris(artistIds) {
     var deferred = Q.defer();
     getAlbumIds(artistIds)
         .then(function (albumIds) {
+            // console.log('getting track uris from releases.');
             return getTrackUrisFromAlbums(albumIds);
         })
         .then(function (uris) {
             deferred.resolve(uris);
         })
         .catch(function (err) {
+            console.log('getArtistTrackUris ERROR');
             deferred.reject(err);
         })
     return deferred.promise;
@@ -425,16 +431,32 @@ function getArtistTrackUris(artistIds) {
 function getAlbumIds(artistIds) {
     var deferred = Q.defer();
     Artist.find({
-        '_id': artistIds
-    }, 'recent_release.id', function (err, artists) {
-        if (err) {
-            deferred.reject(err);
-        }
-        var ids = artists.map(function (a) {
-            return a.recent_release.id;
+            $and: [{
+                    '_id': artistIds
+                },
+                {
+                    'recent_release.id': {
+                        $exists: true
+                    }
+                }
+            ]
+        },
+        'recent_release',
+        function (err, artists) {
+            if (err) {
+                deferred.reject(err);
+            }
+            // console.log(artists);
+            var ids = artists.map(function (a) {
+                if (a.recent_release.id) {
+                    return a.recent_release.id;
+                }
+                // return a.recent_release.id;
+            });
+            // console.log(ids);
+            deferred.resolve(ids);
+
         });
-        deferred.resolve(ids);
-    })
     return deferred.promise;
 }
 
@@ -453,6 +475,7 @@ function getTrackUrisFromAlbums(albumIds) {
     var promises = [];
 
     for (var i = 0; i < albumIds.length; i++) {
+        // console.log(albumIds[i]);
         promises.push(getAlbumsTrackUris(albumIds[i]));
     }
     Q.all(promises)
@@ -463,6 +486,7 @@ function getTrackUrisFromAlbums(albumIds) {
             deferred.resolve(uris);
         })
         .catch(function (err) {
+            console.log('getTrackUrisFromAlbums ERROR')
             deferred.reject(err);
         })
     return deferred.promise;
@@ -487,6 +511,7 @@ function getAlbumsTrackUris(albumId) {
 
             if (totalTracksLength > 50) { // if album tracks larger than spotify limit, iterate
                 iterated = true;
+                console.log('iterating...');
                 for (var offset = 50; offset < totalTracksLength; offset += 50) {
                     promises.push(spotifyServerApi.getAlbumTracksItems(albumId, offset));
                 }
@@ -504,6 +529,8 @@ function getAlbumsTrackUris(albumId) {
             }
         })
         .catch(function (err) {
+            console.log('getAlbumsTrackUris ERROR');
+            // console.log(albumId);
             deferred.reject(err);
         })
     return deferred.promise;

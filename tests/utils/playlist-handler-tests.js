@@ -8,6 +8,7 @@ var expect = require('chai').expect,
     testHelper = require('../test-helpers'),
     sampleData = require('../sample-test-data'),
     SpotifyApiUser = require('../../server/utils/spotify-user-api'),
+    queueGetArtistDetails = require('../../server/utils/queue-get-artist-details'),
     User = require('../../server/models/user'),
     Artist = require('../../server/models/artist');
 
@@ -26,6 +27,9 @@ describe('playlist handler', function () {
         var mins = 10;
         this.timeout(mins * 60000);
         var numReleases = 20;
+
+        queueGetArtistDetails.pause();
+
         testHelper.stageSpotifyUser(numReleases)
             .then(function (mSpotifyUser) {
                 spotifyUser = mSpotifyUser;
@@ -35,6 +39,9 @@ describe('playlist handler', function () {
 
     // runs after each unit test
     afterEach(function (done) {
+
+        queueGetArtistDetails.resume();
+
         var emptyJson = JSON.stringify({}, null, 4);
         var fileName = 'playlist-reset-date.json';
         var filePath = path.join(__dirname, '../../server/utils/utils-resources/' + fileName);
