@@ -43,6 +43,10 @@ var updateNewReleasePlaylists = function () {
             users.forEach(function (user) {
                 p = p.then(function () {
                     return updatePlaylist(user)
+                })
+                .catch(function(err) {
+                   console.log(user); 
+                   console.log(err);
                 });
             });
             deferred.resolve(p);
@@ -93,6 +97,7 @@ function updatePlaylist(user) {
         })
         .then(function () {
             console.log('adding releases to playlist');
+            // console.log(user);
             // add releases
             api.addReleaseTracksToPlaylist(user)
                 .then(function () {

@@ -374,6 +374,7 @@ Api.prototype.addReleaseTracksToPlaylist = function (user) {
             return api.setAccessToken(accessToken.token);
         })
         .then(function () {
+            console.log('here?');
             return getArtistTrackUris(user.new_releases);
         })
         .then(function (uris) {

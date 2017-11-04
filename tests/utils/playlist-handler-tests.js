@@ -78,7 +78,7 @@ describe('playlist handler', function () {
                     console.log('staged users, now updating playlists');
                     playlist.updateNewReleasePlaylists()
                         .then(function(promises) {
-                            console.log('we here?');
+                            // console.log('we here?');
                             console.log(promises);
                             done();
                         });
