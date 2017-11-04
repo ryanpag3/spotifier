@@ -5,7 +5,8 @@ var Q = require('q'),
     User = require('../server/models/user'),
     Artist = require('../server/models/artist'),
     sampleData = require('./sample-test-data'),
-    spotifyServerApi = require('../server/utils/spotify-server-api');
+    spotifyServerApi = require('../server/utils/spotify-server-api'),
+    queueGetArtistDetails = require('../server/utils/queue-get-artist-details');
 
 module.exports = {
     insert: function (user) {

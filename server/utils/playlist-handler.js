@@ -105,8 +105,9 @@ function updatePlaylist(user) {
                     deferred.resolve();
                 })
                 .catch(function (err) {
-                    console.log('error adding releases');
+                    console.log('addReleaseTracksToPlaylist ERROR');
                     console.log(err);
+                    // console.log(user);
                     deferred.reject(err);
                 });
         })
