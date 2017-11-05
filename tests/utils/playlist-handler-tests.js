@@ -28,7 +28,7 @@ describe('playlist handler', function () {
         this.timeout(mins * 60000);
         var numReleases = 20;
 
-        queueGetArtistDetails.pause();
+        queueGetArtistDetails.pauseNoLogging();
 
         testHelper.stageSpotifyUser(numReleases)
             .then(function (mSpotifyUser) {
@@ -40,7 +40,7 @@ describe('playlist handler', function () {
     // runs after each unit test
     afterEach(function (done) {
 
-        queueGetArtistDetails.resume();
+        queueGetArtistDetails.resumeNoLogging();
 
         var emptyJson = JSON.stringify({}, null, 4);
         var fileName = 'playlist-reset-date.json';
@@ -74,7 +74,7 @@ describe('playlist handler', function () {
         //         });
         // });
         it('should be able to handle a large amount of user playlists to update', function (done) {
-            this.timeout(1000 * numUsers);
+            this.timeout(120000);
             var deferred = Q.defer();
             var promises = [];
             var users = [];
@@ -98,7 +98,7 @@ describe('playlist handler', function () {
 
     describe('updatePlaylist', function () {
         it('should properly resolve after updating a users playlist', function (done) {
-            this.timeout(7000); // allow extra time if spotify api is slow
+            this.timeout(15000); // allow extra time if spotify api is slow
             var updatePlaylist = playlist.__get__('updatePlaylist');
             var api = new SpotifyApiUser();
             var twoWeeksAgo = new Date();

@@ -84,6 +84,18 @@ module.exports = {
         })
     },
 
+    pauseNoLogging: function() {
+        artistDetailsQueue.pause().then(function() {
+            // do nothing
+        });
+    },
+
+    resumeNoLogging: function() {
+        artistDetailsQueue.resume().then(function() {
+            // do nothing
+        });
+    },
+
     /**
      * this is run on startup to expose the socket utility to the queue service
      * @param mSocketUtil

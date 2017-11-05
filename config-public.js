@@ -8,6 +8,10 @@ config.placeholderAlbumTitle = 'details request queued...';
 config.spotify.playlistTitle = 'spotifier.io | New Releases | Week of ' + getMonday();
 config.spotify.playlistDescription = 'Testing!';
 
+// TODO: refactor to use this config variable. 
+// turn on for more verbose debugging output
+config.verboseMode = true;
+
 
 module.exports = config;
 
