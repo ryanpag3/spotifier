@@ -414,7 +414,7 @@ function getArtistTrackUris(artistIds) {
             deferred.resolve(uris);
         })
         .catch(function (err) {
-            console.log('getArtistTrackUris ERROR');
+            // console.log('getArtistTrackUris ERROR');
             deferred.reject(err);
         })
     return deferred.promise;
@@ -486,7 +486,7 @@ function getTrackUrisFromAlbums(albumIds) {
             deferred.resolve(uris);
         })
         .catch(function (err) {
-            console.log('getTrackUrisFromAlbums ERROR')
+            // console.log('getTrackUrisFromAlbums ERROR')
             deferred.reject(err);
         })
     return deferred.promise;
@@ -529,7 +529,7 @@ function getAlbumsTrackUris(albumId) {
             }
         })
         .catch(function (err) {
-            console.log('getAlbumsTrackUris ERROR');
+            // console.log('getAlbumsTrackUris ERROR');
             // console.log(albumId);
             deferred.reject(err);
         })

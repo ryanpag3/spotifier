@@ -28,7 +28,9 @@ describe('playlist handler', function () {
         this.timeout(mins * 60000);
         var numReleases = 20;
 
-        queueGetArtistDetails.pauseNoLogging();
+        // queueGetArtistDetails.pauseNoLogging();
+        queueGetArtistDetails.pause();
+        
 
         testHelper.stageSpotifyUser(numReleases)
             .then(function (mSpotifyUser) {
@@ -40,7 +42,9 @@ describe('playlist handler', function () {
     // runs after each unit test
     afterEach(function (done) {
 
-        queueGetArtistDetails.resumeNoLogging();
+        // queueGetArtistDetails.resumeNoLogging();
+        queueGetArtistDetails.resume();
+        
 
         var emptyJson = JSON.stringify({}, null, 4);
         var fileName = 'playlist-reset-date.json';
@@ -74,7 +78,7 @@ describe('playlist handler', function () {
         //         });
         // });
         it('should be able to handle a large amount of user playlists to update', function (done) {
-            this.timeout(120000);
+            this.timeout(30000);
             var deferred = Q.defer();
             var promises = [];
             var users = [];

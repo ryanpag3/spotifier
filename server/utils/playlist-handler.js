@@ -38,15 +38,16 @@ var updateNewReleasePlaylists = function () {
             if (err) {
                 throw new Error(err);
             }
-            console.log(users.length);
+            console.log('Users length: ' + users.length);
 
             users.forEach(function (user) {
                 p = p.then(function () {
                     return updatePlaylist(user)
                 })
                 .catch(function(err) {
-                   console.log(user); 
+                   // console.log(user); 
                    console.log(err);
+
                 });
             });
             deferred.resolve(p);
@@ -157,6 +158,9 @@ function playlistResetNeeded(user) {
     } else {
         userResetDate = new Date(userResetDate); // instantiate for comparator
         var diffOfDays = numDaysBetween(userResetDate, globalResetDate);
+        // console.log('difference of days: ' + diffOfDays);
+        console.log(globalResetDate + ' ' + currentDateTime);
+
         if (diffOfDays >= 7 && globalResetDate < currentDateTime) {
             serializeUserResetDate(user)
                 .then(function () {
