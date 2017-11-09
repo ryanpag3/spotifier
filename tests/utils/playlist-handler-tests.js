@@ -28,8 +28,8 @@ describe('playlist handler', function () {
         this.timeout(mins * 60000);
         var numReleases = 20;
 
-        // queueGetArtistDetails.pauseNoLogging();
-        queueGetArtistDetails.pause();
+        queueGetArtistDetails.pauseNoLogging();
+        // queueGetArtistDetails.pause();
         
 
         testHelper.stageSpotifyUser(numReleases)
@@ -42,8 +42,8 @@ describe('playlist handler', function () {
     // runs after each unit test
     afterEach(function (done) {
 
-        // queueGetArtistDetails.resumeNoLogging();
-        queueGetArtistDetails.resume();
+        queueGetArtistDetails.resumeNoLogging();
+        // queueGetArtistDetails.resume();
         
 
         var emptyJson = JSON.stringify({}, null, 4);

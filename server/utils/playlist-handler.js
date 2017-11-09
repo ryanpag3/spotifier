@@ -247,6 +247,7 @@ function saveDefaultGlobalPlaylistResetDate() {
 function getLastSundayMidnight() {
     var currentDateTime = new Date();
     var lastSunday = new Date(currentDateTime.setDate(currentDateTime.getDate() - currentDateTime.getDay()));
+    
     lastSunday.setHours(23, 59, 59, 0); // set right before midnight
     return new Date(lastSunday);
 }
