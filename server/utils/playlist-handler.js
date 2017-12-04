@@ -45,9 +45,8 @@ var updateNewReleasePlaylists = function () {
                     return updatePlaylist(user)
                 })
                 .catch(function(err) {
-                   // console.log(user); 
-                   console.log(err);
-
+                   // console.log(user);
+                   console.log('playlist-handler.js updateNewReleasePlaylists: ' + err); 
                 });
             });
             deferred.resolve(p);
@@ -103,13 +102,23 @@ function updatePlaylist(user) {
             api.addReleaseTracksToPlaylist(user)
                 .then(function () {
                     console.log('finished adding releases');
-                    deferred.resolve();
+                    console.log('----------------------------------------------');
+                    console.log('PASS CASE');
+                    console.log(user);
+                    console.log('----------------------------------------------');
+                    console.log('pausing for api');
+                    setTimeout(function() {
+                        deferred.resolve();
+                    }, 500);
+                    
                 })
                 .catch(function (err) {
                     console.log('ERROR: addReleaseTracksToPlaylist');
                     console.log(err);
+                    console.log('----------------------------------------------');
+                    console.log('FAIL CASE')
                     console.log(user);
-                    // console.log(user);
+                    console.log('----------------------------------------------');
                     deferred.reject(err);
                 });
         })

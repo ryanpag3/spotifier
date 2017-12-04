@@ -380,14 +380,33 @@ Api.prototype.addReleaseTracksToPlaylist = function (user) {
         })
         .then(function (uris) {
             console.log('adding tracks to playlist')
-            api.addTracksToPlaylist(user.name, user.playlist.id, uris)
-                .then(function (data) {
-                    deferred.resolve(data);
-                })
-                .catch(function (err) {
-                    console.log('addTracksToPlaylist Error Thrown');
-                    deferred.reject(err);
-                });
+            console.log('uri array length: ' + uris.length);
+            var vals = [];
+            var twoDFlag = false;
+            if (uris.length > 50) {
+                vals = chunkArray(uris, 50);
+                twoDFlag = true;
+            } else {
+                vals = uris;
+            }
+            // console.log('vals: ' + vals);
+            // this is messy but has less overhead
+            function run() {
+                api.addTracksToPlaylist(user.name, user.playlist.id, twoDFlag === false ? vals : vals.pop())
+                    .then(function (data) {
+                        if (vals.length > 0 && twoDFlag === true) {
+                            run();
+                        } else {
+                            deferred.resolve(data);
+                        }
+                    })
+                    .catch(function (err) {
+                        console.log('addTracksToPlaylist Error Thrown');
+                        deferred.reject(err);
+                    });
+            }
+
+            run();
         })
         .catch(function (err) {
             deferred.reject(err);
@@ -418,6 +437,26 @@ function getArtistTrackUris(artistIds) {
             deferred.reject(err);
         })
     return deferred.promise;
+}
+
+/**
+ * Returns an array with arrays of the given size.
+ *
+ * @param myArray {Array} array to split
+ * @param chunk_size {Integer} Size of every group
+ */
+function chunkArray(myArray, chunk_size) {
+    var index = 0;
+    var arrayLength = myArray.length;
+    var tempArray = [];
+
+    for (index = 0; index < arrayLength; index += chunk_size) {
+        myChunk = myArray.slice(index, index + chunk_size);
+        // Do something if you want with the group
+        tempArray.push(myChunk);
+    }
+
+    return tempArray;
 }
 
 /**

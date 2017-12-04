@@ -1,6 +1,7 @@
 var Q = require('q'),
     fs = require('fs'),
     path = require('path'),
+    JSONStream = require('JSONStream'),
     Db = require('../server/utils/db'),
     User = require('../server/models/user'),
     Artist = require('../server/models/artist'),
@@ -67,6 +68,7 @@ module.exports = {
 
         if (artistCache.syncDate === undefined || Date.parse(artistCache.syncDate) < date) {
             console.log('Refreshing release cache, this may take up to ten minutes!');
+            console.log('This only needs to be done once a week so sit tight :)');
             artistCache.syncDate = new Date();
             spotifyServerApi.getNewReleases()
                 .then(function (releasesObj) {
@@ -87,7 +89,11 @@ module.exports = {
                         if (err) {
                             console.log(err);
                         } else {
-                            console.log('save to file successful!');
+                            var waitTime = 30000;
+                            setTimeout(function() {
+                                console.log('save to file successful!');
+                                console.log('Pausing thread for ' + waitTime + ' milliseconds to let Spotify catch up.'); 
+                            }, waitTime)
                             deferred.resolve(releases);
                         }
                     });

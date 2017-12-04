@@ -30,7 +30,6 @@ describe('playlist handler', function () {
 
         queueGetArtistDetails.pauseNoLogging();
         // queueGetArtistDetails.pause();
-        
 
         testHelper.stageSpotifyUser(numReleases)
             .then(function (mSpotifyUser) {
@@ -44,7 +43,6 @@ describe('playlist handler', function () {
 
         queueGetArtistDetails.resumeNoLogging();
         // queueGetArtistDetails.resume();
-        
 
         var emptyJson = JSON.stringify({}, null, 4);
         var fileName = 'playlist-reset-date.json';
@@ -55,8 +53,6 @@ describe('playlist handler', function () {
                 done();
             });
         });
-
-
     });
 
     /** UNIT TESTS **/
@@ -82,19 +78,19 @@ describe('playlist handler', function () {
             var deferred = Q.defer();
             var promises = [];
             var users = [];
-            var numUsers = 5;
+            var numUsers = 25;
             var numReleases = 20;
             testHelper.stageSpotifyUsers(numUsers, numReleases)
                 .then(function(users) {
                     console.log('staged users, now updating playlists');
                     playlist.updateNewReleasePlaylists()
                         .then(function(promises) {
-                            // console.log('we here?');
-                            console.log(promises);
+                            // console.log(promises);
                             done();
                         });
                 })
                 .catch(function(err) {
+                    console.log('unit test error thrown...');
                     console.log(err);
                 });
         });
