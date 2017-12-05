@@ -6,7 +6,7 @@ config.prodUrl = 'https://spotifier.io';
 config.confirmCodeLength = 16;
 config.placeholderAlbumTitle = 'details request queued...';
 config.spotify.playlistTitle = 'spotifier.io | New Releases | Week of ' + getMonday();
-config.spotify.playlistDescription = 'Testing!';
+config.spotify.playlistDescription = 'This is a BETA feature. There may be bugs. Please report any to github.com/ryanpage42/spotifier';
 
 // TODO: refactor to use this config variable. 
 // turn on for more verbose debugging output

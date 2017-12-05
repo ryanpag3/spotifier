@@ -5,7 +5,8 @@ var CronJob = require('cron').CronJob,
     getArtistDetailsQueue = require('./queue-get-artist-details'),
     syncLibraryQueue = require('./queue-sync-user-library'),
     spotifyApiServer = require('../utils/spotify-server-api'),
-    emailHandler = require('./email');
+    emailHandler = require('./email'),
+    playlistHandler = require('./playlist-handler');
 
 
 /**
@@ -39,7 +40,9 @@ function scan() {
                     return e.recent_release.title.toLowerCase();
                 });
                 // query for artist by spotify_id
-                Artist.findOne({'spotify_id': releaseSpotifyIds[i]}, function (err, artist) {
+                Artist.findOne({
+                    'spotify_id': releaseSpotifyIds[i]
+                }, function (err, artist) {
                     if (err) {
                         console.log('mongo error thrown!');
                         console.log(err);
@@ -67,7 +70,11 @@ function scan() {
                                         console.log(artist.name + ' | ' + release.title);
                                         console.log('--------');
                                         // update artist document with new release and flag for notification
-                                        Artist.findOneAndUpdate({'_id': artist._id}, {'recent_release': release},
+                                        Artist.findOneAndUpdate({
+                                                '_id': artist._id
+                                            }, {
+                                                'recent_release': release
+                                            },
                                             function (err, artist) {
                                                 getArtistDetailsQueue.createJob(artist);
                                             });
@@ -82,7 +89,7 @@ function scan() {
                                         deferred.resolve();
                                     }
                                 })
-                                .catch(function(err) {
+                                .catch(function (err) {
                                     console.log(err);
                                     run();
                                 })
@@ -91,7 +98,7 @@ function scan() {
                             if (removeSpecial(release.title).toLowerCase() !==
                                 removeSpecial(artist.recent_release.title).toLowerCase()) {
                                 spotifyApiServer.getAlbumInfo(release)
-                                    .then(function(album) {
+                                    .then(function (album) {
                                         if (album.release_date > artist.recent_release.release_date) {
                                             // todo: move this code block to it's own method
 
@@ -106,7 +113,11 @@ function scan() {
                                             console.log('--------');
                                             console.log(artist.name + ' | ' + release.title);
                                             console.log('--------');
-                                            Artist.findOneAndUpdate({'_id': artist._id}, {'recent_release': release},
+                                            Artist.findOneAndUpdate({
+                                                    '_id': artist._id
+                                                }, {
+                                                    'recent_release': release
+                                                },
                                                 function (err, artist) {
                                                     getArtistDetailsQueue.createJob(artist);
                                                 });
@@ -121,7 +132,7 @@ function scan() {
                                             deferred.resolve();
                                         }
                                     })
-                                    .catch(function(err) {
+                                    .catch(function (err) {
                                         console.log(err);
                                         run();
                                     });
@@ -149,7 +160,7 @@ function scan() {
                 })
             }
         })
-        .catch(function(err) {
+        .catch(function (err) {
             console.log(err);
         });
     return deferred.promise;
@@ -170,20 +181,27 @@ var startScan = function (sendEmails) {
     // scan for new releases
     scan()
         .then(function () {
-            //TODO: update user playlists before resuming
-            // resume job queues
-            syncLibraryQueue.resume();
-            getArtistDetailsQueue.resume();
-            if (sendEmails === true) {
-                // send new release emails
-                emailHandler.sendNewReleaseEmails()
-                    .then(function () {
-                        console.log('EMAIL SERVICE RESOLVED');
+            playlistHandler.updateNewReleasePlaylists()
+                .then(function () {
+                    // resume job queues
+                    syncLibraryQueue.resume();
+                    getArtistDetailsQueue.resume();
+                    if (sendEmails === true) {
+                        // send new release emails
+                        emailHandler.sendNewReleaseEmails()
+                            .then(function () {
+                                console.log('EMAIL SERVICE RESOLVED');
+                                deferred.resolve();
+                            });
+                    } else {
                         deferred.resolve();
-                    });
-            } else {
-                deferred.resolve();
-            }
+                    }
+                })
+                .catch(function (err) {
+                    console.log(err);
+                    deferred.reject(err);
+                });
+
         })
         .catch(function (err) {
             console.log(err);
@@ -225,6 +243,3 @@ function removeSpecial(text) {
     }
     return '';
 }
-
-
-
