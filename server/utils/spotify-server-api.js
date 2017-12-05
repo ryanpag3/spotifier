@@ -233,6 +233,52 @@ var self = module.exports = {
         return deferred.promise;
     },
 
+    /**
+     * Returns an albums track array
+     */
+    getAlbumTracksItems: function(albumId, offset) {
+        var deferred = Q.defer();
+        this.getAlbumTracks(albumId, offset)
+            .then(function(tracks) {
+                deferred.resolve(tracks.items);
+            })
+            .catch(function(err) {
+                deferred.reject(err);
+            })
+        return deferred.promise;
+    },
+
+    /**
+     * Returns tracks and body information for the specified album
+     * TODO: document & test
+     */
+    getAlbumTracks: function(albumId, offset) {
+        var deferred = Q.defer();
+        var limit = 50;
+
+        if (!offset) {
+            offset = 0;
+        }
+
+        self.refreshClientToken()
+            .then(function() {
+                spotifyApi.getAlbumTracks(albumId, {
+                    limit: limit,
+                    offset: offset
+                })
+                .then(function(data) {
+                    deferred.resolve(data.body);
+                })
+                .catch(function(err) {
+                    deferred.reject(err);
+                })
+            })
+            .catch(function(err) {
+                deferred.reject(err);
+            })
+        return deferred.promise;
+    },
+
     getRecentReleaseId: function (artist) {
         var deferred = Q.defer();
         self.refreshClientToken()
@@ -256,9 +302,10 @@ var self = module.exports = {
 
     /**
      * Gets all albums released in the last two weeks.
+     * TODO:
+     * 1. refactor to remove duplicate cache file creation
      */
     getNewReleases: function () {
-        console.log('grabbing new releases from Spotify!');
         var deferred = Q.defer();
         var releases = {};
         var artistAdded = {};
@@ -268,16 +315,13 @@ var self = module.exports = {
         var p = path.join(__dirname, './cache/cached-new-releases.txt');
         var cachedReleases = fs.existsSync(p) ? fs.readFileSync(p, 'utf-8') : undefined;
         if (cachedReleases) {
-            console.log('new releases parsed from cache file.');
             cachedReleases = JSON.parse(cachedReleases);
         } else {
-            console.log('no new release cache file found.');
             cachedReleases = {};
         }
 
         // if syncDate has not been set or syncDate is older than 24 hours from this point
         if (cachedReleases.syncDate === undefined || Date.parse(cachedReleases.syncDate) < checkDate) {
-            console.log('getting new releases...')
             cachedReleases.syncDate = new Date();
             self.refreshClientToken()
                 .then(function () {
@@ -296,6 +340,7 @@ var self = module.exports = {
                                         name: data.body.albums.items[i].artists[0].name,
                                         recent_release: {
                                             id: data.body.albums.items[i].id,
+                                            uri: data.body.albums.items[i].uri,
                                             title: data.body.albums.items[i].name,
                                             images: data.body.albums.items[i].images,
                                             url: data.body.albums.items[i].external_urls.spotify

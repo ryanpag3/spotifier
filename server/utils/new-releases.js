@@ -126,7 +126,7 @@ function scan() {
                                         run();
                                     });
                             } else {
-                                // todo: fix code duplication
+                                // TODO: fix code duplication
                                 i++; // move pointer right
                                 if (i < releaseSpotifyIds.length) { // if we have not checked all new releases
                                     run();
@@ -170,10 +170,10 @@ var startScan = function (sendEmails) {
     // scan for new releases
     scan()
         .then(function () {
+            //TODO: update user playlists before resuming
             // resume job queues
             syncLibraryQueue.resume();
             getArtistDetailsQueue.resume();
-
             if (sendEmails === true) {
                 // send new release emails
                 emailHandler.sendNewReleaseEmails()

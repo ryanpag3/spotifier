@@ -8,7 +8,7 @@ var express = require('express'),
     router = express.Router();
 
 router.get('/login', passport.authenticate('spotify', {
-        scope: ['user-read-private', 'user-read-email', 'user-library-read'],
+        scope: ['user-read-private', 'user-read-email', 'user-library-read', 'playlist-modify-private', 'playlist-modify-public'],
         showDialog: true
     }),
     // callback function
@@ -83,6 +83,7 @@ router.get('/callback',
             .catch(function (err) { // create user err catch
                 console.log(err);
             });
+
 
         // DEBUGGING
         process.env.NODE_ENV ? null : res.redirect('/library');
@@ -181,7 +182,7 @@ router.post('/email/unsubscribe', function(req, res) {
  * Will call db handler and remove user emails that bounce.
  */
 router.post('/email/bounce', function(req, res) {
-    // todo
+    // TODO:
 });
 
 /**
@@ -189,14 +190,14 @@ router.post('/email/bounce', function(req, res) {
  * Will call db handler and remove user email's who return complaints.
  */
 router.post('/email/complaint', function(req, res) {
-    // todo
+    // TODO:
 });
 
 /**
  * API endpoint for getting notifications for Amazon SES deliveries.
  */
 router.post('/email/delivery', function(req, res) {
-   // todo
+   // TODO:
 });
 
 

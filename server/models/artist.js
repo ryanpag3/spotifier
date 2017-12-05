@@ -12,6 +12,7 @@ var Artist = new Schema({
     name: {type: String, required: true},
     recent_release: {type: {
         id: String,
+        uri: String,
         title: String,
         release_date: String,
         images: [],

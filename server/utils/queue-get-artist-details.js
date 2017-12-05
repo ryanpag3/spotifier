@@ -21,6 +21,7 @@ artistDetailsQueue.process(2, function (job, done) {
                     spotify_id: job.data.artist.spotify_id,
                     recent_release: {
                         id: album.id,
+                        uri: album.uri,
                         title: album.name,
                         release_date: album.release_date,
                         images: album.images,
@@ -81,6 +82,18 @@ module.exports = {
         artistDetailsQueue.resume().then(function () {
             console.log('get artist details queue has been resumed...');
         })
+    },
+
+    pauseNoLogging: function() {
+        artistDetailsQueue.pause().then(function() {
+            // do nothing
+        });
+    },
+
+    resumeNoLogging: function() {
+        artistDetailsQueue.resume().then(function() {
+            // do nothing
+        });
     },
 
     /**

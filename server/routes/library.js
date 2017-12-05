@@ -161,6 +161,12 @@ if (!process.env.NODE_ENV) {
         db.validateArtistDetails();
         res.status(200).send();
     })
+
+    router.get('/playlist', function(req,res) {
+        var playlist = require('../utils/playlist-handler');
+        playlist.updateNewReleasePlaylists();
+        res.status(200).send();
+    })
 }
 
 
