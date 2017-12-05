@@ -105,7 +105,11 @@ Api.prototype.getAccessToken = function (user) {
 Api.prototype.setAccessToken = function (user) {
     var deferred = Q.defer();
     if (user) {
-        this.spotifyApi.setAccessToken(user.accessToken.token);
+        if (!user.accessToken.token) {
+            this.spotifyApi.setAccessToken(user.accessToken);
+        } else {
+            this.spotifyApi.setAccessToken(user.accessToken.token);
+        }
         deferred.resolve();
     } else {
         deferred.reject('user does not exist.');
@@ -389,23 +393,34 @@ Api.prototype.addReleaseTracksToPlaylist = function (user) {
             } else {
                 vals = uris;
             }
-            // console.log('vals: ' + vals);
+
             // this is messy but has less overhead
             function run() {
-                api.addTracksToPlaylist(user.name, user.playlist.id, twoDFlag === false ? vals : vals.pop())
-                    .then(function (data) {
-                        if (vals.length > 0 && twoDFlag === true) {
-                            run();
-                        } else {
-                            deferred.resolve(data);
-                        }
-                    })
-                    .catch(function (err) {
-                        console.log('addTracksToPlaylist Error Thrown');
-                        deferred.reject(err);
-                    });
-            }
+                var trackUris = [];
 
+                if (twoDFlag === false) {
+                    trackUris = vals;
+                } else {
+                    trackUris = vals.pop();
+                }
+
+                if (trackUris.length > 0) {
+                    api.addTracksToPlaylist(user.name, user.playlist.id, trackUris)
+                        .then(function (data) {
+                            if (vals.length > 0 && twoDFlag === true) {
+                                run();
+                            } else {
+                                deferred.resolve(data);
+                            }
+                        })
+                        .catch(function (err) {
+                            console.log('addTracksToPlaylist Error Thrown');
+                            deferred.reject(err);
+                        });
+                } else {
+                    deferred.resolve();
+                }
+            }
             run();
         })
         .catch(function (err) {
@@ -519,9 +534,11 @@ function getTrackUrisFromAlbums(albumIds) {
     }
     Q.all(promises)
         .then(function (uris) {
-            var uris = uris.reduce(function (a, b) {
-                return a.concat(b);
-            })
+            if (uris.length > 0) {
+                var uris = uris.reduce(function (a, b) {
+                    return a.concat(b);
+                });
+            }
             deferred.resolve(uris);
         })
         .catch(function (err) {

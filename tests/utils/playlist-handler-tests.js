@@ -74,11 +74,11 @@ describe('playlist handler', function () {
         //         });
         // });
         it('should be able to handle a large amount of user playlists to update', function (done) {
-            this.timeout(30000);
+            this.timeout(60000);
             var deferred = Q.defer();
             var promises = [];
             var users = [];
-            var numUsers = 25;
+            var numUsers = 10;
             var numReleases = 20;
             testHelper.stageSpotifyUsers(numUsers, numReleases)
                 .then(function(users) {

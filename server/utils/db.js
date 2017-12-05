@@ -21,7 +21,6 @@ var Db = function () {
  * @returns {Q.Promise|Object} user doc from mongo
  */
 Db.prototype.createUser = function (mUser) {
-    console.log(mUser);
     var deferred = Q.defer(),
         username = mUser.name;
     User.findOne({

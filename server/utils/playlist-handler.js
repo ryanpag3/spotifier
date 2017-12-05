@@ -20,24 +20,27 @@ var updateNewReleasePlaylists = function () {
     var deferred = Q.defer();
     var p = Q();
 
+    console.log('updating new release playlists');
+
     User.find({
-            $and: [{ // query filter
-                    'new_releases': {
-                        $exists: true,
-                        $ne: []
-                    }
-                },
-                {
-                    'refresh_token': {
-                        $exists: true
-                    }
-                }
-            ]
+            // $and: [{ // query filter
+            //         'new_releases': {
+            //             $exists: true,
+            //             $ne: []
+            //         }
+            //     },
+            //     {
+            //         'refresh_token': {
+            //             $exists: true
+            //         }
+            //     }
+            // ]
         },
         function (err, users) {
             if (err) {
                 throw new Error(err);
             }
+            
             console.log('Users length: ' + users.length);
 
             users.forEach(function (user) {
@@ -45,17 +48,10 @@ var updateNewReleasePlaylists = function () {
                     return updatePlaylist(user)
                 })
                 .catch(function(err) {
-                   // console.log(user);
                    console.log('playlist-handler.js updateNewReleasePlaylists: ' + err); 
                 });
             });
             deferred.resolve(p);
-
-            // for (var i = 0; i < users.length; i++) {
-            //     console.log(i);
-            //     promises.push(updatePlaylist(users[i]));
-            // }
-            // deferred.resolve(Q.allSettled(promises));
         });
     return deferred.promise;
 }
@@ -78,10 +74,12 @@ function updatePlaylist(user) {
             if (!exists) {
                 return createPlaylist(user);
             } else {
-                return;
+                return user;
             }
         })
-        .then(function () {
+        .then(function (nUser) {
+            // back to outer scope
+            user = nUser;
             // is current date later than reset date?
             return playlistResetNeeded(user);
         })
@@ -104,12 +102,13 @@ function updatePlaylist(user) {
                     console.log('finished adding releases');
                     console.log('----------------------------------------------');
                     console.log('PASS CASE');
-                    console.log(user);
+                    console.log(user.name);
+                    console.log(user.playlist);
                     console.log('----------------------------------------------');
-                    console.log('pausing for api');
+                    console.log('pausing for api rate limit');
                     setTimeout(function() {
                         deferred.resolve();
-                    }, 500);
+                    }, 600);
                     
                 })
                 .catch(function (err) {
@@ -119,7 +118,10 @@ function updatePlaylist(user) {
                     console.log('FAIL CASE')
                     console.log(user);
                     console.log('----------------------------------------------');
-                    deferred.reject(err);
+                    console.log('pausing for api rate limit');
+                    setTimeout(function() {
+                        deferred.reject(err);
+                    })
                 });
         })
         .catch(function (err) {
@@ -169,7 +171,7 @@ function playlistResetNeeded(user) {
         userResetDate = new Date(userResetDate); // instantiate for comparator
         var diffOfDays = numDaysBetween(userResetDate, globalResetDate);
         // console.log('difference of days: ' + diffOfDays);
-        console.log(globalResetDate + ' ' + currentDateTime);
+        // console.log(globalResetDate + ' ' + currentDateTime);
 
         if (diffOfDays >= 7 && globalResetDate < currentDateTime) {
             serializeUserResetDate(user)
@@ -310,7 +312,6 @@ function saveGlobalPlaylistResetDate(date) {
     return deferred.promise;
 }
 
-// TODO: save playlist ID to document
 function createPlaylist(userId) {
     var deferred = Q.defer();
     var spotifyUserApi = new SpotifyUserApi();
@@ -319,11 +320,19 @@ function createPlaylist(userId) {
         '_id': userId
     }, function (err, user) {
         spotifyUserApi.createPlaylist(user)
-            .then(function (playlistInfo) {
-                console.log(playlistInfo);
-                deferred.resolve();
-            })
-    })
+            .then(function (playlistId) {
+                user.playlist.id = playlistId;
+                user.playlist.last_reset = '';
+                user.save(function(err, nUser) {
+                    if (err) {
+                        // I think leaving this in will cause the whole promise chain to break on exception
+                        // further testing required before ready for production
+                        // deferred.reject(err);
+                    }
+                    deferred.resolve(nUser);
+                });
+            });
+    });
     return deferred.promise;
 }
 
