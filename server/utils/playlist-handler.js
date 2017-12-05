@@ -23,18 +23,18 @@ var updateNewReleasePlaylists = function () {
     console.log('updating new release playlists');
 
     User.find({
-            // $and: [{ // query filter
-            //         'new_releases': {
-            //             $exists: true,
-            //             $ne: []
-            //         }
-            //     },
-            //     {
-            //         'refresh_token': {
-            //             $exists: true
-            //         }
-            //     }
-            // ]
+            $and: [{ // query filter
+                    'new_releases': {
+                        $exists: true,
+                        $ne: []
+                    }
+                },
+                {
+                    'refresh_token': {
+                        $exists: true
+                    }
+                }
+            ]
         },
         function (err, users) {
             if (err) {
