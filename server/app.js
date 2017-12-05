@@ -101,12 +101,12 @@ const setupApp = function(app, express, socketUtil) {
     });
 
     // error handlers
-    app.use(function(req, res, next) {
-      var err = new Error('not found');
-      err.status = 404;
-      // report error in middleware
-      next(err);
-    });
+    // app.use(function(req, res, next) {
+    //   var err = new Error('not found');
+    //   err.status = 404;
+    //   // report error in middleware
+    //   next(err);
+    // });
 
     app.use(function(err, req, res) {
         res.status(err.status || 500);
