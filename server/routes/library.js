@@ -147,16 +147,16 @@ router.get('/me', function (req, res) {
     })
 });
 
-router.get('/scan', function (req, res) {
-    releaseScanner.startScan(true);
-    res.status(200).send();
-});
 
 /**
  * Expose these routes only if in development mode
  */
 if (!process.env.NODE_ENV) {
 
+    router.get('/scan', function (req, res) {
+        releaseScanner.startScan(true);
+        res.status(200).send();
+    });
 
     router.get('/validate', function (req, res) {
         var db = new Db();
