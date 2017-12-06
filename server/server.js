@@ -6,6 +6,7 @@ var express = require('express'),
     app = express(),
     http = require('http'),
     Socket = require('./utils/socket'),
+    logger = require('./utils/logger'),
     httpServer = http.createServer(app),
     // setup sockets
     io = require('socket.io')(httpServer),
@@ -16,6 +17,6 @@ require('./app.js')(app, express, socket); // expose middleware/setup applicatio
 require('./utils/cron'); // initialize cron jobs
 
 httpServer.listen(3000, function () {
-    console.log('Server successfully launched on port 3000');
+    logger.info('Server successfully launched on port 3000')
 });
 

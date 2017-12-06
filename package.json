@@ -34,6 +34,7 @@
     "express-session": "^1.15.6",
     "helmet": "^3.9.0",
     "kue": "^0.11.6",
+    "log4js": "^2.3.12",
     "mongoose": "^4.13.6",
     "moniker": "^0.1.2",
     "nodemailer": "^4.4.0",
@@ -45,6 +46,7 @@
     "rxjs": "^5.5.3",
     "socket.io": "^2.0.4",
     "spotify-web-api-node": "^2.5.0",
+    "winston": "^3.0.0-rc1",
     "zone.js": "^0.8.18"
   },
   "devDependencies": {
