@@ -3,6 +3,7 @@ var Q = require('q'),
     path = require('path'),
     JSONStream = require('JSONStream'),
     Db = require('../server/utils/db'),
+    logger = require('../server/utils/logger'),
     User = require('../server/models/user'),
     Artist = require('../server/models/artist'),
     sampleData = require('./sample-test-data'),
@@ -67,15 +68,15 @@ module.exports = {
         }
 
         if (artistCache.syncDate === undefined || Date.parse(artistCache.syncDate) < date) {
-            console.log('Refreshing release cache, this may take up to ten minutes!');
-            console.log('This only needs to be done once a week so sit tight :)');
+            logger.info('Refreshing release cache, this may take up to ten minutes!');
+            logger.info('This only needs to be done once a week so sit tight :)');
             artistCache.syncDate = new Date();
             spotifyServerApi.getNewReleases()
                 .then(function (releasesObj) {
                     var releases = [];
                     // convert associative array to regular array
                     var keys = Object.keys(releasesObj);
-                    console.log(keys.length);
+
                     for (var k = 0; k < keys.length; k++) {
                         for (var j = 0; j < releasesObj[keys[k]].length; j++) {
                             releases.push(releasesObj[keys[k]][j]);
@@ -87,12 +88,12 @@ module.exports = {
                         flag: 'w'
                     }, function (err) {
                         if (err) {
-                            console.log(err);
+                            logger.error(err);
                         } else {
                             var waitTime = 30000;
                             setTimeout(function() {
-                                console.log('save to file successful!');
-                                console.log('Pausing thread for ' + waitTime + ' milliseconds to let Spotify catch up.'); 
+                                logger.info('save to file successful!');
+                                logger.info('Pausing thread for ' + waitTime + ' milliseconds to let Spotify catch up.'); 
                             }, waitTime)
                             deferred.resolve(releases);
                         }
@@ -149,7 +150,7 @@ module.exports = {
                                     };
                                     Artist.create(artist, function (err) {
                                         if (err) {
-                                            console.log(err);
+                                            logger.error(err);
                                         } else {
                                             i++;
                                             // console.log('artist: ' + i++ + '/' + n + ' created.');
@@ -160,13 +161,13 @@ module.exports = {
                                     setTimeout(insertNewArtist, 0);
                                 } else {
                                     setTimeout(function () {
-                                        console.log('artists inserted')
+                                        logger.info('artists inserted')
                                         deferred.resolve('job done!')
                                     }, 10);
                                 }
                             })
                             .catch(function (err) {
-                                console.log(err);
+                                logger.error(err);
                                 i--;
                                 insertNewArtist();
                             })
@@ -186,7 +187,7 @@ module.exports = {
                                     };
                                     Artist.create(artist, function (err) {
                                         if (err) {
-                                            console.log(err);
+                                            logger.error(err);
                                         } else {
                                             i++;
                                             // console.log('artist: ' + i++ + '/' + n + ' created.');
@@ -202,7 +203,7 @@ module.exports = {
                                 }
                             })
                             .catch(function (err) {
-                                console.log(err);
+                                logger.error(err);
                                 i--;
                                 insertNewArtist();
                             })
@@ -282,19 +283,19 @@ module.exports = {
                 // maybe an updateMany with a filter would be a better approach
                 User.remove({}, function (err) {
                     if (err) {
-                        console.log(err);
+                        logger.error(err);
                     }
                     User.insertMany(users, function (err) {
                         if (err) {
-                            console.log(err);
+                            logger.error(err);
                         }
                         Artist.remove({}, function (err) {
                             if (err) {
-                                console.log(err);
+                                logger.error(err);
                             }
                             Artist.insertMany(artists, function (err) {
                                 if (err) {
-                                    console.log(err);
+                                    logger.error(err);
                                 } else {
                                     deferred.resolve();
                                 }

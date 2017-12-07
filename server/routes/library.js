@@ -11,7 +11,8 @@ var express = require('express'),
     SpotifyApiUser = require('../utils/spotify-user-api.js'),
     Db = require('../utils/db.js'),
     syncLibraryJobQueue = require('../utils/queue-sync-user-library.js'),
-    releaseScanner = require('../utils/new-releases');
+    releaseScanner = require('../utils/new-releases'),
+    logger = require('../utils/logger');
 
 /**
  * returns the authenticated user's tracked artist library
@@ -42,7 +43,7 @@ router.get('/sync', function (req, res) {
             res.status(200).send();
         })
         .catch(function (err) { // catch refresh access token error
-            console.log(err);
+            logger.error(err);
         });
 });
 
@@ -187,7 +188,7 @@ function refreshAccessToken(req) {
                 req.session.passport.user.accessToken = accessToken;
                 req.session.save(function (err) {
                     if (err) {
-                        console.log(err);
+                        logger.error(err);
                     }
                     deferred.resolve();
                 });

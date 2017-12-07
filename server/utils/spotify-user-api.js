@@ -2,6 +2,7 @@ var SpotifyApi = require('spotify-web-api-node'),
     spotifyServerApi = require('./spotify-server-api'),
     Q = require('q'),
     Db = require('./db.js'),
+    logger = require('./logger'),
     Artist = require('../models/artist'),
     configPrivate = require('../../private/config-private'),
     configPublic = require('../../config-public'),
@@ -38,9 +39,8 @@ Api.prototype.syncLibrary = function (user, socketUtil) {
         .then(function () {
             api.getLibraryArtists(user)
                 .then(function (artists) {
-                    console.log(artists.length);
                     var db = new Db();
-                    console.log(user.name + '\'s library is being added.');
+                    logger.info(user.name + '\'s library is being added with artist array length: ' + artists.length);
                     db.addAllArtists(user, artists, socketUtil)
                         .then(function () {
                             db.getLibrary(user)
@@ -51,12 +51,12 @@ Api.prototype.syncLibrary = function (user, socketUtil) {
                         });
                 })
                 .catch(function (err) {
-                    console.log(err);
+                    logger.error(err);
                     deferred.reject(err);
                 })
         })
         .catch(function (err) {
-            console.log(err);
+            logger.error(err);
             deferred.reject(err);
         });
     return deferred.promise;
@@ -166,7 +166,7 @@ Api.prototype.getLibraryArtists = function (user) {
                         if (offset < data.body.total - 1) {
                             setTimeout(go, 250); // run again
                         } else {
-                            console.log('artists successfully grabbed with a length of: ' + self.artists.length);
+                            logger.info('artists successfully grabbed with a length of: ' + self.artists.length);
                             deferred.resolve(self.artists); // return array
                         }
                     })
@@ -177,7 +177,7 @@ Api.prototype.getLibraryArtists = function (user) {
             })
             // catch get access token error
             .catch(function (err) {
-                console.log(err);
+                logger.error(err);
             });
     }
     // begin recursive call
@@ -222,7 +222,7 @@ Api.prototype.searchArtists = function (user, query) {
                     deferred.resolve(results);
                 })
                 .catch(function (err) {
-                    console.log(err);
+                    logger.error(err);
                     deferred.reject(err);
                 })
         });
@@ -375,16 +375,16 @@ Api.prototype.addReleaseTracksToPlaylist = function (user) {
 
     this.getAccessToken(user)
         .then(function (accessToken) {
-            console.log('setting access token.')
+            logger.info('setting access token.')
             return api.setAccessToken(accessToken.token);
         })
         .then(function () {
-            console.log('converting to uri values.');
+            logger.info('converting to uri values.');
             return getArtistTrackUris(user.new_releases);
         })
         .then(function (uris) {
-            console.log('adding tracks to playlist')
-            console.log('uri array length: ' + uris.length);
+            logger.info('adding tracks to playlist')
+            logger.info('uri array length: ' + uris.length);
             var vals = [];
             var twoDFlag = false;
             if (uris.length > 50) {
@@ -414,7 +414,7 @@ Api.prototype.addReleaseTracksToPlaylist = function (user) {
                             }
                         })
                         .catch(function (err) {
-                            console.log('addTracksToPlaylist Error Thrown');
+                            logger.error('addTracksToPlaylist Error Thrown');
                             deferred.reject(err);
                         });
                 } else {
@@ -567,7 +567,7 @@ function getAlbumsTrackUris(albumId) {
 
             if (totalTracksLength > 50) { // if album tracks larger than spotify limit, iterate
                 iterated = true;
-                console.log('iterating...');
+                logger.info('iterating through tracks');
                 for (var offset = 50; offset < totalTracksLength; offset += 50) {
                     promises.push(spotifyServerApi.getAlbumTracksItems(albumId, offset));
                 }

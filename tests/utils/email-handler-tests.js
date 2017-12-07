@@ -4,6 +4,7 @@ var expect = require('chai').expect,
     User = require('../../server/models/user'),
     Artist = require('../../server/models/artist'),
     email = require('../../server/utils/email'),
+    logger = require('../../server/utils/logger'),
     releaseScanner = require('../../server/utils/new-releases'),
     Db = require('../../server/utils/db'),
     testHelper = require('../test-helpers'),
@@ -39,7 +40,7 @@ describe('email-handler tests', function () {
                         done();
                     })
                     .catch(function (err) {
-                        console.log(err);
+                        logger.error(err);
                     });
             })
     });
@@ -62,19 +63,19 @@ describe('email-handler tests', function () {
                                        done();
                                    })
                                    .catch(function(err) { // catch getUser err
-                                       console.log(err);
+                                       logger.error(err);
                                    })
                            })
                            .catch(function(err) { // catch confirm err
-                               console.log(err);
+                               logger.error(err);
                            })
                    })
                    .catch(function(err) { // catch setConfirmCode err
-                       console.log(err);
+                       logger.error(err);
                    })
            })
             .catch(function(err) { // catch insert err
-                console.log(err);
+                logger.error(err);
             })
     });
 
@@ -96,11 +97,11 @@ describe('email-handler tests', function () {
                             })
                     })
                     .catch(function(err) { // catch setConfirmCode err
-                        console.log(err);
+                        logger.error(err);
                     })
             })
             .catch(function(err) { // catch insert err
-                console.log(err);
+                logger.error(err);
             })
     });
 

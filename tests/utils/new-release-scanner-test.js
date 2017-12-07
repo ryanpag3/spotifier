@@ -6,6 +6,7 @@ var expect = require('chai').expect,
     User = require('../../server/models/user'),
     Artist = require('../../server/models/artist'),
     email = require('../../server/utils/email'),
+    logger = require('../../server/utils/logger'),
     Db = require('../../server/utils/db'),
     testHelper = require('../test-helpers'),
     sampleData = require('../sample-test-data'),
@@ -49,7 +50,7 @@ describe('new-release-scanner unit tests', function () {
                                 }
                                 var userReleasesFound = 0;
                                 for (var i = 0; i < users.length; i++) {
-                                    console.log(users[i]);
+                                    logger.info(users[i]);
                                     if (users[i].new_releases.length > 0) userReleasesFound++;
                                 }
                                 expect(userReleasesFound).to.be.greaterThan(0);
@@ -58,11 +59,11 @@ describe('new-release-scanner unit tests', function () {
                         }, 0);
                     })
                     .catch(function (err) {
-                        console.log(err);
+                        logger.error(err);
                     });
             })
             .catch(function (err) {
-                console.log(err);
+                logger.error(err);
             });
 
     });

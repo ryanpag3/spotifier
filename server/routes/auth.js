@@ -5,6 +5,7 @@ var express = require('express'),
     passport = require('passport'),
     Db = require('../utils/db.js'),
     email = require('../utils/email'),
+    logger = require('../utils/logger'),
     router = express.Router();
 
 router.get('/login', passport.authenticate('spotify', {
@@ -58,7 +59,7 @@ router.get('/callback',
                 req.session.passport.user._id = user._id;
                 req.session.save(function (err) {
                     if (err) {
-                        console.log(err);
+                        logger.error(err);
                     }
                 });
                 db.emailExists(user)
@@ -81,7 +82,7 @@ router.get('/callback',
                     })
             })
             .catch(function (err) { // create user err catch
-                console.log(err);
+                logger.error(err);
             });
 
 

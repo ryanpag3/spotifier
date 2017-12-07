@@ -2,7 +2,8 @@ var express = require('express'),
     Q = require('q'),
     router = express.Router(),
     SpotifyApiUser = require('../utils/spotify-user-api.js'),
-    scanner = require('../utils/new-releases.js');
+    scanner = require('../utils/new-releases.js'),
+    logger = require('../utils/logger');
 
 router.post('/search', function(req, res) {
     var spotifyApiUser = new SpotifyApiUser();
@@ -21,7 +22,7 @@ router.post('/search', function(req, res) {
                 req.session.save(function(err){
                     // catch serialization error
                     if (err) {
-                        console.log(err);
+                        logger.error(err);
                     }
                 });
             }
@@ -32,12 +33,12 @@ router.post('/search', function(req, res) {
                     })
                 })
                 .catch(function(err) {
-                    console.log(err);
+                    logger.error(err);
                 })
         })
         // catch refresh access token api error
         .catch(function(err) {
-            console.log(err);
+            logger.error(err);
         });
 });
 

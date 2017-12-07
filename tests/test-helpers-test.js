@@ -7,6 +7,7 @@ var expect = require('chai').expect,
     Artist = require('../server/models/artist'),
     email = require('../server/utils/email'),
     Db = require('../server/utils/db'),
+    logger = require('../server/utils/logger'),
     testHelper = require('./test-helpers'),
     sampleData = require('./sample-test-data'),
     spotifyApiServer = require('../server/utils/spotify-server-api');
@@ -81,7 +82,7 @@ describe('test-helper unit tests', function () {
                                 })
                             })
                             .catch(function (err) {
-                                console.log(err);
+                                logger.error(err);
                             })
                     })
             })

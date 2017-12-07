@@ -3,7 +3,8 @@ var Queue = require('bull'),
     cluster = require('cluster'),
     path = require('path'),
     spotifyApiServer = require('../utils/spotify-server-api'),
-    Db = require('./db');
+    Db = require('./db'),
+    logger = require('./logger');
 var socketUtil;
 
 var artistDetailsQueue = new Queue('artist-details'); // todo add prod redis values
@@ -41,7 +42,7 @@ artistDetailsQueue.process(2, function (job, done) {
             done(null, artist);
         })
         .catch(function (err) {
-            console.log(err);
+            logger.error(err);
             done(new Error(err));
         })
 });
@@ -51,10 +52,10 @@ artistDetailsQueue.process(2, function (job, done) {
  */
 artistDetailsQueue
     .on('error', function (err) {
-        console.log(err);
+        logger.error(err);
     })
     .on('failed', function (job, err) {
-        console.log('get artist details job failed, restarting...');
+        logger.info('get artist details job failed, restarting...');
     })
     .on('completed', function (job, result) {
         if (socketUtil) {
@@ -74,13 +75,13 @@ module.exports = {
 
     pause: function () {
         artistDetailsQueue.pause().then(function () {
-            console.log('the artist details queue is now paused...');
+            logger.info('the artist details queue is now paused...');
         })
     },
 
     resume: function () {
         artistDetailsQueue.resume().then(function () {
-            console.log('get artist details queue has been resumed...');
+            logger.info('get artist details queue has been resumed...');
         })
     },
 

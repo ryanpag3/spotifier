@@ -7,6 +7,7 @@ var nodemailer = require('nodemailer'),
     User = require('../models/user'),
     Artist = require('../models/artist'),
     Db = require('./db'),
+    logger = require('./logger'),
     configPrivate = require('../../private/config-private'),
     configPublic = require('../../config-public');
 
@@ -79,7 +80,7 @@ Email.prototype.sendNewReleaseEmails = function () {
             }
         }, function (err, users) {
             if (err) {
-                console.log(err);
+                logger.error(err);
             }
             if (users && users.length > 0) { // if users still have new_releases pending
                 var master = users[0]; // master is the user we will query for all matching artist patterns with
@@ -98,7 +99,7 @@ Email.prototype.sendNewReleaseEmails = function () {
                     var addresses = [];
                     // catch err
                     if (err) {
-                        console.log(err);
+                        logger.error(err);
                     }
 
                     // build the recipients
@@ -115,7 +116,7 @@ Email.prototype.sendNewReleaseEmails = function () {
                         var newReleaseEmail = new EmailTemplate(templateDir);
                         // catch err
                         if (err) {
-                            console.log(err);
+                            logger.error(err);
                         }
 
                         var unsubUrl = process.env.NODE_ENV ? 'https://spotifier.io/unsubscribe' : 'http://localhost:3000/unsubscribe';
@@ -126,7 +127,7 @@ Email.prototype.sendNewReleaseEmails = function () {
                         }, function (err, result) {
                             // catch err
                             if (err) {
-                                console.log(err);
+                                logger.error(err);
                             } else if (validateTemplate(result)) {
                                 var today = new Date(Date.now()).toLocaleDateString('en-US');
                                 // define email options
@@ -152,21 +153,21 @@ Email.prototype.sendNewReleaseEmails = function () {
                                             }
                                         }, function (err) {
                                             if (err) {
-                                                console.log(err);
+                                                logger.error(err);
                                             }
                                             sendNewReleaseBatch(); // process next release batch and send
                                         });
 
                                     })
                                     .catch(function (err) {
-                                        console.log(err);
+                                        logger.error(err);
                                         // if email fails to send, we set a backoff of 2 mins before retrying
                                         setTimeout(function () {
                                             sendNewReleaseBatch();
                                         }, 120000);
                                     });
                             } else {
-                                console.log('error creating template for confirmation email!');
+                                logger.error('error creating template for confirmation email!');
                             }
                         });
                     });
@@ -209,7 +210,7 @@ Email.prototype.sendConfirmationEmail = function (user) {
                 // render email template
                 confirmEmail.render(templateVals, function (err, result) {
                     if (err) {
-                        console.log(err);
+                        logger.error(err);
                     } else if (validateTemplate(result)) {
                         var mailOptions = {
                             from: configPrivate.domain.email,
@@ -230,7 +231,7 @@ Email.prototype.sendConfirmationEmail = function (user) {
                                 deferred.reject(err);
                             })
                     } else {
-                        console.log('there was an error creating the email template!')
+                        logger.error('there was an error creating the email template!')
                     }
                 });
             }
@@ -268,7 +269,7 @@ Email.prototype.confirm = function (query) {
                     }
                 }, function (err) {
                     if (err) {
-                        console.log(err);
+                        logger.error(err);
                         deferred.reject(err);
                     } else {
                         deferred.resolve();
@@ -276,12 +277,12 @@ Email.prototype.confirm = function (query) {
                 })
             } else {
                 var error = 'invalid confirm code';
-                console.log(error);
+                logger.error(error);
                 deferred.reject(error);
             }
         } else {
             var error = 'user not found!';
-            console.log(error);
+            logger.error(error);
             deferred.reject(error);
         }
     });

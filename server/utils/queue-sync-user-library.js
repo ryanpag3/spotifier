@@ -2,7 +2,8 @@ var Queue = require('bull'),
     Q = require('q'),
     User = require('../models/user.js'),
     syncLibraryQueue = new Queue('sync-library'), // todo add redis production server values
-    SpotifyApiUser = require('./spotify-user-api.js');
+    SpotifyApiUser = require('./spotify-user-api.js'),
+    logger = require('./logger');
 var socketUtil; // assigned on job creation, need to use global namespace to allow event listener usage
 
 syncLibraryQueue
@@ -15,7 +16,7 @@ syncLibraryQueue
         };
         User.update({'_id': job.data.user._id}, update, function (err) {
             if (err) {
-                console.log(err);
+                logger.error(err);
             }
         })
     })
@@ -29,13 +30,13 @@ syncLibraryQueue
         User.update({'_id': job.data.user._id}, update,
             function (err) {
                 if (err) {
-                    console.log(err);
+                    logger.error(err);
                 }
             })
     })
     .on('completed', function (job, result) {
         socketUtil.alertSyncQueueStatusChange(job.data.user, 'completed');
-        console.log(job.data.user.name + ' finished their sync library job.');
+        logger.info(job.data.user.name + ' finished their sync library job.');
         var update = {
             sync_queue: {
                 status: 'not queued'
@@ -44,7 +45,7 @@ syncLibraryQueue
         User.update({'_id': job.data.user._id}, update,
             function (err) {
                 if (err) {
-                    console.log(err);
+                    logger.error(err);
                 }
             })
     });
@@ -104,7 +105,7 @@ module.exports = {
                     if (job) {
                         job.remove()
                             .then(function () {
-                                console.log(user.name + '\'s job has been removed.');
+                                logger.info(user.name + '\'s job has been removed.');
                                 deferred.resolve();
                             })
                             .catch(function (err) {
@@ -134,13 +135,13 @@ module.exports = {
 
     pause: function () {
         syncLibraryQueue.pause().then(function () {
-            console.log('sync library queue is now paused...')
+            logger.info('sync library queue is now paused...')
         });
     },
 
     resume: function () {
         syncLibraryQueue.resume().then(function () {
-            console.log('sync library queue is now resumed...');
+            logger.info('sync library queue is now resumed...');
         })
 
     },

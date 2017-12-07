@@ -9,6 +9,7 @@ var expect = require('chai').expect,
     sampleData = require('../sample-test-data'),
     SpotifyApiUser = require('../../server/utils/spotify-user-api'),
     queueGetArtistDetails = require('../../server/utils/queue-get-artist-details'),
+    logger = require('../../server/utils/logger'),
     User = require('../../server/models/user'),
     Artist = require('../../server/models/artist');
 
@@ -82,7 +83,7 @@ describe('playlist handler', function () {
             var numReleases = 20;
             testHelper.stageSpotifyUsers(numUsers, numReleases)
                 .then(function(users) {
-                    console.log('staged users, now updating playlists');
+                    logger.info('staged users, now updating playlists');
                     playlist.updateNewReleasePlaylists()
                         .then(function(promises) {
                             // console.log(promises);
@@ -90,8 +91,8 @@ describe('playlist handler', function () {
                         });
                 })
                 .catch(function(err) {
-                    console.log('unit test error thrown...');
-                    console.log(err);
+                    logger.error('unit test error thrown...');
+                    logger.error(err);
                 });
         });
     });
@@ -159,8 +160,8 @@ describe('playlist handler', function () {
                 })
                 .catch(function (err) {
                     // rewire throws err to catch block
-                    console.log('ERROR: should return true when it is time to reset the playlist');
-                    console.log(err);
+                    logger.error('ERROR: should return true when it is time to reset the playlist');
+                    logger.error(err);
                 });
         });
 
@@ -174,8 +175,8 @@ describe('playlist handler', function () {
                 })
                 .catch(function (err) {
                     // rewire throws err to catch block
-                    console.log('ERROR: should return false when it is not time to reset the playlist');
-                    console.log(err);
+                    logger.error('ERROR: should return false when it is not time to reset the playlist');
+                    logger.error(err);
                 });
         });
     });

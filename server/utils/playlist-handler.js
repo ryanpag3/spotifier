@@ -6,6 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const User = require('../models/user');
 const Db = require('../utils/db');
+const logger = require('../utils/logger');
 const SpotifyUserApi = require('./spotify-user-api');
 
 /**
@@ -20,7 +21,7 @@ var updateNewReleasePlaylists = function () {
     var deferred = Q.defer();
     var p = Q();
 
-    console.log('updating new release playlists');
+    logger.info('updating new release playlists');
 
     User.find({
             $and: [{ // query filter
@@ -41,14 +42,14 @@ var updateNewReleasePlaylists = function () {
                 throw new Error(err);
             }
             
-            console.log('Users length: ' + users.length);
+            logger.info('Users length: ' + users.length);
 
             users.forEach(function (user) {
                 p = p.then(function () {
                     return updatePlaylist(user)
                 })
                 .catch(function(err) {
-                   console.log('playlist-handler.js updateNewReleasePlaylists: ' + err); 
+                   logger.info('playlist-handler.js updateNewReleasePlaylists: ' + err); 
                 });
             });
             deferred.resolve(p);
@@ -86,39 +87,39 @@ function updatePlaylist(user) {
         .then(function (reset) {
             // if reset, empty playlist
             if (reset) {
-                console.log('playlist reset needed for ' + user.name + '. Emptying...');
+                logger.info('playlist reset needed for ' + user.name + '. Emptying...');
                 return api.emptyPlaylist(user);
             } else {
-                console.log('playlist reset not needed for ' + user.name);
+                logger.info('playlist reset not needed for ' + user.name);
                 return;
             }
         })
         .then(function () {
-            console.log('adding releases to playlist');
+            logger.info('adding releases to playlist');
             // console.log(user);
             // add releases
             api.addReleaseTracksToPlaylist(user)
                 .then(function () {
-                    console.log('finished adding releases');
-                    console.log('----------------------------------------------');
-                    console.log('PASS CASE');
-                    console.log(user.name);
-                    console.log(user.playlist);
-                    console.log('----------------------------------------------');
-                    console.log('pausing for api rate limit');
+                    logger.info('finished adding releases');
+                    logger.info('----------------------------------------------');
+                    logger.info('PASS CASE');
+                    logger.info(user.name);
+                    logger.info(user.playlist);
+                    logger.info('----------------------------------------------');
+                    logger.info('pausing for api rate limit');
                     setTimeout(function() {
                         deferred.resolve();
                     }, 600);
                     
                 })
                 .catch(function (err) {
-                    console.log('ERROR: addReleaseTracksToPlaylist');
-                    console.log(err);
-                    console.log('----------------------------------------------');
-                    console.log('FAIL CASE')
-                    console.log(user);
-                    console.log('----------------------------------------------');
-                    console.log('pausing for api rate limit');
+                    logger.error('ERROR: addReleaseTracksToPlaylist');
+                    logger.error(err);
+                    logger.error('----------------------------------------------');
+                    logger.error('FAIL CASE')
+                    logger.error(user);
+                    logger.error('----------------------------------------------');
+                    logger.error('pausing for api rate limit');
                     setTimeout(function() {
                         deferred.reject(err);
                     })
@@ -165,7 +166,7 @@ function playlistResetNeeded(user) {
                 deferred.resolve(false); // skip this weeks reset
             })
             .catch(function (err) {
-                console.log(err);
+                logger.error(err);
             });
     } else {
         userResetDate = new Date(userResetDate); // instantiate for comparator
@@ -179,7 +180,7 @@ function playlistResetNeeded(user) {
                     deferred.resolve(true);
                 })
                 .catch(function (err) {
-                    console.log(err);
+                    logger.error(err);
                 })
         } else {
             deferred.resolve(false);

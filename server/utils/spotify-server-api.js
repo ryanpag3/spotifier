@@ -3,6 +3,7 @@ var SpotifyApi = require('spotify-web-api-node'),
     Q = require('q'),
     fs = require('fs'),
     path = require('path'),
+    logger = require('./logger'),
     configPrivate = require('../../private/config-private'),
     credentials = {
         clientId: configPrivate.spotify.clientId,
@@ -25,7 +26,7 @@ var self = module.exports = {
                 deferred.resolve();
             })
             .catch(function (err) {
-                console.log(err);
+                logger.error(err);
                 deferred.reject(err);
             });
         return deferred.promise;
@@ -48,13 +49,13 @@ var self = module.exports = {
                                 deferred.resolve(mostRecent);
                             })
                             .catch(function (err) {
-                                console.log('get most recent details error')
-                                console.log(err);
+                                logger.error('get most recent details error')
+                                logger.error(err);
                                 deferred.reject(err); // job failed, will restart
                             })
                     })
                     .catch(function (err) {
-                        console.log(err);
+                        logger.error(err);
                         deferred.reject(err); // job failed, will restart
                     })
             })
@@ -156,7 +157,7 @@ var self = module.exports = {
                         }
                     })
                     .catch(function (err) {
-                        console.log(err);
+                        logger.error(err);
                         deferred.reject(err);
                     })
             } else { // no releases of type
@@ -205,7 +206,7 @@ var self = module.exports = {
                     }
                 })
                 .catch(function (err) {
-                    console.log(err);
+                    logger.error(err);
                     run();
                 })
         }
@@ -358,17 +359,17 @@ var self = module.exports = {
                                 if (offset < data.body.albums.total) {
                                     run();
                                 } else {
-                                    console.log('Last two weeks of releases from Spotify grabbed!');
+                                    logger.info('Last two weeks of releases from Spotify grabbed!');
                                     cachedReleases.releases = releases;
                                     if (!process.env.NODE_ENV) {
-                                        console.log('writing cached releases to file...');
+                                        logger.info('writing cached releases to file...');
                                         fs.writeFile(path.join(__dirname, './cache/cached-new-releases.txt'), JSON.stringify(cachedReleases, null, 4), {
                                             encoding: 'utf-8',
                                             flag: 'w'
                                         }, function (err) {
                                             if (err) {
-                                                console.log('write file error thrown!');
-                                                console.log(err);
+                                                logger.error('write file error thrown!');
+                                                logger.error(err);
                                             }
                                         });
                                     }
@@ -376,13 +377,13 @@ var self = module.exports = {
                                 }
                             })
                             .catch(function (err) {
-                                console.log(err);
+                                logger.error(err);
                                 run();
                             })
                     }
                 })
                 .catch(function (err) {
-                    console.log(err);
+                    logger.error(err);
                 });
         } else {
             deferred.resolve(cachedReleases.releases);
@@ -431,7 +432,7 @@ var self = module.exports = {
                     })
             })
             .catch(function (err) {
-                console.log(err);
+                logger.error(err);
                 deferred.reject('**REFRESH CLIENT TOKEN**' + err);
             });
         return deferred.promise;

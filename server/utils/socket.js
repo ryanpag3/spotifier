@@ -1,5 +1,6 @@
 var User = require('../models/user'),
-    Artist = require('../models/artist');
+    Artist = require('../models/artist'),
+    logger = ('./logger');
 
 function Socket(io) {
     var self = this;
@@ -41,7 +42,7 @@ Socket.prototype.alertArtistDetailsChange = function (artist) {
 
     Artist.findOne({'spotify_id': artist.spotify_id}, 'users_tracking', function (err, qArtist) {
         if (err) {
-            console.log(err);
+            logger.error(err);
         }
         if (qArtist) {
             for (var i = 0; i < qArtist.users_tracking.length; i++) {

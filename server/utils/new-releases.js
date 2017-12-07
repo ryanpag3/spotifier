@@ -6,6 +6,7 @@ var CronJob = require('cron').CronJob,
     syncLibraryQueue = require('./queue-sync-user-library'),
     spotifyApiServer = require('../utils/spotify-server-api'),
     emailHandler = require('./email'),
+    logger = require('./logger'),
     playlistHandler = require('./playlist-handler');
 
 
@@ -26,7 +27,7 @@ var CronJob = require('cron').CronJob,
  *  todo: refactor to limit code duplication
  * */
 function scan() {
-    console.log('scan started!');
+    logger.info('scan started!');
     var deferred = Q.defer();
     spotifyApiServer.getNewReleases()
         .then(function (releases) {
@@ -44,12 +45,12 @@ function scan() {
                     'spotify_id': releaseSpotifyIds[i]
                 }, function (err, artist) {
                     if (err) {
-                        console.log('mongo error thrown!');
-                        console.log(err);
+                        logger.error('mongo error thrown!');
+                        logger.error(err);
                     }
                     // if exists and has a recent_release that has been set
                     if (artist !== null && artist.recent_release.id !== undefined) {
-                        console.log('checking ' + artist.name);
+                        logger.info('checking ' + artist.name + ' for release data.');
                         if (artistReleaseTitles.length > 1) { // if artist has multiple releases in past two weeks
                             spotifyApiServer.getRecentRelease(artist)
                                 .then(function (album) {
@@ -65,10 +66,10 @@ function scan() {
                                     if (removeSpecial(release.title).toLowerCase() !==
                                         removeSpecial(artist.recent_release.title).toLowerCase() &&
                                         release.release_date > artist.recent_release.release_date) {
-                                        console.log('release found!');
-                                        console.log('--------');
-                                        console.log(artist.name + ' | ' + release.title);
-                                        console.log('--------');
+                                        logger.info('--------');
+                                        logger.info('release found!');
+                                        logger.info(artist.name + ' | ' + release.title);
+                                        logger.info('--------');
                                         // update artist document with new release and flag for notification
                                         Artist.findOneAndUpdate({
                                                 '_id': artist._id
@@ -85,12 +86,12 @@ function scan() {
                                     if (i < releaseSpotifyIds.length) { // if we have not checked all new releases
                                         run();
                                     } else {
-                                        console.log('done processing new releases!');
+                                        logger.info('done processing new releases!');
                                         deferred.resolve();
                                     }
                                 })
                                 .catch(function (err) {
-                                    console.log(err);
+                                    logger.error(err);
                                     run();
                                 })
                         } else {
@@ -109,10 +110,10 @@ function scan() {
                                                 images: album.images,
                                                 url: album.external_urls.spotify
                                             };
-                                            console.log('release found!');
-                                            console.log('--------');
-                                            console.log(artist.name + ' | ' + release.title);
-                                            console.log('--------');
+                                            logger.info('release found!');
+                                            logger.info('--------');
+                                            logger.info(artist.name + ' | ' + release.title);
+                                            logger.info('--------');
                                             Artist.findOneAndUpdate({
                                                     '_id': artist._id
                                                 }, {
@@ -128,12 +129,12 @@ function scan() {
                                         if (i < releaseSpotifyIds.length) { // if we have not checked all new releases
                                             run();
                                         } else {
-                                            console.log('done processing new releases!');
+                                            logger.info('done processing new releases!');
                                             deferred.resolve();
                                         }
                                     })
                                     .catch(function (err) {
-                                        console.log(err);
+                                        logger.error(err);
                                         run();
                                     });
                             } else {
@@ -142,7 +143,7 @@ function scan() {
                                 if (i < releaseSpotifyIds.length) { // if we have not checked all new releases
                                     run();
                                 } else {
-                                    console.log('done processing new releases!');
+                                    logger.info('done processing new releases!');
                                     deferred.resolve();
                                 }
                             }
@@ -153,7 +154,7 @@ function scan() {
                         if (i < releaseSpotifyIds.length) { // if we have not checked all new releases
                             run();
                         } else {
-                            console.log('done processing new releases!');
+                            logger.info('done processing new releases!');
                             deferred.resolve();
                         }
                     }
@@ -161,7 +162,7 @@ function scan() {
             }
         })
         .catch(function (err) {
-            console.log(err);
+            logger.error(err);
         });
     return deferred.promise;
 }
@@ -190,7 +191,7 @@ var startScan = function (sendEmails) {
                         // send new release emails
                         emailHandler.sendNewReleaseEmails()
                             .then(function () {
-                                console.log('EMAIL SERVICE RESOLVED');
+                                logger.info('EMAIL SERVICE RESOLVED');
                                 deferred.resolve();
                             });
                     } else {
@@ -198,13 +199,13 @@ var startScan = function (sendEmails) {
                     }
                 })
                 .catch(function (err) {
-                    console.log(err);
+                    logger.error(err);
                     deferred.reject(err);
                 });
 
         })
         .catch(function (err) {
-            console.log(err);
+            logger.error(err);
             deferred.reject(err);
         });
     return deferred.promise;
