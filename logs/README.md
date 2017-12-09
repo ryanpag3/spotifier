@@ -1,0 +1,1 @@
+File is used to keep directory structure intact with git.
