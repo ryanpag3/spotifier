@@ -5,3 +5,5 @@ tests/artist-release-cache.txt
 server/utils/cache/cached-new-releases.txt
 server/sslcert/
 private/
+logs/log.json
+logs/human.log
