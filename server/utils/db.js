@@ -94,22 +94,35 @@ Db.prototype.addAllArtists = function (user, artists, socketUtil) {
         i = this._addIndex,
         deferred = Q.defer();
 
-    go(); // start recursive call
-    function go() {
-        // add artist
-        db.addArtist(user, artists[i], socketUtil)
-            .then(function () {
-                i++;
-                if (i < artists.length) {
-                    setTimeout(go, 0);
-                } else {
-                    deferred.resolve(); // end of artist array reached, resolve
-                }
-            })
-            .catch(function (err) {
-                deferred.reject(err); // add artist threw error, reject
-            });
+    if (!user || !user._id) {
+        deferred.reject('user not found');
+        return deferred.promise;
     }
+
+    User.findOne({
+        '_id': user._id
+    }, function (err, user) {
+        if (err) {
+            deferred.reject(err);
+        }
+
+        go(); // start recursive call
+        function go() {
+            // add artist
+            db.addArtist(user, artists[i], socketUtil)
+                .then(function () {
+                    i++;
+                    if (i < artists.length) {
+                        setTimeout(go, 0);
+                    } else {
+                        deferred.resolve(); // end of artist array reached, resolve
+                    }
+                })
+                .catch(function (err) {
+                    deferred.reject(err); // add artist threw error, reject
+                });
+        }
+    });
 
     return deferred.promise;
 };
@@ -166,11 +179,12 @@ Db.prototype.addArtist = function (user, artist, socketUtil) {
                             socketUtil.alertArtistDetailsChange(qArtist);
                         }
                     }
+                    deferred.resolve();
                 })
                 .catch(function (err) {
                     deferred.reject(err);
                 });
-            deferred.resolve();
+
         } else {
             // if doesn't exist
             // create temporary artist document if needed
@@ -192,11 +206,12 @@ Db.prototype.addArtist = function (user, artist, socketUtil) {
                 }
                 // associate user and artist
                 db.assignArtist(user, artist)
+                    .then(function () {
+                        deferred.resolve();
+                    })
                     .catch(function (err) {
                         deferred.reject('**ASSIGN ARTIST **' + err);
                     });
-                deferred.resolve();
-
             })
         }
     });
@@ -577,4 +592,88 @@ Db.prototype.validateArtistDetails = function () {
         }
     })
 };
+
+Db.prototype.changeUserPlaylistSetting = function (userId, playlistEnabled) {
+    var deferred = Q.defer();
+
+    User.findOne({
+        '_id': userId
+    }, function (err, user) {
+        if (err) {
+            deferred.reject(err);
+            return deferred.promise;
+        }
+
+        if (user.playlist) {
+            user.playlist.enabled = playlistEnabled;
+        } else {
+            user.playlist = {
+                enabled: playlistEnabled
+            };
+        }
+
+        user.save(function (err, mUser) {
+            deferred.resolve(mUser.playlist.enabled);
+        });
+    });
+
+    return deferred.promise;
+};
+
+Db.prototype.getUserPlaylistSetting = function (userId) {
+    var deferred = Q.defer();
+    User.findOne({
+        '_id': userId
+    }, function (err, user) {
+        if (err) {
+            deferred.reject(err);
+            return deferred.promise;
+        }
+
+        if (user.playlist == undefined || user.playlist.enabled == undefined) {
+            setDefaultUserPlaylistSetting(user._id)
+                .then(function (playlistEnabled) {
+                    deferred.resolve(playlistEnabled);
+                })
+                .catch(function (err) {
+                    deferred.reject(err);
+                });
+        } else {
+            deferred.resolve(user.playlist.enabled);
+        }
+    });
+    return deferred.promise;
+}
+
+function setDefaultUserPlaylistSetting(userId) {
+    var deferred = Q.defer();
+
+    User.findOne({
+        '_id': userId
+    }, function (err, user) {
+        if (err) {
+            deferred.reject(err);
+            return deferred.promise;
+        }
+
+        if (!user.playlist) {
+            user.playlist = {
+                enabled: true
+            }
+        } else {
+            user.playlist.enabled = true;
+        }
+
+        user.save(function (err, user) {
+            if (err) {
+                deferred.reject(err);
+                return deferred.promise;
+            }
+            deferred.resolve(user.playlist.enabled);
+        });
+    });
+
+    return deferred.promise;
+}
+
 module.exports = Db;

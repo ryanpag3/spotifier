@@ -17,7 +17,8 @@ var User = new Schema({
     new_releases: [Schema.ObjectId],
     playlist: {
         id: String,
-        last_reset: String
+        last_reset: String,
+        enabled: Boolean
     },
     sync_queue: {
         id: Number,

@@ -22,7 +22,7 @@ router.get('/logout', function (req, res) {
     res.redirect('/');
 });
 
-router.get('/get', function(req, res) {
+router.get('/get', function (req, res) {
     if (req.user) {
         var user = {
             _id: req.user._id,
@@ -51,7 +51,10 @@ router.get('/status', function (req, res) {
 });
 
 router.get('/callback',
-    passport.authenticate('spotify', {failureRedirect: '/'}), function (req, res) {
+    passport.authenticate('spotify', {
+        failureRedirect: '/'
+    }),
+    function (req, res) {
         var db = new Db();
         db.createUser(req.user) // creates new user object in db if it doesn't already exist
             .then(function (user) {
@@ -167,13 +170,13 @@ router.get('/email/status', function (req, res) {
 /**
  * endpoint for unsubscribing a user's email
  */
-router.post('/email/unsubscribe', function(req, res) {
+router.post('/email/unsubscribe', function (req, res) {
     var db = new Db();
     db.unsubscribeEmail(req.body.email)
-        .then(function() {
+        .then(function () {
             res.status(200).send();
         })
-        .catch(function() {
+        .catch(function () {
             res.status(500).send();
         })
 });
@@ -182,7 +185,7 @@ router.post('/email/unsubscribe', function(req, res) {
  * API endpoint for receiving email bounces from Amazon SES.
  * Will call db handler and remove user emails that bounce.
  */
-router.post('/email/bounce', function(req, res) {
+router.post('/email/bounce', function (req, res) {
     // TODO:
 });
 
@@ -190,19 +193,51 @@ router.post('/email/bounce', function(req, res) {
  * API endpoint for getting notifications for Amazon SES spam complaints.
  * Will call db handler and remove user email's who return complaints.
  */
-router.post('/email/complaint', function(req, res) {
+router.post('/email/complaint', function (req, res) {
     // TODO:
 });
 
 /**
  * API endpoint for getting notifications for Amazon SES deliveries.
  */
-router.post('/email/delivery', function(req, res) {
-   // TODO:
+router.post('/email/delivery', function (req, res) {
+    // TODO:
 });
 
+/**
+ * Called on playlist enabled checkbox change
+ */
+router.post('/setting/playlist-update', function (req, res) {
+    var db = new Db();
+    db.changeUserPlaylistSetting(req.user._id, req.body.playlistEnabled)
+        .then(function(playlistEnabled) {
+            return res.status(200).json({
+                playlistEnabled: playlistEnabled
+            });
+        })
+        .catch(function(err) {
+            return res.status(500).json({
+                err: err
+            });
+        });
+});
+
+/**
+ * Return the current playlist enabled state for a user
+ */
+router.get('/setting/playlist', function (req, res) {
+    var db = new Db();
+    db.getUserPlaylistSetting(req.user._id)
+        .then(function(playlistEnabled) {
+            return res.status(200).json({
+                playlistEnabled: playlistEnabled
+            });
+        })
+        .catch(function(err) {
+            return res.status(500).json({
+                err: err
+            });
+        });
+});
 
 module.exports = router;
-
-
-

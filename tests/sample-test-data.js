@@ -5,27 +5,11 @@
 var privateConfig = require('../private/config-private'),
     moniker = require('moniker'),
     potNames = moniker.generator([moniker.noun]);
+
 module.exports = {
 
-    getFailArtist: function () {
-        return {};
-    },
-
-    passArtist: function () {
-        return {
-            spotify_id: '123456789',
-            name: 'passArtist',
-            recent_release: {
-                id: '1234',
-                title: 'album title',
-                release_date: 'release date',
-                images: []
-            }
-        }
-    },
-
     getFailArtists: function () {
-        return [{}, {}, {}, {}];
+        return [{}, {}, {}, {}]
     },
 
     getPassArtists: function () {
@@ -81,16 +65,34 @@ module.exports = {
         ]
     },
 
-    // fail all user tests
-    getFailUser: function () {
-        return {}
+    getFailArtist: function () {
+        // fails all test cases
+        return {};
     },
 
-    // pass creation but fail email checks
+    getPassArtist: function () {
+        return {
+            spotify_id: '123456789',
+            name: 'passArtist',
+            recent_release: {
+                id: '1234',
+                title: 'album title',
+                release_date: 'release date',
+                images: []
+            }
+        };
+    },
+
+    getFailUser: function () {
+        // fail all user tests
+        return {};
+    },
+
     getFailEmailUser: function () {
+        // pass creation but fail email checks
         return {
             name: 'emailFailUser'
-        }
+        };
     },
 
     // pass email created but fail confirmed
@@ -101,7 +103,7 @@ module.exports = {
                 address: privateConfig.gmail.username,
                 confirmed: false
             }
-        }
+        };
     },
 
     // pass all user tests
@@ -112,7 +114,7 @@ module.exports = {
                 address: privateConfig.gmail.username,
                 confirmed: true
             }
-        }
+        };
     },
 
     // pass all user tests and check for multiple email functionality
@@ -155,7 +157,8 @@ module.exports = {
             refresh_token: privateConfig.spotify.testRefreshToken,
             playlist: {
                 id: privateConfig.spotify.testPlaylistId,
-                last_reset: '' // TODO:
+                last_reset: '',
+                enabled: true
             }
         };
     }

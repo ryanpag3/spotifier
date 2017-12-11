@@ -36,6 +36,11 @@ app.config(['$routeProvider', '$locationProvider', 'SpotifyProvider',
                 access: {restricted: true},
                 title: 'User Library'
             })
+            .when('/settings', {
+                templateUrl: 'partials/settings.html',
+                access: {restricted: true},
+                title: 'Settings'
+            })
             .otherwise('/');
 
 

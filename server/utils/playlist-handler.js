@@ -24,7 +24,7 @@ var updateNewReleasePlaylists = function () {
     logger.info('updating new release playlists');
 
     User.find({
-            $and: [{ // query filter
+            $and: [{
                     'new_releases': {
                         $exists: true,
                         $ne: []
@@ -34,6 +34,9 @@ var updateNewReleasePlaylists = function () {
                     'refresh_token': {
                         $exists: true
                     }
+                },
+                {
+                    'playlist.enabled': true
                 }
             ]
         },
@@ -259,8 +262,13 @@ function saveDefaultGlobalPlaylistResetDate() {
  */
 function getLastSundayMidnight() {
     var currentDateTime = new Date();
-    var lastSunday = new Date(currentDateTime.setDate(currentDateTime.getDate() - currentDateTime.getDay()));
-    
+    var currSundayOffset = 0;
+
+    if (currentDateTime.getDay() == 0) {
+        currSundayOffset = 7;
+    }
+
+    var lastSunday = new Date(currentDateTime.setDate(currentDateTime.getDate() - currentDateTime.getDay() - currSundayOffset));
     lastSunday.setHours(23, 59, 59, 0); // set right before midnight
     return new Date(lastSunday);
 }

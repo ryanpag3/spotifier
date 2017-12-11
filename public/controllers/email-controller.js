@@ -1,8 +1,19 @@
 var app = angular.module('spotifier');
 
-app.controller('email-controller', ['$scope', '$location', '$route', 'authService',
-    function ($scope, $location, $route, authService) {
+app.controller('email-controller', ['$scope', '$location', '$route', 'authService', 'dbService',
+    function ($scope, $location, $route, authService, dbService) {
+        var user;
         $scope.matching = true;
+        $scope.playlistEnabled;
+        
+        initialize();
+        function initialize() {
+            user = JSON.parse(sessionStorage.getItem('user'));
+            dbService.getPlaylistSetting(user._id)
+                .then(function(playlistEnabled) {
+                    $scope.playlistEnabled = playlistEnabled;
+                });
+        };
 
         $scope.submitEmail = function () {
             // if inputs are matching
@@ -23,6 +34,11 @@ app.controller('email-controller', ['$scope', '$location', '$route', 'authServic
                     $scope.unsubscribed = false;
                 });
         };
+
+        $scope.playlistEnabledChange = function() {
+            // no promise because we don't care if it fails
+            dbService.updatePlaylistSetting($scope.playlistEnabled);
+        }
 
         /**
          * Ng-click handler for sending a confirmation again.
