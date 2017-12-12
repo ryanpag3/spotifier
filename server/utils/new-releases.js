@@ -100,7 +100,8 @@ function scan() {
                                 removeSpecial(artist.recent_release.title).toLowerCase()) {
                                 spotifyApiServer.getAlbumInfo(release)
                                     .then(function (album) {
-                                        if (album.release_date > artist.recent_release.release_date) {
+                                        var currentDate = new Date();
+                                        if ((album.release_date > artist.recent_release.release_date) && (album.release_date <= currentDate)) {
                                             // todo: move this code block to it's own method
 
                                             release = {

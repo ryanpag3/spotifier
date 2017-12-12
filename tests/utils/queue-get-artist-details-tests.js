@@ -34,7 +34,7 @@ describe('sync library queue utility', function () {
         it('should not error when large amounts of artist details are requested', function(done) {
             this.timeout(60000 * 10);
             var numUsers = 0,
-                numArtists = 1000,
+                numArtists = 10,
                 numAssigns = 0;
             testHelper.stageSampleNewReleaseDb(numUsers, numArtists, numAssigns)
                 .then(function() {
