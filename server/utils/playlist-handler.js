@@ -174,10 +174,11 @@ function playlistResetNeeded(user) {
     } else {
         userResetDate = new Date(userResetDate); // instantiate for comparator
         var diffOfDays = numDaysBetween(userResetDate, globalResetDate);
-        // console.log('difference of days: ' + diffOfDays);
-        // console.log(globalResetDate + ' ' + currentDateTime);
-
+        logger.debug('USER RESET DATE: ' + userResetDate);
+        logger.debug('GLOBAL RESET DATE: ' + globalResetDate);
+        logger.debug('DIFFERENCE OF DAYS: ' + diffOfDays);
         if (diffOfDays >= 7 && globalResetDate < currentDateTime) {
+            logger.debug('VALID - RESET NEEDED');
             serializeUserResetDate(user)
                 .then(function () {
                     deferred.resolve(true);
@@ -186,6 +187,7 @@ function playlistResetNeeded(user) {
                     logger.error(err);
                 })
         } else {
+            logger.debug('INVALID - RESET NOT NEEDED');
             deferred.resolve(false);
         }
     }

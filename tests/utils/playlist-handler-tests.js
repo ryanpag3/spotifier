@@ -79,7 +79,7 @@ describe('playlist handler', function () {
             var deferred = Q.defer();
             var promises = [];
             var users = [];
-            var numUsers = 10;
+            var numUsers = 1;
             var numReleases = 20;
             testHelper.stageSpotifyUsers(numUsers, numReleases)
                 .then(function(users) {
@@ -151,7 +151,7 @@ describe('playlist handler', function () {
         it('should return true when it is time to reset the playlist', function (done) {
             // this.timeout(5000);
             var resetDate = new Date();
-            resetDate.setDate(resetDate.getDate() - 14); // ensure valid by moving back two weeks
+            resetDate.setDate(resetDate.getDate() - 12); // ensure valid by moving back two weeks
             spotifyUser.playlist.last_reset = resetDate;
             playlistResetNeeded(spotifyUser)
                 .then(function (resetNeeded) {
