@@ -307,6 +307,7 @@ var self = module.exports = {
      * 1. refactor to remove duplicate cache file creation
      */
     getNewReleases: function () {
+        var runAttempts = 0;
         var deferred = Q.defer();
         var releases = {};
         var artistAdded = {};
@@ -378,7 +379,11 @@ var self = module.exports = {
                             })
                             .catch(function (err) {
                                 logger.error(err);
-                                run();
+                                if (runAttempts < 1000) {
+                                    logger.debug('Run attempt: ' + runAttempts);
+                                    runAttempts++;
+                                    run();
+                                }
                             })
                     }
                 })
