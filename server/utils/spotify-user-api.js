@@ -246,6 +246,10 @@ Api.prototype.playlistExists = function (user) {
             return api.getPlaylist(user.name, user.playlist.id);
         })
         .then(function (result) {
+            logger.info('spotify-user-api.js playlistExists - does result return?')
+            logger.info('---payload---');
+            logger.info(result);
+            logger.info('---end payload---');
             result ? deferred.resolve(true) : deferred.resolve(false);
         })
         .catch(function (err) {
