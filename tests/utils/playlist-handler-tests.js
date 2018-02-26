@@ -82,15 +82,15 @@ describe('playlist handler', function () {
             var numUsers = 1;
             var numReleases = 20;
             testHelper.stageSpotifyUsers(numUsers, numReleases)
-                .then(function(users) {
+                .then(function (users) {
                     logger.info('staged users, now updating playlists');
                     playlist.updateNewReleasePlaylists()
-                        .then(function(promises) {
+                        .then(function (promises) {
                             // console.log(promises);
                             done();
                         });
                 })
-                .catch(function(err) {
+                .catch(function (err) {
                     logger.error('unit test error thrown...');
                     logger.error(err);
                 });
@@ -141,17 +141,22 @@ describe('playlist handler', function () {
         it('should return false when no reset time has been recorded for a user', function (done) {
             var user = sampleData.getSpotifyAuthenticatedUserPlaylistCreated();
 
-            playlistResetNeeded(user)
-                .then(function (resetNeeded) {
-                    expect(resetNeeded).to.be.false;
-                    done();
+            testHelper.stageSpotifyUser(20)
+                .then(function (nUser) {
+                    playlistResetNeeded(nUser)
+                        .then(function (resetNeeded) {
+                            expect(resetNeeded).to.be.false;
+                            done();
+                        });
                 });
+
+
         });
 
         it('should return true when it is time to reset the playlist', function (done) {
             // this.timeout(5000);
             var resetDate = new Date();
-            resetDate.setDate(resetDate.getDate() - 12); // ensure valid by moving back two weeks
+            resetDate.setDate(resetDate.getDate() - 14); // ensure valid by moving back two weeks
             spotifyUser.playlist.last_reset = resetDate;
             playlistResetNeeded(spotifyUser)
                 .then(function (resetNeeded) {
@@ -217,7 +222,6 @@ describe('playlist handler', function () {
         var numDaysBetween = playlist.__get__('numDaysBetween');
         var getLastSundayMidnight = playlist.__get__('getLastSundayMidnight');
 
-        // TODO:
         it('moveDateForward should move the specified date forward exactly one week', function (done) {
             var current = new Date();
             var oneWeekForward = moveDateForwardOneWeek(current);
@@ -239,6 +243,21 @@ describe('playlist handler', function () {
                     done();
                 });
 
+        });
+    });
+
+    describe('serializeUserResetDate', function () {
+        var serializeUserResetDate = playlist.__get__('serializeUserResetDate');
+
+        it('should serialize the date for the user', function (done) {
+            testHelper.stageSpotifyUser(20)
+                .then(function (user) {
+                    serializeUserResetDate(user)
+                        .then(function (nUser) {
+                            expect(nUser.playlist.last_reset).to.exist;
+                            done();
+                        });
+                });
         });
     });
 });

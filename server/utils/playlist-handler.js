@@ -213,16 +213,28 @@ var numDaysBetween = function (d1, d2) {
 function serializeUserResetDate(user) {
     var deferred = Q.defer();
     var currentDateTime = new Date();
-    User.update({
+    User.findOne({
         '_id': user._id
-    }, {
-        'last_reset': currentDateTime
-    }, function (err) {
+    }, function (err, nUser) {
         if (err) {
-            deferred.reject(err);
+            logger.error(err);
         }
-        deferred.resolve();
-    })
+
+        if (nUser.playlist) {
+            nUser.playlist.last_reset = currentDateTime;
+        } else {
+            nUser.playlist = {
+                last_reset: currentDateTime
+            }
+        }
+
+        nUser.save(function(err, mUser) {
+            if (err) {
+                logger.error(err);
+            }
+            deferred.resolve(mUser);
+        });
+    });
     return deferred.promise;
 }
 
