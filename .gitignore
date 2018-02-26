@@ -7,3 +7,4 @@ server/sslcert/
 private/
 logs/log.json
 logs/human.log
+package-lock.json
