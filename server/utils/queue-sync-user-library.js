@@ -61,7 +61,7 @@ syncLibraryQueue.process(3, function (job, done) {
         })
 });
 
-module.exports = {
+libraryQueue = {
     /**
      * add sync library job for a user and serializes job information to database if they want to
      * remove themselves from the queue later.
@@ -146,6 +146,24 @@ module.exports = {
 
     },
 
+    enqueueScheduledSyncs: function() {
+        var deferred = Q.defer();
+        User.find({'sync_queue.scheduled': true}, function(err, users) {
+            if (err) {
+                deferred.reject(err);
+            }
+
+            for (i = 0; i < users.length; i++) {
+                logger.debug('creating sync job for user');
+                libraryQueue.createJob(users[i]);
+            }
+
+            deferred.resolve();
+        });
+
+        return deferred.promise;
+    },
+
     /**
      * this is run on startup to expose the socket utility to the queue service
      * @param mSocketUtil
@@ -154,3 +172,5 @@ module.exports = {
         socketUtil = mSocketUtil;
     }
 };
+
+module.exports = libraryQueue;

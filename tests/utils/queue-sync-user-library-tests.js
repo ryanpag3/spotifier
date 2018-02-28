@@ -63,4 +63,15 @@ describe('sync library queue utility', function () {
         })
     });
 
+    describe('enqueueScheduledSyncs', function() {
+        it('should create sync library jobs for all users with the valid condition', function(done) {
+            testHelper.stageSpotifyUser(20)
+                .then(function(user) {
+                    syncUserLibraryQueue.enqueueScheduledSyncs()
+                        .then(function() {
+                            done();
+                        })
+                });
+        });
+    });
 });

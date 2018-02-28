@@ -159,6 +159,9 @@ module.exports = {
                 id: privateConfig.spotify.testPlaylistId,
                 last_reset: '',
                 enabled: true
+            },
+            sync_queue: {
+                scheduled: true
             }
         };
     }

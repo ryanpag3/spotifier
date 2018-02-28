@@ -5,6 +5,7 @@ var CronJob = require('cron').CronJob,
     releaseScanner = require('./new-releases'),
     Db = require('./db'),
     logger = require('./logger');
+    syncLibraryQueue = require('./queue-sync-user-library');
 
 // only run these jobs in production environment
 if (process.env.NODE_ENV) {
@@ -22,6 +23,12 @@ if (process.env.NODE_ENV) {
             logger.info('running validate artist details job!');
             var db = new Db();
             db.validateArtistDetails();
+
+            logger.info('running scheduled library syncs');
+            syncLibraryQueue.enqueueScheduledSyncs()
+                .then(function() {
+                    logger.info('syncs have been scheduled');
+                });
         },
         null,
         true,

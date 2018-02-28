@@ -4,6 +4,7 @@ app.factory('dbService', ['$http', '$q',
         return ({
            getLibrary: getLibrary,
            updatePlaylistSetting: updatePlaylistSetting,
+           updateSyncScheduledSetting: updateSyncScheduledSetting,
            getPlaylistSetting: getPlaylistSetting
         });
 
@@ -43,5 +44,21 @@ app.factory('dbService', ['$http', '$q',
                 deferred.reject(res);
             });
         return deferred.promise;
+        }
+
+        function updateSyncScheduledSetting(mEnabled) {
+            var deferred = $q.defer();
+            $http.post('user/setting/sync-scheduled-update', ({scheduled: mEnabled}))
+                .then(function(res) {
+                    if (res.status == 200) {
+                        deferred.resolve(res.data.result);
+                    } else {
+                        deferred.reject();
+                    }
+                })
+                .catch(function(res) {
+                    deferred.reject(res);
+                });
+            return deferred.promise;
         }
     }]);

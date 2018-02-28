@@ -676,4 +676,89 @@ function setDefaultUserPlaylistSetting(userId) {
     return deferred.promise;
 }
 
+Db.prototype.changeUserSyncSchedule = function (userId, scheduled) {
+    var deferred = Q.defer();
+
+    User.findOne({
+        '_id': userId
+    }, function (err, user) {
+        if (err) {
+            deferred.reject(err);
+            return deferred.promise;
+        }
+
+        if (user.sync_queue) {
+            user.sync_queue.scheduled = scheduled;
+        } else {
+            user.sync_queue = {
+                scheduled: scheduled
+            };
+        }
+
+        user.save(function (err, mUser) {
+            logger.debug('user: ' + mUser);
+            deferred.resolve(mUser.sync_queue.scheduled);
+        });
+    });
+
+    return deferred.promise;
+}
+
+Db.prototype.getUserSyncSchedule = function (userId) {
+    var deferred = Q.defer();
+    User.findOne({
+        '_id': userId
+    }, function (err, user) {
+        if (err) {
+            deferred.reject(err);
+            return deferred.promise;
+        }
+
+        if (user.sync_queue == undefined || user.sync_queue.scheduled == undefined) {
+            setDefaultUserSyncSchedule(user._id)
+                .then(function (scheduled) {
+                    deferred.resolve(scheduled);
+                })
+                .catch(function (err) {
+                    deferred.reject(err);
+                });
+        } else {
+            deferred.resolve(user.sync_queue.scheduled);
+        }
+    });
+    return deferred.promise;
+}
+
+
+function setDefaultUserSyncSchedule(userId) {
+    var deferred = Q.defer();
+
+    User.findOne({
+        '_id': userId
+    }, function (err, user) {
+        if (err) {
+            deferred.reject(err);
+            return deferred.promise;
+        }
+
+        if (!user.sync_queue) {
+            user.sync_queue = {
+                scheduled: false
+            }
+        } else {
+            user.sync_queue.scheduled = false;
+        }
+
+        user.save(function (err, user) {
+            if (err) {
+                deferred.reject(err);
+                return deferred.promise;
+            }
+            deferred.resolve(user.sync_queue.scheduled);
+        });
+    });
+
+    return deferred.promise;
+}
+
 module.exports = Db;

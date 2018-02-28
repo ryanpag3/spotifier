@@ -240,4 +240,34 @@ router.get('/setting/playlist', function (req, res) {
         });
 });
 
+router.post('/setting/sync-scheduled-update', function(req, res) {
+    var db = new Db();
+    db.changeUserSyncSchedule(req.user._id, req.body.scheduled)
+        .then(function(enabled) {
+            return res.status(200).json({
+                scheduled: enabled
+            });
+        })
+        .catch(function(err) {
+            return res.status(500).json({
+                err: err
+            })
+        });
+});
+
+router.get('/setting/sync-scheduled', function (req, res) {
+    var db = new Db();
+    db.getUserSyncSchedule(req.user._id)
+        .then(function(scheduled) {
+            return res.status(200).json({
+                scheduled: scheduled
+            });
+        })
+        .catch(function(err) {
+            return res.status(500).json({
+                err: err
+            });
+        });
+});
+
 module.exports = router;

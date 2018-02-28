@@ -22,7 +22,8 @@ var User = new Schema({
     },
     sync_queue: {
         id: Number,
-        status: String
+        status: String,
+        scheduled: Boolean
     }
 });
 
