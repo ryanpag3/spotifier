@@ -125,6 +125,7 @@ var self = module.exports = {
         var releaseTypeIndex = 0; // array of arrays index
         var index = 0; // arrays index
         var date; // last date checked
+        var currDate = new Date();
 
         run(); // initialize
         function run() {
@@ -132,8 +133,9 @@ var self = module.exports = {
             if (releases[releaseTypeIndex].length > 0) {
                 self.getAlbumInfo(releases[releaseTypeIndex][index])
                     .then(function (album) {
-                        if (!recentRelease || recentRelease.release_date < album.release_date) {
-                            recentRelease = album;
+                        if ((!recentRelease || recentRelease.release_date < album.release_date)) {
+                            if (album.release_date < currDate)
+                                recentRelease = album;
                             index++; // move pointer right
                             if (index === releases[releaseTypeIndex].length) {
                                 moveToNextArray();
