@@ -5,7 +5,8 @@ app.factory('dbService', ['$http', '$q',
            getLibrary: getLibrary,
            updatePlaylistSetting: updatePlaylistSetting,
            updateSyncScheduledSetting: updateSyncScheduledSetting,
-           getPlaylistSetting: getPlaylistSetting
+           getPlaylistSetting: getPlaylistSetting,
+           getSyncScheduled: getSyncScheduled
         });
 
         function getLibrary() {
@@ -58,6 +59,17 @@ app.factory('dbService', ['$http', '$q',
                 })
                 .catch(function(res) {
                     deferred.reject(res);
+                });
+            return deferred.promise;
+        }
+
+        function getSyncScheduled(userId) {
+            var deferred = $q.defer();
+            $http.get('user/setting/sync-scheduled')
+                .then(function(res) {
+                    if (res.status === 200) {
+                        deferred.resolve(res.data.scheduled);
+                    }
                 });
             return deferred.promise;
         }

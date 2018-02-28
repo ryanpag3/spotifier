@@ -13,6 +13,10 @@ app.controller('email-controller', ['$scope', '$location', '$route', 'authServic
                 .then(function(playlistEnabled) {
                     $scope.playlistEnabled = playlistEnabled;
                 });
+            dbService.getSyncScheduled(user._id)
+                .then(function(scheduled) {
+                    $scope.syncScheduled = scheduled;
+                });
         };
 
         $scope.submitEmail = function () {

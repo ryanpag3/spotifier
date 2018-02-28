@@ -696,7 +696,7 @@ Db.prototype.changeUserSyncSchedule = function (userId, scheduled) {
         }
 
         user.save(function (err, mUser) {
-            logger.debug('user: ' + mUser);
+            // logger.debug('user: ' + mUser);
             deferred.resolve(mUser.sync_queue.scheduled);
         });
     });
