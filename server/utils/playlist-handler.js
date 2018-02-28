@@ -52,7 +52,7 @@ var updateNewReleasePlaylists = function () {
                     return updatePlaylist(user)
                 })
                 .catch(function(err) {
-                   logger.info('playlist-handler.js updateNewReleasePlaylists: ' + err); 
+                   logger.info('playlist-handler.js updateNewReleasePlaylists: ' + err);
                 });
             });
             deferred.resolve(p);
@@ -361,5 +361,6 @@ function createPlaylist(userId) {
 
 // expose top level function
 module.exports = {
-    updateNewReleasePlaylists: updateNewReleasePlaylists
+    updateNewReleasePlaylists: updateNewReleasePlaylists,
+    createPlaylist: createPlaylist
 }
