@@ -133,6 +133,19 @@ describe('playlist handler', function () {
                     done();
                 });
         });
+
+        it('should return false when a deleted playlist is passed to it', function(done) {
+            testHelper.stageSpotifyUser(10)
+                .then(function(user) {
+                    user.playlist.id = '5pclqzfsqGp6RmKBWtKdPM'; // invalid
+                    playlistExists(user)
+                        .then(function(exists) {
+                            expect(exists).to.be.false;
+                            done();
+                        })
+                })
+            
+        })
     });
 
     describe('playlistResetNeeded', function () {

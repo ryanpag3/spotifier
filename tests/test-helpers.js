@@ -8,7 +8,8 @@ var Q = require('q'),
     Artist = require('../server/models/artist'),
     sampleData = require('./sample-test-data'),
     spotifyServerApi = require('../server/utils/spotify-server-api'),
-    queueGetArtistDetails = require('../server/utils/queue-get-artist-details');
+    queueGetArtistDetails = require('../server/utils/queue-get-artist-details'),
+    playlistHandler = require('../server/utils/playlist-handler');
 
 module.exports = {
     insert: function (user) {
@@ -311,6 +312,8 @@ module.exports = {
     /**
      * stage new releases for the test spotify account
      * TODO: refactor to use promise chaining instead of recursion
+     * I know this is really messy I'm sorry I don't write code like
+     * this anymore
      */
     stageSpotifyUser: function (numReleases) {
         if (!numReleases) {
@@ -323,8 +326,9 @@ module.exports = {
         // get artist releases from last two weeks
         this.getArtists()
             .then(function (releases) {
+                logger.debug('got releases from spotify api')
                 var user = new User(spotifyUser).save(function (err, user) {
-                        // add psuedo new releases
+                    // add psuedo new releases
                         var i = 0;
                         run(); // init
                         function run() {
@@ -343,7 +347,17 @@ module.exports = {
                                             User.findOne({
                                                 '_id': user._id
                                             }, function (err, user) {
-                                                deferred.resolve(user);
+                                                logger.debug('creating playlist for user')
+                                                playlistHandler.createPlaylist(user._id)
+                                                    .then(function(user) {
+                                                        logger.debug('user playlist created');
+                                                        deferred.resolve(user);
+                                                    })
+                                                    .catch(function(err) {
+                                                        logger.error('error: ', err);
+                                                        deferred.reject(err);
+                                                    });
+                                                // deferred.resolve(user);
                                             });
                                         }
                                     })

@@ -248,7 +248,8 @@ Api.prototype.playlistExists = function (user) {
         .then(function (result) {
             logger.info('spotify-user-api.js playlistExists - does result return?')
             logger.info('---payload---');
-            logger.info(result);
+            logger.info(result.body.name);
+            logger.info(result.body.href);
             logger.info('---end payload---');
             result ? deferred.resolve(true) : deferred.resolve(false);
         })

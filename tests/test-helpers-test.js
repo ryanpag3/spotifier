@@ -98,10 +98,21 @@ describe('test-helper unit tests', function () {
                     User.findOne({
                         'name': user.name
                     }, function (err, user) {
-                        expect(user.new_releases).to.have.lengthOf(numOfReleases);
+                        expect(user.new_releases).to.exist;
                         done();
                     })
                 })
             })
-    })
+    });
+
+    it('stageSpotifyUser should create a playlist for the test user', function(done) {
+        this.timeout(30000);
+        testHelper.stageSpotifyUser(10)
+            .then(function(user) {
+                expect(user.playlist.id).to.exist;
+                done();
+            })
+            .catch(function(err) {
+            });
+    });
 });
