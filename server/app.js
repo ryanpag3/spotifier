@@ -108,13 +108,13 @@ const setupApp = function(app, express, socketUtil) {
     //   next(err);
     // });
 
-    app.use(function(err, req, res) {
-        res.status(err.status || 500);
-        res.end(JSON.stringify({
-            message: err.message,
-            error: {}
-        }));
-    });
+    // app.use(function(err, req, res) {
+    //     res.status(err.status || 500);
+    //     res.end(JSON.stringify({
+    //         message: err.message,
+    //         error: {}
+    //     }));
+    // });
 };
 
 module.exports = setupApp;

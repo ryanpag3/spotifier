@@ -40,6 +40,10 @@ app.controller('email-controller', ['$scope', '$location', '$route', 'authServic
             dbService.updatePlaylistSetting($scope.playlistEnabled);
         }
 
+        $scope.syncScheduledChange = function() {
+            dbService.updateSyncScheduledSetting($scope.syncScheduled);
+        }
+
         /**
          * Ng-click handler for sending a confirmation again.
          */

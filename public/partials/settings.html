@@ -34,9 +34,14 @@
             <span class="playlist-form">Enable/Disable&nbsp;
                 <input class="playlist-checkbox" type="checkbox" data-ng-change="playlistEnabledChange()" data-ng-model="playlistEnabled">
             </span>
-             <div class="nav-button-wrapper">
-                <a target="_self" href="/library"><button class="nav-btn btn btn-success" >GO BACK</button></a>
-             </div>
+             <hr>
+             <h2 class="category">Automatic Library Sync</h2>
+             <span class="playlist-form">Enable/Disable&nbsp;
+                 <input class="playlist-checkbox" type="checkbox" data-ng-change="syncScheduledChange()" data-ng-model="syncScheduled">
+             </span>
+              <div class="nav-button-wrapper">
+                 <a target="_self" href="/library"><button class="nav-btn btn btn-success" >GO BACK</button></a>
+              </div>
         </div>
 
         <div id="social-bar" class="row">
