@@ -378,6 +378,57 @@ module.exports = {
         return deferred.promise;
     },
 
+    stageSpotifyUserFix: function(numReleases) {
+        var self = this;
+        var deferred = Q.defer();
+        var db = new Db();
+        var spotifyUser = sampleData.getSpotifyAuthenticatedUserPlaylistCreated();
+
+        if (!numReleases) {
+            throw new Error('stageSpotifyUser: the number of releases is undefined!');
+        }
+
+        this.getArtists()
+            .then(function (results) {
+                new User(spotifyUser).save(
+                    function(err, user) {
+                        var p = Q();
+                        for (var i = 0; i < numReleases; i++) {
+                            p = p.then(function() {
+                                var artist = releases[getRandom(releases.length - 1)];
+                                return stageArtistUser(user, artist);
+                            })
+                            .catch(function(err) {
+                                deferred.reject(err);
+                            });
+                        }
+
+                    });
+            });
+    },
+
+    stageArtistUser: function(user, artist) {
+        var db = new Db();
+        db.addArtist(user, artist)
+            .then(function() {
+                flagUserArtistRelease(user, artist);
+            });
+    },
+
+    flagUserArtistRelease: function(user, artist) {
+        var db = new Db();
+        Artist.findOne({
+            'spotify_id' : artist.spotify_id
+        }, function (err, artist) {
+            db.artistNewReleaseFound(artist);
+
+        })
+    },
+
+    stagePlaylist: function(user) {
+
+    },
+
     /**
      * TODO: docs
      * @param {*} numUsers 
