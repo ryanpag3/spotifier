@@ -91,7 +91,7 @@ describe('test-helper unit tests', function () {
     it('stageSpotifyUser should add artists to database and assign them to spotify user as new releases', function (done) {
         this.timeout(5000);
         var numOfReleases = 20;
-        testHelper.stageSpotifyUser(numOfReleases)
+        testHelper.stageSpotifyUserFix(numOfReleases)
             .then(function (user) {
                 Artist.find({}, function (err, artists) {
                     expect(artists).to.have.lengthOf(numOfReleases);

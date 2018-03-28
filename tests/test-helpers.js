@@ -92,9 +92,9 @@ module.exports = {
                             logger.error(err);
                         } else {
                             var waitTime = 30000;
-                            setTimeout(function() {
+                            setTimeout(function () {
                                 logger.info('save to file successful!');
-                                logger.info('Pausing thread for ' + waitTime + ' milliseconds to let Spotify catch up.'); 
+                                logger.info('Pausing thread for ' + waitTime + ' milliseconds to let Spotify catch up.');
                             }, waitTime)
                             deferred.resolve(releases);
                         }
@@ -328,7 +328,7 @@ module.exports = {
             .then(function (releases) {
                 logger.debug('got releases from spotify api')
                 var user = new User(spotifyUser).save(function (err, user) {
-                    // add psuedo new releases
+                        // add psuedo new releases
                         var i = 0;
                         run(); // init
                         function run() {
@@ -349,11 +349,11 @@ module.exports = {
                                             }, function (err, user) {
                                                 logger.debug('creating playlist for user')
                                                 playlistHandler.createPlaylist(user._id)
-                                                    .then(function(user) {
+                                                    .then(function (user) {
                                                         logger.debug('user playlist created');
                                                         deferred.resolve(user);
                                                     })
-                                                    .catch(function(err) {
+                                                    .catch(function (err) {
                                                         logger.error('error: ', err);
                                                         deferred.reject(err);
                                                     });
@@ -378,7 +378,7 @@ module.exports = {
         return deferred.promise;
     },
 
-    stageSpotifyUserFix: function(numReleases) {
+    stageSpotifyUserFix: function (numReleases) {
         var self = this;
         var deferred = Q.defer();
         var db = new Db();
@@ -391,42 +391,64 @@ module.exports = {
         this.getArtists()
             .then(function (results) {
                 new User(spotifyUser).save(
-                    function(err, user) {
+                    function (err, user) {
                         var p = Q();
                         for (var i = 0; i < numReleases; i++) {
-                            p = p.then(function() {
-                                var artist = releases[getRandom(releases.length - 1)];
-                                return stageArtistUser(user, artist);
-                            })
-                            .catch(function(err) {
-                                deferred.reject(err);
-                            });
+                            p = p.then(function () {
+                                    var artist = releases[getRandom(releases.length - 1)];
+                                    return stageArtistUser(user, artist);
+                                })
+                                .catch(function (err) {
+                                    deferred.reject(err);
+                                });
                         }
-
+                        return stagePlaylist(user);
                     });
             });
+        return deferred.promise;
     },
 
-    stageArtistUser: function(user, artist) {
+    stageArtistUser: function (user, artist) {
+        var deferred = Q.defer();
         var db = new Db();
         db.addArtist(user, artist)
-            .then(function() {
-                flagUserArtistRelease(user, artist);
+            .then(function () {
+                return flagUserArtistRelease(user, artist);
             });
     },
 
-    flagUserArtistRelease: function(user, artist) {
+    flagUserArtistRelease: function (user, artist) {
+        var deferred = Q.defer();
         var db = new Db();
         Artist.findOne({
-            'spotify_id' : artist.spotify_id
+            'spotify_id': artist.spotify_id
         }, function (err, artist) {
+            if (err) {
+                logger.debug(err);
+                deferred.reject();
+            }
             db.artistNewReleaseFound(artist);
-
-        })
+            deferred.resolve();
+        });
+        return deferred.promise;
     },
 
-    stagePlaylist: function(user) {
-
+    stagePlaylist: function (user) {
+        var deferred = Q.defer();
+        // requery for updated object information
+        User.findOne({
+            '_id': user._id
+        }, function (err, user) {
+            logger.debug('creating playlist for user');
+        });
+        playlistHandler.createPlaylist(user._id)
+            .then(function (user) {
+                deferred.resolve(user);
+            })
+            .catch(function (err) {
+                deferred.reject(err);
+            });
+        return deferred.promise;
     },
 
     /**
