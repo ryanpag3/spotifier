@@ -32,7 +32,7 @@ describe('sync library queue utility', function () {
 
     describe('calls create job method', function () {
         it('should serialize a job id and set enqueued to true when a user is entered into the queue', function(done) {
-            testHelper.insert(sampleData.passUser())
+            testHelper.insert(sampleData.getPassUser())
                 .then(function(user) {
                     syncUserLibraryQueue.createJob(user)
                         .then(function() {
@@ -50,7 +50,7 @@ describe('sync library queue utility', function () {
 
     describe('calls remove job method', function () {
         it('it should resolve when the job has successfully been removed from the queue', function(done) {
-            testHelper.insert(sampleData.passUser())
+            testHelper.insert(sampleData.getPassUser())
                 .then(function(user) {
                     syncUserLibraryQueue.createJob(user)
                         .then(function() {

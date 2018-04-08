@@ -32,16 +32,17 @@ describe('sync library queue utility', function () {
 
     describe('create job tests', function () {
         it('should not error when large amounts of artist details are requested', function(done) {
-            this.timeout(60000 * 10);
-            var numUsers = 0,
-                numArtists = 10,
-                numAssigns = 0;
+            this.timeout(60000);
+            var numUsers = 5,
+                numArtists = 50,
+                numAssigns = 50;
             testHelper.stageSampleNewReleaseDb(numUsers, numArtists, numAssigns)
                 .then(function() {
                     Artist.find({}, function(err, artists) {
                         for(var i = 0; i < artists.length; i++) {
                             getArtistDetailsQueue.createJob(artists[i]);
                         }
+                        done();
                     })
                 })
         })

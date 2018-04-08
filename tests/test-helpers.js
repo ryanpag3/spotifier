@@ -30,10 +30,13 @@ module.exports = {
 
         self.addRandomUsers(numUsers)
             .then(function () {
+                logger.debug( 'stageSampleNewReleaseDb', 'added random users');
                 self.addRandomArtists(numArtists)
                     .then(function () {
+                        logger.debug('stageSampleNewReleaseDb', 'added random artists');
                         self.assignRandom(numAssigns)
                             .then(function () {
+                                logger.debug( 'stageSampleNewReleaseDb', 'assigned random');
                                 deferred.resolve();
                             })
                     })
@@ -63,6 +66,7 @@ module.exports = {
         var artistCache = fs.existsSync(p) ? fs.readFileSync(p, 'utf-8') : undefined;
         // this might be redundant to above
         if (artistCache) {
+            // logger.debug('getArtists', 'parsing artist cache');
             artistCache = JSON.parse(artistCache);
         } else {
             artistCache = {};
@@ -81,6 +85,9 @@ module.exports = {
                     for (var k = 0; k < keys.length; k++) {
                         for (var j = 0; j < releasesObj[keys[k]].length; j++) {
                             releases.push(releasesObj[keys[k]][j]);
+                        }
+                        if (releases.length >= 25000) {
+                            break; // prevent test cache from getting too big
                         }
                     }
                     artistCache.releases = releases;
@@ -101,6 +108,7 @@ module.exports = {
                     });
                 })
         } else {
+            // logger.debug('getArtists', 'resolving cached releases');
             deferred.resolve(artistCache.releases);
         }
         return deferred.promise;
@@ -154,6 +162,7 @@ module.exports = {
                                             logger.error(err);
                                         } else {
                                             i++;
+                                            logger.debug('random artist ' + (i-1) + '/' + n + ' has been created.');
                                             // console.log('artist: ' + i++ + '/' + n + ' created.');
                                         }
                                     });
@@ -191,6 +200,7 @@ module.exports = {
                                             logger.error(err);
                                         } else {
                                             i++;
+                                            logger.debug('random artist ' + (i-1) + '/' + n + ' has been created.');
                                             // console.log('artist: ' + i++ + '/' + n + ' created.');
                                         }
                                     });
@@ -309,76 +319,7 @@ module.exports = {
         return deferred.promise;
     },
 
-    /**
-     * stage new releases for the test spotify account
-     * TODO: refactor to use promise chaining instead of recursion
-     * I know this is really messy I'm sorry I don't write code like
-     * this anymore
-     */
     stageSpotifyUser: function (numReleases) {
-        if (!numReleases) {
-            throw 'numReleases cannot be undefined!';
-        }
-        var self = this;
-        var deferred = Q.defer();
-        var db = new Db();
-        var spotifyUser = sampleData.getSpotifyAuthenticatedUserPlaylistCreated();
-        // get artist releases from last two weeks
-        this.getArtists()
-            .then(function (releases) {
-                logger.debug('got releases from spotify api')
-                var user = new User(spotifyUser).save(function (err, user) {
-                        // add psuedo new releases
-                        var i = 0;
-                        run(); // init
-                        function run() {
-                            var artist = releases[getRandom(releases.length - 1)];
-                            // add artist to database
-                            db.addArtist(user, artist)
-                                .then(function () {
-                                    Artist.findOne({
-                                        'spotify_id': artist.spotify_id
-                                    }, function (err, artist) {
-                                        // flag user for new release
-                                        db.artistNewReleaseFound(artist);
-                                        if (++i < numReleases) {
-                                            run();
-                                        } else {
-                                            User.findOne({
-                                                '_id': user._id
-                                            }, function (err, user) {
-                                                logger.debug('creating playlist for user')
-                                                playlistHandler.createPlaylist(user._id)
-                                                    .then(function (user) {
-                                                        logger.debug('user playlist created');
-                                                        deferred.resolve(user);
-                                                    })
-                                                    .catch(function (err) {
-                                                        logger.error('error: ', err);
-                                                        deferred.reject(err);
-                                                    });
-                                                // deferred.resolve(user);
-                                            });
-                                        }
-                                    })
-                                })
-                                .catch(function (err) {
-                                    // TODO:
-                                    // console.log add artist vs throw err?
-                                });
-                        }
-                    })
-                    .catch(function (err) {
-                        deferred.reject(err);
-                    });
-            })
-            .catch(function (err) {
-                deferred.reject(err);
-            });
-        return deferred.promise;
-    },
-
-    stageSpotifyUserFix: function (numReleases) {
         var self = this;
         var deferred = Q.defer();
         var db = new Db();
@@ -388,21 +329,24 @@ module.exports = {
             throw new Error('stageSpotifyUser: the number of releases is undefined!');
         }
 
+        logger.debug('Staging spotify user');
+
         this.getArtists()
-            .then(function (results) {
+            .then(function (releases) {
                 new User(spotifyUser).save(
                     function (err, user) {
-                        var p = Q();
-                        for (var i = 0; i < numReleases; i++) {
-                            p = p.then(function () {
-                                    var artist = releases[getRandom(releases.length - 1)];
-                                    return stageArtistUser(user, artist);
-                                })
-                                .catch(function (err) {
-                                    deferred.reject(err);
-                                });
+                        if (err) {
+                            logger.error('stageSpotifyUser', err);
                         }
-                        return stagePlaylist(user);
+
+                        var p = Q();
+                        var promises = [];
+                        for (var i = 0; i < numReleases; i++) {
+                            var artist = releases[getRandom(releases.length - 1)];
+                            promise = self.stageArtistUser(user, artist);
+                            promises.push(promise);
+                        }
+                        Q.all(promises).then(deferred.resolve(self.stagePlaylist(user)));
                     });
             });
         return deferred.promise;
@@ -440,14 +384,14 @@ module.exports = {
             '_id': user._id
         }, function (err, user) {
             logger.debug('creating playlist for user');
+            playlistHandler.createPlaylist(user._id)
+                .then(function (user) {
+                    deferred.resolve(user);
+                })
+                .catch(function (err) {
+                    deferred.reject(err);
+                });
         });
-        playlistHandler.createPlaylist(user._id)
-            .then(function (user) {
-                deferred.resolve(user);
-            })
-            .catch(function (err) {
-                deferred.reject(err);
-            });
         return deferred.promise;
     },
 
@@ -465,9 +409,13 @@ module.exports = {
             // output time for each user creation
             // console.log(newTime - currTime);
             currTime = newTime;
-            promises.push(this.stageSpotifyUser(numReleases));
+            promise = this.stageSpotifyUser(numReleases)
+            promises.push(promise);
         }
-        deferred.resolve(Q.all(promises));
+        Q.all(promises).then(function() {
+            logger.debug('resolving staging.');
+            deferred.resolve();
+        });
         return deferred.promise;
     }
 }; // end module.exports

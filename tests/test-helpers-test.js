@@ -18,6 +18,19 @@ mongoose.connect('mongodb://localhost/spotifier_test', {
 });
 
 describe('test-helper unit tests', function () {
+
+    before(function(done) {
+        var mins = 20;
+        this.timeout(60000 * mins)
+        logger.info('Forcing library update check on test init')
+        // force library update with extended timeout
+        testHelper.getArtists()
+            .then(function(releases) {
+                // these are not the droids you are looking for
+                done();
+            })
+    });
+
     // before each unit test
     beforeEach(function (done) {
         done();
@@ -25,8 +38,14 @@ describe('test-helper unit tests', function () {
 
     // after each unit test
     afterEach(function (done) {
-        User.remove({}, function () { // drop user collection
-            Artist.remove({}, function () { // drop artist collection
+        User.remove({}, function (err, result) { // drop user collection
+            if (err) {
+                logger.error('AfterEach test-helpers-testjs', err);
+            }
+            Artist.remove({}, function (err, result) { // drop artist collection
+                if (err) {
+                    logger.error(err);
+                }
                 done(); // callback
             })
         })
@@ -43,7 +62,7 @@ describe('test-helper unit tests', function () {
 
     it('addRandomArtists should insert n number of artists at random to the artist db', function (done) {
         this.timeout(600000);
-        var n = 5;
+        var n = 1;
         testHelper.addRandomArtists(n)
             .then(function (res) {
                 Artist.find({}, function (err, artists) {
@@ -91,7 +110,7 @@ describe('test-helper unit tests', function () {
     it('stageSpotifyUser should add artists to database and assign them to spotify user as new releases', function (done) {
         this.timeout(5000);
         var numOfReleases = 20;
-        testHelper.stageSpotifyUserFix(numOfReleases)
+        testHelper.stageSpotifyUser(numOfReleases)
             .then(function (user) {
                 Artist.find({}, function (err, artists) {
                     expect(artists).to.have.lengthOf(numOfReleases);
@@ -114,5 +133,16 @@ describe('test-helper unit tests', function () {
             })
             .catch(function(err) {
             });
+    });
+
+    it('stageSpotifyUsers should add all users', function(done) {
+        this.timeout(30000);
+        testHelper.stageSpotifyUsers(5, 20)
+            .then(function() {
+                done();
+            })
+            .catch(function(err) {
+                this.logger.error(err);
+            })
     });
 });

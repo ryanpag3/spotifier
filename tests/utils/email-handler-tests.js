@@ -32,7 +32,7 @@ describe('email-handler tests', function () {
 
     it('sendConfirmationEmail should resolve on a successful email sent with a confirmCode', function (done) {
         this.timeout(10000); // allow more time for this unit test
-        testHelper.insert(sampleData.unconfirmedUser())
+        testHelper.insert(sampleData.getUnconfirmedUser())
             .then(function (user) {
                 email.sendConfirmationEmail(user)
                     .then(function (successMsg) {
@@ -48,7 +48,7 @@ describe('email-handler tests', function () {
     it('confirm should resolve if the confirmation code for the specified user is equal to the one in the user doc', function (done) {
         var db = new Db();
         var testConfirmCode = '1234';
-        testHelper.insert(sampleData.unconfirmedUser())
+        testHelper.insert(sampleData.getUnconfirmedUser())
            .then(function(user) {
                // serialize confirm code for user
                db.setConfirmCode(user, testConfirmCode)
@@ -83,7 +83,7 @@ describe('email-handler tests', function () {
         var db = new Db();
         var testConfirmCode = '1234',
             failConfirmCode = '4321';
-        testHelper.insert(sampleData.unconfirmedUser())
+        testHelper.insert(sampleData.getUnconfirmedUser())
             .then(function(user) {
                 // serialize confirm code for user
                 db.setConfirmCode(user, testConfirmCode)

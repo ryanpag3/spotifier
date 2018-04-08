@@ -1,8 +1,22 @@
 /**
  * Script for running all unit tests
  */
+var redis = require('redis');
+var client = redis.createClient();
+var logger = require('../server/utils/logger');
 
  describe('Run all unit tests', function() {
+
+    /**
+     * Global before each for all child test cases
+     */
+    beforeEach(function(done) {
+        client.flushall(function(err, success) {
+            // logger.debug('Flushed redis store.');
+            done();
+        });
+    });
+
     describe('test-helpers-test.js', function() {
         require('./test-helpers-test');
     })

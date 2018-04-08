@@ -44,6 +44,7 @@
     "passport-spotify": "^0.3.1",
     "pug": "^2.0.0-rc.4",
     "q": "^1.5.1",
+    "redis": "^2.8.0",
     "rxjs": "^5.5.3",
     "socket.io": "^2.0.4",
     "spotify-web-api-node": "^2.5.0",
