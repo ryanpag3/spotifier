@@ -51,7 +51,7 @@
     background-color: black;
     display: flex;
     max-height: 100px;
-    max-width: 100px;
+    max-width: 200px;
     padding: 2px;
     justify-content: center;
     align-items: center;
