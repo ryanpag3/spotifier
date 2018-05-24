@@ -383,9 +383,10 @@ var self = module.exports = {
                             })
                             .catch(function (err) {
                                 logger.error(err);
-                                if (runAttempts < 1000) {
+                                if (runAttempts < 10000) {
                                     logger.debug('Run attempt: ' + runAttempts);
                                     runAttempts++;
+                                    offset++; // eventually we will get past bad one
                                     run();
                                 }
                             })
