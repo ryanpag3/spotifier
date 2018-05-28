@@ -29,6 +29,9 @@ describe('test-helper unit tests', function () {
                 // these are not the droids you are looking for
                 done();
             })
+            .catch((err) => {
+                logger.error(err, err.stack);
+            });
     });
 
     // before each unit test

@@ -305,12 +305,198 @@ var self = module.exports = {
         return deferred.promise;
     },
 
+    getNewReleases: () => {
+        logger.info('retrieving new releases from Spotify.');
+        let cachedReleases = self.getCachedReleases();
+        let twentyFourHoursAgo = new Date();
+        twentyFourHoursAgo.setDate(twentyFourHoursAgo.getDate() - 1);
+        return new Promise((resolve, reject) => {
+            if (cachedReleases.syncDate != undefined && Date.parse(cachedReleases.syncDate) > twentyFourHoursAgo)
+                return resolve(cachedReleases);
+            logger.info('starting new release queries');
+            self.refreshClientToken()
+                .then(() => self.getNewReleaseLen())
+                .then((length) => {
+                    console.log('new release length: ' + length);
+                    if (length < 10000)
+                        return self.queryNewReleases('tag:new');
+                    return self.chunkAndQueryNewReleases();
+                });
+        });
+    },
+
+    getCachedReleases: () => {
+        logger.info('getting cached releases');
+        let p = path.join(__dirname, './cache/cached-new-releases.txt');
+        return fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf-8')) : {};
+    },
+
+    /**
+     * get length of tag:new query on spotify search
+     */
+    getNewReleaseLen: () => {
+        return self.getSearchQueryLen('tag:new');
+    },
+
+    getSearchQueryLen: (query) => {
+        return spotifyApi.searchAlbums(query, {
+                limit: 1,
+                offset: 0
+            }).then((data) => {
+                logger.info(data);
+                return data.body.albums.total;
+            })
+            .catch((err) => {
+                logger.error('getSearchQe')
+                logger.error(err, err.stack);
+            })
+    },
+
+    queryNewReleases: (query) => {
+        return new Promise((resolve, reject) => {
+            self.getNewReleaseLen()
+                .then((len) => {
+                    let promises = [];
+                    for (let offset = 0; offset < len; offset += 50) {
+                        promises.push(spotifyApi.searchAlbums(query, {
+                            limit: 50,
+                            offet: offset
+                        }));
+                    }
+                    Promise.all(promises).then((results) => {
+                            let newReleases = [];
+                            for (let i in results) {
+                                newReleases = newReleases.concat(results[i]);
+                            }
+                            resolve(newReleases);
+                        })
+                        .catch((err) => {
+                            reject(err);
+                        });
+                });
+        });
+    },
+
+    chunkAndQueryNewReleases: () => {
+        logger.info('chunking new release queries');
+        let newQuery = 'tag:new';
+        return new Promise((resolve, reject) => {
+            // iterate through alphabet
+            // if results length > 1
+            // iterate through second character
+            // push to promise arr;
+            let promises = [];
+            let digits = 0;
+            let queries = self.buildAlphaQueryArr(digits);
+            for (let i in queries) {
+                logger.info(queries.length);
+                promises.push(self.execChunkNewReleaseQuery(queries[i] + '&' + newQuery));
+            }
+            Promise.all(promises).then(releasesArr => {
+                    let releases = [];
+                    for (let i in releasesArr) {
+                        releases = releases.concat(releasesArr[i]);
+                    }
+                    resolve(releases);
+                })
+                .catch((err) => {
+                    reject(err);
+                });
+        });
+    },
+
+    execChunkNewReleaseQuery: (query) => {
+        let queryResLength = self.getSearchQueryLen(query);
+        logger.info(query);
+        if (queryResLength > 10000)
+            return self.execMultiDigitNewReleaseQuery(query, 1);
+        return self.queryNewReleases(query);
+    },
+
+    execMultiDigitNewReleaseQuery: (query, digits) => {
+        let queries = self.buildAlphaQueryArr(digits);
+        let promises = [];
+        for (let i in queries) {
+            logger.info(queries.length);
+            promises.push(self.queryNewReleases(queries[i]));
+        }
+        return new Promise((resolve, reject) => {
+            Promise.all(promises).then((results) => {
+                let releases = [];
+                for (let i in results) {
+                    releases = releases.concat(results[i]);
+                }
+                resolve(releases);
+            })
+            .catch((err) => {
+                reject(err);
+            });
+        });
+    },
+
+    buildMultiDigitAlphaQueryArr: (digits) => {
+
+    },
+
+    buildAlphaQueryArr: (digits) => {
+        let alphUpper = 'ABCDEFGHIJKLMONPQRSTUVWXYZ';
+        let alphLower = 'abcdefghijklmnopqrstuvwxyz';
+        let length = alphUpper.length;
+        let queries = [];
+        for (let i = 0; i < length; i++) {
+            queries = queries.concat(self.buildAlphaQueryMatrix(alphUpper[i], digits));
+            queries = queries.concat(self.buildAlphaQueryMatrix(alphLower[i], digits));
+        }
+        queries.push(self.buildNewReleaseNotCase(queries));
+        return queries;
+    },
+
+    buildAlphaQueryMatrix: (character, digits) => {
+        let alphUpper = 'ABCDEFGHIJKLMONPQRSTUVWXYZ';
+        let alphLower = 'abcdefghijklmnopqrstuvwxyz';
+        let length = alphUpper.length;
+        let alphaCombinations = alphUpper.split('');
+        let matrix = alphaCombinations.map(x => {
+            return 'q=album:' + x + '*';
+        });
+
+        for (let i = 0; i < digits; i++) {
+            for (let j in alphaCombinations) {
+                for (let i in alphLower) {
+                    matrix.push('q=album:' + alphaCombinations[j] + alphLower[i] + '*');
+                }
+            }
+        }
+        return matrix;
+    },
+
+    /**
+     * build a query that is not 
+     */
+    buildNewReleaseNotCase: (queries) => {
+        logger.info(queries.length);
+        let notStr = 'q=NOT+';
+        for (let i in queries) {
+            try {
+                let valArr = queries[i].split(':');
+                notStr += valArr[1] + '+NOT+';
+            } catch (e) {
+                logger.error(e, e.stack);
+            }
+            
+        }
+        notStr = notStr.slice(0, -5)
+        logger.info('notStr ' + notStr);
+        return notStr;
+    },
+
     /**
      * Gets all albums released in the last two weeks.
      * TODO:
      * 1. refactor to remove duplicate cache file creation
      */
-    getNewReleases: function () {
+    getNewReleasesOld: function () {
+        logger.info('getting new releases');
         var runAttempts = 0;
         var deferred = Q.defer();
         var releases = {};
@@ -335,12 +521,19 @@ var self = module.exports = {
                     var offset = 0;
 
                     function run() {
+                        logger.debug(offset);
+                        logger.debug(query);
                         spotifyApi.searchAlbums(query, {
                                 limit: 50,
                                 offset: offset
                             })
                             .then(function (data) {
+
+                                logger.debug(data.statusCode);
+
+
                                 for (var i = 0; i < data.body.albums.items.length; i++) {
+                                    try{
                                     var album = {
                                         spotify_id: data.body.albums.items[i].artists[0].id,
                                         name: data.body.albums.items[i].artists[0].name,
@@ -354,6 +547,10 @@ var self = module.exports = {
                                     };
 
                                     releases[album.spotify_id] ? releases[album.spotify_id].push(album) : releases[album.spotify_id] = [album];
+                                } catch (e) {
+                                    logger.info('handled spotify corrupted object');
+                                    logger.error(e, e.stack);
+                                }
                                     // releases.push(album);
                                     // if (!artistAdded[album.name]){
                                     //     artistAdded[album.name] = true;
@@ -362,6 +559,7 @@ var self = module.exports = {
                                 }
                                 offset = offset + 50;
                                 if (offset < data.body.albums.total) {
+                                    logger.info('new release progress: ' + offset + '/' + data.body.albums.total);
                                     run();
                                 } else {
                                     logger.info('Last two weeks of releases from Spotify grabbed!');
@@ -374,7 +572,7 @@ var self = module.exports = {
                                         }, function (err) {
                                             if (err) {
                                                 logger.error('write file error thrown!');
-                                                logger.error(err);
+                                                logger.error(err, err.stack);
                                             }
                                         });
                                     }
@@ -382,8 +580,8 @@ var self = module.exports = {
                                 }
                             })
                             .catch(function (err) {
-                                logger.error(err);
-                                if (runAttempts < 10000) {
+                                logger.error(err, err.stack);
+                                if (runAttempts < 50000) {
                                     logger.debug('Run attempt: ' + runAttempts);
                                     runAttempts++;
                                     offset++; // eventually we will get past bad one

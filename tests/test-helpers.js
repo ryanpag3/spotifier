@@ -107,6 +107,9 @@ module.exports = {
                         }
                     });
                 })
+                .catch((err) => {
+                    logger.error(err, err.stack);
+                });
         } else {
             // logger.debug('getArtists', 'resolving cached releases');
             deferred.resolve(artistCache.releases);

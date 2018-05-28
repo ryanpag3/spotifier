@@ -8,8 +8,10 @@ log.addTransform(function(elem) {
      *  "line" : "linenumber"
      * }
      */
-    delete elem.file;
-    delete elem.line;
+    if (elem)
+        delete elem.file;
+    if (elem)
+        delete elem.line;
     return null;
 })
 log.addTarget('console').withFormatter('human');
