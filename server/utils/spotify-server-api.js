@@ -3,6 +3,7 @@ var SpotifyApi = require('spotify-web-api-node'),
     Q = require('q'),
     fs = require('fs'),
     path = require('path'),
+    Promise = require('bluebird'),
     logger = require('./logger'),
     configPrivate = require('../../private/config-private'),
     credentials = {
@@ -241,13 +242,13 @@ var self = module.exports = {
     /**
      * Returns an albums track array
      */
-    getAlbumTracksItems: function(albumId, offset) {
+    getAlbumTracksItems: function (albumId, offset) {
         var deferred = Q.defer();
         this.getAlbumTracks(albumId, offset)
-            .then(function(tracks) {
+            .then(function (tracks) {
                 deferred.resolve(tracks.items);
             })
-            .catch(function(err) {
+            .catch(function (err) {
                 deferred.reject(err);
             })
         return deferred.promise;
@@ -257,7 +258,7 @@ var self = module.exports = {
      * Returns tracks and body information for the specified album
      * TODO: document & test
      */
-    getAlbumTracks: function(albumId, offset) {
+    getAlbumTracks: function (albumId, offset) {
         var deferred = Q.defer();
         var limit = 50;
 
@@ -266,19 +267,19 @@ var self = module.exports = {
         }
 
         self.refreshClientToken()
-            .then(function() {
+            .then(function () {
                 spotifyApi.getAlbumTracks(albumId, {
-                    limit: limit,
-                    offset: offset
-                })
-                .then(function(data) {
-                    deferred.resolve(data.body);
-                })
-                .catch(function(err) {
-                    deferred.reject(err);
-                })
+                        limit: limit,
+                        offset: offset
+                    })
+                    .then(function (data) {
+                        deferred.resolve(data.body);
+                    })
+                    .catch(function (err) {
+                        deferred.reject(err);
+                    })
             })
-            .catch(function(err) {
+            .catch(function (err) {
                 deferred.reject(err);
             })
         return deferred.promise;
@@ -343,21 +344,21 @@ var self = module.exports = {
                 limit: 1,
                 offset: 0
             }).then((data) => {
-                logger.info(data);
                 return data.body.albums.total;
             })
             .catch((err) => {
                 logger.error('getSearchQe')
-                logger.error(err, err.stack);
+                logger.error(err);
+                return -1;
             })
     },
 
     queryNewReleases: (query) => {
         return new Promise((resolve, reject) => {
-            self.getNewReleaseLen()
-                .then((len) => {
+            self.getSearchQueryLen(query)
+                .then((length) => {
                     let promises = [];
-                    for (let offset = 0; offset < len; offset += 50) {
+                    for (let offset = 0; offset < length; offset += 50) {
                         promises.push(spotifyApi.searchAlbums(query, {
                             limit: 50,
                             offet: offset
@@ -374,7 +375,8 @@ var self = module.exports = {
                             reject(err);
                         });
                 });
-        });
+        })
+
     },
 
     chunkAndQueryNewReleases: () => {
@@ -388,11 +390,12 @@ var self = module.exports = {
             let promises = [];
             let digits = 0;
             let queries = self.buildAlphaQueryArr(digits);
-            for (let i in queries) {
-                logger.info(queries.length);
-                promises.push(self.execChunkNewReleaseQuery(queries[i] + '&' + newQuery));
-            }
-            Promise.all(promises).then(releasesArr => {
+            Promise.map(queries, (query) => {
+                logger.info('query: ' + query + '&' + newQuery);
+                    return Promise.delay(50).then(() => self.execChunkNewReleaseQuery(query + '&' + newQuery));
+                }, {
+                    concurrency: 1
+                }).then(releasesArr => {
                     let releases = [];
                     for (let i in releasesArr) {
                         releases = releases.concat(releasesArr[i]);
@@ -406,31 +409,41 @@ var self = module.exports = {
     },
 
     execChunkNewReleaseQuery: (query) => {
-        let queryResLength = self.getSearchQueryLen(query);
-        logger.info(query);
-        if (queryResLength > 10000)
-            return self.execMultiDigitNewReleaseQuery(query, 1);
-        return self.queryNewReleases(query);
+        logger.info('executing chunked query');
+        return new Promise((resolve, reject) => {
+            self.getSearchQueryLen(query)
+                .then((length) => {
+                    logger.info('length: ' + length);
+                    if (length > 10000)
+                        return resolve(self.execMultiDigitNewReleaseQuery(query, 0));
+                    return resolve(self.queryNewReleases(query));
+                });
+        })
+
+
     },
 
     execMultiDigitNewReleaseQuery: (query, digits) => {
         let queries = self.buildAlphaQueryArr(digits);
         let promises = [];
         for (let i in queries) {
-            logger.info(queries.length);
             promises.push(self.queryNewReleases(queries[i]));
         }
         return new Promise((resolve, reject) => {
-            Promise.all(promises).then((results) => {
-                let releases = [];
-                for (let i in results) {
-                    releases = releases.concat(results[i]);
-                }
-                resolve(releases);
-            })
-            .catch((err) => {
-                reject(err);
-            });
+            Promise.map(promises, (x) => {
+                    return Promise.delay(1000);
+                }, {
+                    concurrency: 2
+                }).then((results) => {
+                    let releases = [];
+                    for (let i in results) {
+                        releases = releases.concat(results[i]);
+                    }
+                    resolve(releases);
+                })
+                .catch((err) => {
+                    reject(err);
+                });
         });
     },
 
@@ -483,10 +496,9 @@ var self = module.exports = {
             } catch (e) {
                 logger.error(e, e.stack);
             }
-            
+
         }
-        notStr = notStr.slice(0, -5)
-        logger.info('notStr ' + notStr);
+        notStr = notStr.slice(0, -5);
         return notStr;
     },
 
@@ -533,24 +545,24 @@ var self = module.exports = {
 
 
                                 for (var i = 0; i < data.body.albums.items.length; i++) {
-                                    try{
-                                    var album = {
-                                        spotify_id: data.body.albums.items[i].artists[0].id,
-                                        name: data.body.albums.items[i].artists[0].name,
-                                        recent_release: {
-                                            id: data.body.albums.items[i].id,
-                                            uri: data.body.albums.items[i].uri,
-                                            title: data.body.albums.items[i].name,
-                                            images: data.body.albums.items[i].images,
-                                            url: data.body.albums.items[i].external_urls.spotify
-                                        }
-                                    };
+                                    try {
+                                        var album = {
+                                            spotify_id: data.body.albums.items[i].artists[0].id,
+                                            name: data.body.albums.items[i].artists[0].name,
+                                            recent_release: {
+                                                id: data.body.albums.items[i].id,
+                                                uri: data.body.albums.items[i].uri,
+                                                title: data.body.albums.items[i].name,
+                                                images: data.body.albums.items[i].images,
+                                                url: data.body.albums.items[i].external_urls.spotify
+                                            }
+                                        };
 
-                                    releases[album.spotify_id] ? releases[album.spotify_id].push(album) : releases[album.spotify_id] = [album];
-                                } catch (e) {
-                                    logger.info('handled spotify corrupted object');
-                                    logger.error(e, e.stack);
-                                }
+                                        releases[album.spotify_id] ? releases[album.spotify_id].push(album) : releases[album.spotify_id] = [album];
+                                    } catch (e) {
+                                        logger.info('handled spotify corrupted object');
+                                        logger.error(e, e.stack);
+                                    }
                                     // releases.push(album);
                                     // if (!artistAdded[album.name]){
                                     //     artistAdded[album.name] = true;
