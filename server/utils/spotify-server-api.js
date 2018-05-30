@@ -354,28 +354,40 @@ var self = module.exports = {
     },
 
     queryNewReleases: (query) => {
+        logger.info('querying new releases for query: ' + query);
         return new Promise((resolve, reject) => {
             self.getSearchQueryLen(query)
                 .then((length) => {
-                    let promises = [];
-                    for (let offset = 0; offset < length; offset += 50) {
-                        promises.push(spotifyApi.searchAlbums(query, {
-                            limit: 50,
-                            offet: offset
-                        }));
+                    let offsets = [];
+                    // grab as many as we can
+                    for (let offset = 0; offset < length && offset <= 10000; offset += 50) {
+                        offsets.push(offset);
                     }
-                    Promise.all(promises).then((results) => {
-                            let newReleases = [];
-                            for (let i in results) {
-                                newReleases = newReleases.concat(results[i]);
+
+                    Promise.map(offsets, (offset) => {
+                        // logger.info('running query: ' + query + ' with offset: ' + offset);
+                        return Promise.delay(250).then(() => spotifyApi.searchAlbums(query, {
+                                limit: 50,
+                                offset: offset
+                            })
+                            .catch((err) => {
+                                logger.error(err);
+                            }));
+                    }, {
+                        concurrency: 5
+                    }).then((releases) => {
+                        let newReleases = [];
+                        for (let i in releases) {
+                            try {
+                            newReleases = newReleases.concat(releases[i].body.albums.items);
+                            } catch (e) {
+                                logger.error(new Error(e));
                             }
-                            resolve(newReleases);
-                        })
-                        .catch((err) => {
-                            reject(err);
-                        });
+                        }
+                        resolve(newReleases);
+                    });
                 });
-        })
+        });
 
     },
 
@@ -383,24 +395,27 @@ var self = module.exports = {
         logger.info('chunking new release queries');
         let newQuery = 'tag:new';
         return new Promise((resolve, reject) => {
-            // iterate through alphabet
-            // if results length > 1
-            // iterate through second character
-            // push to promise arr;
             let promises = [];
             let digits = 0;
             let queries = self.buildAlphaQueryArr(digits);
             Promise.map(queries, (query) => {
-                logger.info('query: ' + query + '&' + newQuery);
-                    return Promise.delay(50).then(() => self.execChunkNewReleaseQuery(query + '&' + newQuery));
+                    logger.info('query: ' + query + ' ' + newQuery);
+                    return Promise.delay(50).then(() => self.execChunkNewReleaseQuery(query + ' ' + newQuery));
                 }, {
                     concurrency: 1
                 }).then(releasesArr => {
-                    let releases = [];
+                    // let releases = [];
+                    // for (let i in releasesArr) {
+                    //     releases = releases.concat(releasesArr[i]);
+                    // }
+                    let releaseMap = {};
                     for (let i in releasesArr) {
-                        releases = releases.concat(releasesArr[i]);
+                        for (let j in releasesArr[i]) {
+                            releaseMap[releasesArr[i][j].id] = releases[i][j]; 
+                        }
                     }
-                    resolve(releases);
+                    logger.info('total length: ' + releaseMap.length);
+                    resolve(releaseMap);
                 })
                 .catch((err) => {
                     reject(err);
@@ -414,8 +429,6 @@ var self = module.exports = {
             self.getSearchQueryLen(query)
                 .then((length) => {
                     logger.info('length: ' + length);
-                    if (length > 10000)
-                        return resolve(self.execMultiDigitNewReleaseQuery(query, 0));
                     return resolve(self.queryNewReleases(query));
                 });
         })
@@ -458,9 +471,8 @@ var self = module.exports = {
         let queries = [];
         for (let i = 0; i < length; i++) {
             queries = queries.concat(self.buildAlphaQueryMatrix(alphUpper[i], digits));
-            queries = queries.concat(self.buildAlphaQueryMatrix(alphLower[i], digits));
         }
-        queries.push(self.buildNewReleaseNotCase(queries));
+        // queries.push(self.buildNewReleaseNotCase(queries));
         return queries;
     },
 
@@ -469,8 +481,12 @@ var self = module.exports = {
         let alphLower = 'abcdefghijklmnopqrstuvwxyz';
         let length = alphUpper.length;
         let alphaCombinations = alphUpper.split('');
+
+        if (digits == 0)
+            return 'album:' + character + '*';
+
         let matrix = alphaCombinations.map(x => {
-            return 'q=album:' + x + '*';
+            return 'album:' + x + '*';
         });
 
         for (let i = 0; i < digits; i++) {
