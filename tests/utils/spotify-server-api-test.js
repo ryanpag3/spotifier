@@ -33,7 +33,7 @@ describe('spotify-server-api unit tests', function () {
     });
 
     it('should return an array of results', function(done) {
-        this.timeout(60000 * 10);
+        this.timeout(60000 * 15);
         spotifyApiServer.getNewReleases()
             .then(function(releases) {
                 done();

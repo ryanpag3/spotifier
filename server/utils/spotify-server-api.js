@@ -371,18 +371,16 @@ var self = module.exports = {
                                 offset: offset
                             })
                             .catch((err) => {
-                                logger.error(err);
+                                offset -= 50;
+                                // logger.error(new Error(err));
                             }));
                     }, {
                         concurrency: 5
                     }).then((releases) => {
                         let newReleases = [];
                         for (let i in releases) {
-                            try {
-                            newReleases = newReleases.concat(releases[i].body.albums.items);
-                            } catch (e) {
-                                logger.error(new Error(e));
-                            }
+                            if (releases[i])
+                                newReleases = newReleases.concat(releases[i].body.albums.items);
                         }
                         resolve(newReleases);
                     });
@@ -399,8 +397,7 @@ var self = module.exports = {
             let digits = 0;
             let queries = self.buildAlphaQueryArr(digits);
             Promise.map(queries, (query) => {
-                    logger.info('query: ' + query + ' ' + newQuery);
-                    return Promise.delay(50).then(() => self.execChunkNewReleaseQuery(query + ' ' + newQuery));
+                    return Promise.delay(0).then(() => self.execChunkNewReleaseQuery(query + ' ' + newQuery));
                 }, {
                     concurrency: 1
                 }).then(releasesArr => {
@@ -408,13 +405,20 @@ var self = module.exports = {
                     // for (let i in releasesArr) {
                     //     releases = releases.concat(releasesArr[i]);
                     // }
+                    logger.info('completed retrieving new releases, building map' + releasesArr.length);
                     let releaseMap = {};
+                    try {
                     for (let i in releasesArr) {
                         for (let j in releasesArr[i]) {
-                            releaseMap[releasesArr[i][j].id] = releases[i][j]; 
+                            
+                            releaseMap[releasesArr[i][j].id] = releasesArr[i][j]; 
                         }
                     }
-                    logger.info('total length: ' + releaseMap.length);
+                }catch(e) {
+                    logger.error(new Error(e));
+                }
+                    let keys = Object.keys(releaseMap);
+                    logger.info('total length: ' + keys.length);
                     resolve(releaseMap);
                 })
                 .catch((err) => {
@@ -428,7 +432,7 @@ var self = module.exports = {
         return new Promise((resolve, reject) => {
             self.getSearchQueryLen(query)
                 .then((length) => {
-                    logger.info('length: ' + length);
+                    logger.info('query length: length: ' + length);
                     return resolve(self.queryNewReleases(query));
                 });
         })
@@ -472,12 +476,12 @@ var self = module.exports = {
         for (let i = 0; i < length; i++) {
             queries = queries.concat(self.buildAlphaQueryMatrix(alphUpper[i], digits));
         }
-        // queries.push(self.buildNewReleaseNotCase(queries));
+        queries.push(self.buildNewReleaseNotCase(queries));
         return queries;
     },
 
     buildAlphaQueryMatrix: (character, digits) => {
-        let alphUpper = 'ABCDEFGHIJKLMONPQRSTUVWXYZ';
+        let alphUpper = 'ABCDEFGHIJKLMONPQRSTUVWXYZ0123456789';
         let alphLower = 'abcdefghijklmnopqrstuvwxyz';
         let length = alphUpper.length;
         let alphaCombinations = alphUpper.split('');
@@ -485,9 +489,9 @@ var self = module.exports = {
         if (digits == 0)
             return 'album:' + character + '*';
 
-        let matrix = alphaCombinations.map(x => {
-            return 'album:' + x + '*';
-        });
+        // let matrix = alphaCombinations.map(x => {
+        //     return 'album:' + x + '';
+        // });
 
         for (let i = 0; i < digits; i++) {
             for (let j in alphaCombinations) {
@@ -504,17 +508,17 @@ var self = module.exports = {
      */
     buildNewReleaseNotCase: (queries) => {
         logger.info(queries.length);
-        let notStr = 'q=NOT+';
+        let notStr = 'NOT album:';
         for (let i in queries) {
             try {
                 let valArr = queries[i].split(':');
-                notStr += valArr[1] + '+NOT+';
+                notStr += valArr[1] + ' NOT album:';
             } catch (e) {
                 logger.error(e, e.stack);
             }
 
         }
-        notStr = notStr.slice(0, -5);
+        notStr = notStr.slice(0, -11);
         return notStr;
     },
 
