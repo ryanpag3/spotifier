@@ -313,15 +313,32 @@ var self = module.exports = {
         twentyFourHoursAgo.setDate(twentyFourHoursAgo.getDate() - 1);
         return new Promise((resolve, reject) => {
             if (cachedReleases.syncDate != undefined && Date.parse(cachedReleases.syncDate) > twentyFourHoursAgo)
-                return resolve(cachedReleases);
+                return resolve(cachedReleases.releases);
             logger.info('starting new release queries');
-            self.refreshClientToken()
+            return self.refreshClientToken()
                 .then(() => self.getNewReleaseLen())
                 .then((length) => {
                     console.log('new release length: ' + length);
                     if (length < 10000)
                         return self.queryNewReleases('tag:new');
                     return self.chunkAndQueryNewReleases();
+                })
+                .then((releases) => {
+                    if (!process.env.NODE_ENV) {
+                        cachedReleases.syncDate = new Date();
+                        cachedReleases.releases = releases;
+                        logger.info('writing cached releases to file...');
+                        fs.writeFile(path.join(__dirname, './cache/cached-new-releases.txt'), JSON.stringify(cachedReleases, null, 4), {
+                            encoding: 'utf-8',
+                            flag: 'w'
+                        }, function (err) {
+                            if (err) {
+                                logger.error('write file error thrown!');
+                                logger.error(err, err.stack);
+                            }
+                        });
+                    }
+                    resolve(releases);
                 });
         });
     },
@@ -366,7 +383,7 @@ var self = module.exports = {
 
                     Promise.map(offsets, (offset) => {
                         // logger.info('running query: ' + query + ' with offset: ' + offset);
-                        return Promise.delay(250).then(() => spotifyApi.searchAlbums(query, {
+                        return Promise.delay(175).then(() => spotifyApi.searchAlbums(query, {
                                 limit: 50,
                                 offset: offset
                             })
@@ -376,13 +393,36 @@ var self = module.exports = {
                             }));
                     }, {
                         concurrency: 5
-                    }).then((releases) => {
-                        let newReleases = [];
-                        for (let i in releases) {
-                            if (releases[i])
-                                newReleases = newReleases.concat(releases[i].body.albums.items);
+                    }).then((releaseData) => {
+                        let releases = {};
+                        for (let j in releaseData) {
+                            if (!releaseData[j]) {
+                                break;
+                            }
+
+                            for (var i = 0; i < releaseData[j].body.albums.items.length; i++) {
+                                try {
+                                    var album = {
+                                        spotify_id: releaseData[j].body.albums.items[i].artists[0].id,
+                                        name: releaseData[j].body.albums.items[i].artists[0].name,
+                                        recent_release: {
+                                            id: releaseData[j].body.albums.items[i].id,
+                                            uri: releaseData[j].body.albums.items[i].uri,
+                                            title: releaseData[j].body.albums.items[i].name,
+                                            images: releaseData[j].body.albums.items[i].images,
+                                            url: releaseData[j].body.albums.items[i].external_urls.spotify
+                                        }
+                                    };
+
+                                    releases[album.spotify_id] ? releases[album.spotify_id].push(album) : releases[album.spotify_id] = [album];
+                                } catch (e) {
+                                    logger.info('handled spotify corrupted object');
+                                    logger.error(e.toString());
+                                }
+                            }
                         }
-                        resolve(newReleases);
+                        logger.info('releases length ' + Object.keys(releases).length);
+                        resolve(releases);
                     });
                 });
         });
@@ -401,25 +441,22 @@ var self = module.exports = {
                 }, {
                     concurrency: 1
                 }).then(releasesArr => {
-                    // let releases = [];
-                    // for (let i in releasesArr) {
-                    //     releases = releases.concat(releasesArr[i]);
-                    // }
                     logger.info('completed retrieving new releases, building map' + releasesArr.length);
-                    let releaseMap = {};
+                    let releases = {};
                     try {
-                    for (let i in releasesArr) {
-                        for (let j in releasesArr[i]) {
-                            
-                            releaseMap[releasesArr[i][j].id] = releasesArr[i][j]; 
+                        for (let i in releasesArr) {
+                            logger.info(Object.keys(releasesArr[i]).length);
+                            releases = { ...releases,
+                                ...releasesArr[i]
+                            };
                         }
+                        logger.info('done');
+                    } catch (e) {
+                        logger.error(new Error(e));
+                    } finally {
+                        logger.info('total length: ' + Object.keys(releases).length);
+                        resolve(releases);
                     }
-                }catch(e) {
-                    logger.error(new Error(e));
-                }
-                    let keys = Object.keys(releaseMap);
-                    logger.info('total length: ' + keys.length);
-                    resolve(releaseMap);
                 })
                 .catch((err) => {
                     reject(err);
@@ -476,7 +513,8 @@ var self = module.exports = {
         for (let i = 0; i < length; i++) {
             queries = queries.concat(self.buildAlphaQueryMatrix(alphUpper[i], digits));
         }
-        queries.push(self.buildNewReleaseNotCase(queries));
+        // queries.push(self.buildNewReleaseNotCase(queries));
+        // queries.push(self.buildAlphaQueryMatrix('A', digits));
         return queries;
     },
 
