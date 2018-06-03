@@ -393,7 +393,7 @@ var self = module.exports = {
 
                     Promise.map(offsets, (offset) => {
                         // logger.info('running query: ' + query + ' with offset: ' + offset);
-                        return Promise.delay(300).then(() => spotifyApi.searchAlbums(query, {
+                        return Promise.delay(400).then(() => spotifyApi.searchAlbums(query, {
                                 limit: 50,
                                 offset: offset
                             })
@@ -404,6 +404,7 @@ var self = module.exports = {
                     }, {
                         concurrency: 5
                     }).then((releaseData) => {
+                        logger.info('spotify queries resolved with length: ' + releaseData.length);
                         let releases = {};
                         for (let j in releaseData) {
                             if (!releaseData[j]) {
