@@ -152,7 +152,7 @@ router.get('/me', function (req, res) {
 /**
  * Expose these routes only if in development mode
  */
-if (!process.env.NODE_ENV) {
+if (process.env.NODE_ENV) {
 
     router.get('/scan', function (req, res) {
         releaseScanner.startScan(true);
