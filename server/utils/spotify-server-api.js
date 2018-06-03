@@ -409,26 +409,29 @@ var self = module.exports = {
                             if (!releaseData[j]) {
                                 break;
                             }
+                            try {
+                                for (var i = 0; i < releaseData[j].body.albums.items.length; i++) {
+                                    try {
+                                        var album = {
+                                            spotify_id: releaseData[j].body.albums.items[i].artists[0].id,
+                                            name: releaseData[j].body.albums.items[i].artists[0].name,
+                                            recent_release: {
+                                                id: releaseData[j].body.albums.items[i].id,
+                                                uri: releaseData[j].body.albums.items[i].uri,
+                                                title: releaseData[j].body.albums.items[i].name,
+                                                images: releaseData[j].body.albums.items[i].images,
+                                                url: releaseData[j].body.albums.items[i].external_urls.spotify
+                                            }
+                                        };
 
-                            for (var i = 0; i < releaseData[j].body.albums.items.length; i++) {
-                                try {
-                                    var album = {
-                                        spotify_id: releaseData[j].body.albums.items[i].artists[0].id,
-                                        name: releaseData[j].body.albums.items[i].artists[0].name,
-                                        recent_release: {
-                                            id: releaseData[j].body.albums.items[i].id,
-                                            uri: releaseData[j].body.albums.items[i].uri,
-                                            title: releaseData[j].body.albums.items[i].name,
-                                            images: releaseData[j].body.albums.items[i].images,
-                                            url: releaseData[j].body.albums.items[i].external_urls.spotify
-                                        }
-                                    };
-
-                                    releases[album.spotify_id] ? releases[album.spotify_id].push(album) : releases[album.spotify_id] = [album];
-                                } catch (e) {
-                                    logger.info('handled spotify corrupted object');
-                                    logger.error(e.toString());
+                                        releases[album.spotify_id] ? releases[album.spotify_id].push(album) : releases[album.spotify_id] = [album];
+                                    } catch (e) {
+                                        logger.info('handled spotify corrupted object');
+                                        logger.error(e.toString());
+                                    }
                                 }
+                            } catch (e) {
+                                logger.error(new Error(e));
                             }
                         }
                         logger.info('releases length ' + Object.keys(releases).length);
