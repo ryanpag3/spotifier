@@ -349,10 +349,10 @@ var self = module.exports = {
     getCachedReleases: () => {
         logger.info('getting cached releases');
         if (process.env.NODE_ENV) // dont use caching until we upgrade server mem
-            return {};
+            return '{}';
 
         let p = path.join(__dirname, './cache/cached-new-releases.txt');
-        let cachedReleases = fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf-8')) : {};
+        let cachedReleases = fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf-8')) : '{}';
         if (cachedReleases) {
             cachedReleases = JSON.parse(cachedReleases);
         }
@@ -393,7 +393,7 @@ var self = module.exports = {
 
                     Promise.map(offsets, (offset) => {
                         // logger.info('running query: ' + query + ' with offset: ' + offset);
-                        return Promise.delay(500).then(() => spotifyApi.searchAlbums(query, {
+                        return Promise.delay(300).then(() => spotifyApi.searchAlbums(query, {
                                 limit: 50,
                                 offset: offset
                             })
