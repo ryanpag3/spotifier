@@ -64,7 +64,6 @@ const setupApp = function(app, express, socketUtil) {
     syncLibraryQueue.setSocketUtil(socketUtil);
     getArtistDetailsQueue.setSocketUtil(socketUtil);
 
-    app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
     app.use(helmet());
     app.use(cookieParser());
     app.use(bodyParser.json({limit: '10mb'}));
