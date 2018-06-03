@@ -10,6 +10,7 @@ var path = require('path'),
     MongoStore = require('connect-mongo')(session),
     mongoose = require('mongoose'),
     helmet = require('helmet'),
+    logger = require('./utils/logger'),
     configPublic = require('../config-public'),
     configPrivate = require('../private/config-private'),
     syncLibraryQueue = require('./utils/queue-sync-user-library'),
@@ -63,6 +64,7 @@ const setupApp = function(app, express, socketUtil) {
     syncLibraryQueue.setSocketUtil(socketUtil);
     getArtistDetailsQueue.setSocketUtil(socketUtil);
 
+    app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
     app.use(helmet());
     app.use(cookieParser());
     app.use(bodyParser.json({limit: '10mb'}));
