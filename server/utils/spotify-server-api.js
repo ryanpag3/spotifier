@@ -399,7 +399,7 @@ var self = module.exports = {
                             })
                             .catch((err) => {
                                 offset -= 50;
-                                // logger.error(new Error(err));
+                                logger.error(new Error(err));
                             }));
                     }, {
                         concurrency: 5
