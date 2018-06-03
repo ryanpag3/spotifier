@@ -339,6 +339,9 @@ var self = module.exports = {
                         });
                     }
                     resolve(releases);
+                })
+                .catch((err) => {
+                    logger.error(new Error(err));
                 });
         });
     },
@@ -390,7 +393,7 @@ var self = module.exports = {
 
                     Promise.map(offsets, (offset) => {
                         // logger.info('running query: ' + query + ' with offset: ' + offset);
-                        return Promise.delay(250).then(() => spotifyApi.searchAlbums(query, {
+                        return Promise.delay(500).then(() => spotifyApi.searchAlbums(query, {
                                 limit: 50,
                                 offset: offset
                             })
