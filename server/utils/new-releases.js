@@ -62,6 +62,14 @@ function scan() {
                                         images: album.images,
                                         url: album.external_urls.spotify
                                     };
+
+                                    release.release_date = new Date(release.release_date);
+                                    artist.recent_release.release_date = new Date(artist.recent_release.release_date);
+
+                                    // TODO: remove when done debugging
+                                    logger.debug('title check: ' + (removeSpecial(release.title).toLowerCase() !== removeSpecial(artist.recent_release.title).toLowerCase()));
+                                    logger.debug('date check: ' + release.release_date + ' > ' + artist.recent_release.release_date + ' : ' + (release.release_date > artist.recent_release.release_date));
+                                    
                                     // if titles do not match and release date is more present
                                     if (removeSpecial(release.title).toLowerCase() !==
                                         removeSpecial(artist.recent_release.title).toLowerCase() &&
@@ -101,7 +109,11 @@ function scan() {
                                 spotifyApiServer.getAlbumInfo(release)
                                     .then(function (album) {
                                         var currentDate = new Date();
-                                        if ((album.release_date > artist.recent_release.release_date) && (album.release_date <= currentDate)) {
+                                        album.release_date = new Date(album.release_date);
+                                        artist.recent_release.release_date = new Date(artist.recent_release.release_date);
+                                        logger.debug(album.release_date + ' > ' + artist.recent_release.release_date + ' :' + (album.release_date > artist.recent_release.release_date))
+                                        logger.debug(album.release_date  + ' <= ' + currentDate + ' :' + (album.release_date.getTime() <= currentDate.getTime()));
+                                        if ((album.release_date > artist.recent_release.release_date) && (album.release_date.getTime() <= currentDate.getTime())) {
                                             // todo: move this code block to it's own method
 
                                             release = {

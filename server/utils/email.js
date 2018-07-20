@@ -155,6 +155,7 @@ Email.prototype.sendNewReleaseEmails = function () {
                                             if (err) {
                                                 logger.error(err);
                                             }
+                                            logger.info('cleared users pending new releases');
                                             sendNewReleaseBatch(); // process next release batch and send
                                         });
 

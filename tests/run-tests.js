@@ -6,7 +6,6 @@ var client = redis.createClient();
 var logger = require('../server/utils/logger');
 
  describe('Run all unit tests', function() {
-
     /**
      * Global before each for all child test cases
      */

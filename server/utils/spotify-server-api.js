@@ -41,7 +41,8 @@ var self = module.exports = {
         // ensure fresh token
         self.refreshClientToken()
             .then(function () {
-                // get releases for parsing
+
+                //  get releases for parsing
                 self.getArtistReleases(artist)
                     .then(function (releases) {
                         var releases = self.getReleaseTypes(releases);
@@ -186,6 +187,7 @@ var self = module.exports = {
      * Create an array of artist releases, limiting results to albums and singles.
      * @param artist
      * @returns {Q.Promise<T>}
+     * @deprecated
      */
     getArtistReleases: function (artist) {
         var deferred = Q.defer(),
@@ -353,8 +355,9 @@ var self = module.exports = {
 
         let p = path.join(__dirname, './cache/cached-new-releases.txt');
         let cachedReleases = fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf-8')) : '{}';
+        
         if (cachedReleases) {
-            cachedReleases = JSON.parse(cachedReleases);
+            cachedReleases = cachedReleases;
         }
         return cachedReleases;
     },
