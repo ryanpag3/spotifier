@@ -1,6 +1,7 @@
 var SpotifyApi = require('spotify-web-api-node'),
     spotifyServerApi = require('./spotify-server-api'),
     Q = require('q'),
+    request = require('request-promise'),
     Db = require('./db.js'),
     logger = require('./logger'),
     Artist = require('../models/artist'),
@@ -235,28 +236,24 @@ Api.prototype.searchArtists = function (user, query) {
  * @returns Promise<Boolean> playlist exists
  */
 Api.prototype.playlistExists = function (user) {
-    var api = this.spotifyApi;
-    var deferred = Q.defer();
-
-    this.getAccessToken(user)
-        .then(function (accessToken) {
-            return api.setAccessToken(accessToken.token);
-        })
-        .then(function () {
-            return api.getPlaylist(user.name, user.playlist.id);
-        })
-        .then(function (result) {
-            logger.info('spotify-user-api.js playlistExists - does result return?')
-            logger.info('---payload---');
-            logger.info(result.body.name);
-            logger.info(result.body.href);
-            logger.info('---end payload---');
-            result ? deferred.resolve(true) : deferred.resolve(false);
-        })
-        .catch(function (err) {
-            deferred.resolve(false);
-        })
-    return deferred.promise;
+    return new Promise((resolve, reject) => {
+        this.getAccessToken(user)
+            // .then(function (accessToken) {
+            //     return api.setAccessToken(accessToken.token);
+            // })
+            .then(function (token) {
+                return isFollowingPlaylist(token, user);
+                // return api.getUserPlaylists(user.spotify_id);
+                //return api.getPlaylist(user.name, user.playlist.id);
+            })
+            .then(function (result) {
+                return resolve(JSON.parse(result));
+            })
+            .catch(function (err) {
+                logger.error(err);
+                return resolve(false);
+            })
+    });
 }
 
 /** 
@@ -432,6 +429,30 @@ Api.prototype.addReleaseTracksToPlaylist = function (user) {
             deferred.reject(err);
         })
     return deferred.promise;
+}
+
+function isFollowingPlaylist(token, user) {
+    logger.debug('requesting user following');
+    logger.debug(token.token);
+
+    if (!user.playlist) {
+        logger.debug('playlist doesnt exist, returning false');
+        return false;
+    }
+
+    const params = {
+        uri: 'https://api.spotify.com/v1/users/' + user.name + '/playlists/' + user.playlist.id + '/followers/contains?ids=' + user.name,
+        method: 'GET',
+        headers: {
+            'Authorization': 'Bearer ' + token.token,
+            'content-type': 'application/json'
+        },
+        json: true
+    };
+    return request(params)
+        .then((following) => {
+            return following;
+        });
 }
 
 /**

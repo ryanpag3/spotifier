@@ -145,32 +145,4 @@ describe('spotify-user-api.js unit tests', function () {
                 })
         })
     });
-
-    describe('addTracksToPlaylist', function () {
-        it('should add all tracks and resolve', function (done) {
-            this.timeout(5000);
-            var api = new SpotifyApiUser();
-            api.addReleaseTracksToPlaylist(spotifyUser)
-                .then(function (data) {
-                    expect(data).to.exist;
-                    // clear playlist after test run
-                    api.emptyPlaylist(spotifyUser)
-                        .then(function () {
-                            done();
-                        });
-                });
-        });
-
-        it('should throw err when invalid playlist is passed', function(done) {
-            this.timeout(5000);
-            var api = new SpotifyApiUser();
-            var user = sampleData.getSpotifyAuthenticatedUser();
-            user.playlist = {id: '1234'}; // invalidate
-            api.addReleaseTracksToPlaylist(user)
-                .catch(function(err) {
-                    expect(err).to.exist;
-                    done();
-                });
-        });
-    });
 });
