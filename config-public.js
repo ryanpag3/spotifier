@@ -4,7 +4,7 @@ var config = {};
 config.url = 'http://localhost:3000';
 config.prodUrl = 'https://spotifier.io';
 config.confirmCodeLength = 16;
-config.placeholderAlbumTitle = 'details request queued...';
+config.placeholderAlbumTitle = 'fetching artist details...';
 config.spotify.playlistTitle = 'spotifier.io | New Releases | Week of ' + getMonday();
 config.spotify.playlistDescription = 'This is a BETA feature. There may be bugs. Please report any to github.com/ryanpage42/spotifier. If you would like to turn off playlists, you may do so at https://spotifier.io/settings';
 
