@@ -9,14 +9,16 @@ app.controller('email-controller', ['$scope', '$location', '$route', 'authServic
         initialize();
         function initialize() {
             user = JSON.parse(sessionStorage.getItem('user'));
-            dbService.getPlaylistSetting(user._id)
-                .then(function(playlistEnabled) {
-                    $scope.playlistEnabled = playlistEnabled;
-                });
-            dbService.getSyncScheduled(user._id)
-                .then(function(scheduled) {
-                    $scope.syncScheduled = scheduled;
-                });
+            if (user) {
+                dbService.getPlaylistSetting(user._id)
+                    .then(function(playlistEnabled) {
+                        $scope.playlistEnabled = playlistEnabled;
+                    });
+                dbService.getSyncScheduled(user._id)
+                    .then(function(scheduled) {
+                        $scope.syncScheduled = scheduled;
+                    });
+            }
         };
 
         $scope.submitEmail = function () {
