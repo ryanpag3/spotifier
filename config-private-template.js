@@ -9,6 +9,13 @@ var config = {};
 config.gmail = {};
 config.spotify = {};
 
+// mongodb information
+config.db = {
+    ip: '',
+    user: '',
+    password: ''
+};
+
 /**
  * gmail account credentials are used for sending test emails
  * You will need to go to account->Connected apps & sites and scroll

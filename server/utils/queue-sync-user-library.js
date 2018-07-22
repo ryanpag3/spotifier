@@ -9,45 +9,32 @@ var socketUtil; // assigned on job creation, need to use global namespace to all
 syncLibraryQueue
     .on('active', function (job, jobPromise) {
         socketUtil.alertSyncQueueStatusChange(job.data.user, 'active');
-        var update = {
-            sync_queue: {
-                status: 'active'
-            }
-        };
-        User.update({'_id': job.data.user._id}, update, function (err) {
-            if (err) {
+        User.findOne({'_id': job.data.user._id}, (err, user) => {
+            if (err)
                 logger.error(err);
-            }
-        })
+            user.sync_queue.status = 'active';
+            user.save();
+        });
     })
     .on('failed', function (job, err) {
-        // clear user queue status just in case of fatal err
-        var update = {
-            sync_queue: {
-                status: 'not queued'
-            }
-        };
-        User.update({'_id': job.data.user._id}, update,
-            function (err) {
-                if (err) {
-                    logger.error(err);
-                }
-            })
+        User.findOne({'_id': job.data.user._id}, (err, user) => {
+            if (err)
+                logger.error(err);
+            user.sync_queue.id = undefined;
+            user.sync_queue.status = 'not queued';
+            user.save();
+        });
     })
     .on('completed', function (job, result) {
-        socketUtil.alertSyncQueueStatusChange(job.data.user, 'completed');
         logger.info(job.data.user.name + ' finished their sync library job.');
-        var update = {
-            sync_queue: {
-                status: 'not queued'
-            }
-        };
-        User.update({'_id': job.data.user._id}, update,
-            function (err) {
-                if (err) {
-                    logger.error(err);
-                }
-            })
+        socketUtil.alertSyncQueueStatusChange(job.data.user, 'completed');
+        User.findOne({'_id': job.data.user._id}, (err, user) => {
+            if (err)
+                logger.error(err);
+            user.sync_queue.id = undefined;
+            user.sync_queue.status = 'not queued';
+            user.save();
+        });
     });
 
 syncLibraryQueue.process(3, function (job, done) {
@@ -76,14 +63,8 @@ libraryQueue = {
             attempts: 3
         })
             .then(function (job) {
-                var update = {
-                    sync_queue: {
-                        id: job.jobId,
-                        status: 'enqueued'
-                    }
-                };
                 // add job information to db
-                User.update({'_id': user._id}, update, function (err) {
+                User.update({'_id': user._id}, {'sync_queue.id':job.jobId, 'sync_queue.status': 'enqueued'}, function (err) {
                     if (err) {
                         deferred.reject(err);
                     } else {

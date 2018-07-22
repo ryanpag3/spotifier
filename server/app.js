@@ -27,10 +27,12 @@ const setupApp = function(app, express, socketUtil) {
     var options = {
         keepAlive: 1,
         connectTimeoutMS: 30000,
-        useMongoClient: true
+        useMongoClient: true,
+        user: configPrivate.db.user,
+        pass: configPrivate.db.password
     };
 
-    mongoose.connect('mongodb://localhost/spotifier', options);
+    mongoose.connect(configPrivate.db.ip, options);
 
     /*
         Passport session setup.

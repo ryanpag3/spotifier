@@ -1,6 +1,6 @@
 var User = require('../models/user'),
-    Artist = require('../models/artist'),
-    logger = ('./logger');
+    Artist = require('../models/artist');
+var logger = ('./logger');
 
 function Socket(io) {
     var self = this;
