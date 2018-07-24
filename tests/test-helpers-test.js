@@ -128,7 +128,7 @@ describe('test-helper unit tests', function () {
     });
 
     it('stageSpotifyUser should create a playlist for the test user', function(done) {
-        this.timeout(30000);
+        this.timeout(60000);
         testHelper.stageSpotifyUser(10)
             .then(function(user) {
                 expect(user.playlist.id).to.exist;
@@ -139,8 +139,8 @@ describe('test-helper unit tests', function () {
     });
 
     it('stageSpotifyUsers should add all users', function(done) {
-        this.timeout(30000);
-        testHelper.stageSpotifyUsers(5, 20)
+        this.timeout(60000);
+        testHelper.stageSpotifyUsers(1, 10)
             .then(function() {
                 done();
             })

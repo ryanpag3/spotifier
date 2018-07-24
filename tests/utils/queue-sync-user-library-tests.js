@@ -36,11 +36,11 @@ describe('sync library queue utility', function () {
                 .then(function(user) {
                     syncUserLibraryQueue.createJob(user)
                         .then(function() {
-                            User.findOne({'_id': user._id}, function(err, user) {
-                                expect(user).to.not.be.undefined;
+                            User.find({'_id': user._id}, function(err, user) {
+                                expect(user[0]).to.not.be.undefined;
                                 expect(err).to.be.equal(null);
-                                expect(user.sync_queue.enqueued).to.be.true;
-                                assert.isNumber(user.sync_queue.id);
+                                expect(user[0].sync_queue.status).to.be.equal('enqueued');
+                                assert.isNumber(user[0].sync_queue.id);
                                 done();
                             })
                         })

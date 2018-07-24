@@ -199,8 +199,8 @@ describe('db-wrapper', function () {
         testHelper.insert(user)
             .then(function(user) {
                 db.changeUserPlaylistSetting(user._id, true)
-                    .then(function(user) {
-                        expect(user.playlist.enabled).to.equal(true);
+                    .then(function(enabled) {
+                        expect(enabled).to.equal(true);
                         done();
                     })
             })

@@ -79,7 +79,7 @@ describe('new-release-scanner unit tests', function () {
                             // check to make sure all artists have release dates added
                             setTimeout(function () {
                                 for (var i = 0; i < artists.length; i++) {
-                                    expect(artists[i].recent_release.release_date).to.be.a('string');
+                                    expect(artists[i].recent_release.release_date).to.not.be.undefined;
                                 }
                             }, 250 * numArtists); // add a little time buffer to allow queue to finish
 

@@ -33,33 +33,32 @@ function Api() {
  * @returns {Q.Promise<T>}
  */
 Api.prototype.syncLibrary = function (user, socketUtil) {
+    logger.info('attempting to sync ' + user.name + '\'s library.');
     var api = this,
         deferred = Q.defer();
-
-    api.setAccessToken(user)
-        .then(function () {
-            api.getLibraryArtists(user)
-                .then(function (artists) {
-                    var db = new Db();
-                    logger.info(user.name + '\'s library is being added with artist array length: ' + artists.length);
-                    db.addAllArtists(user, artists, socketUtil)
-                        .then(function () {
-                            db.getLibrary(user)
-                                .then(function (library) {
-                                    socketUtil.alertLibraryAdded(user, library);
-                                });
-                            deferred.resolve();
+    api.getAccessToken(user)
+        .then((mUser) => {
+            if (mUser)
+                return this.setAccessToken(mUser);
+            return this.spotifyApi.setAccessToken(user.accessToken);
+        })
+        .then(() => api.getLibraryArtists(user)
+        .then(function (artists) {
+            var db = new Db();
+            logger.info(user.name + '\'s library is being added with artist array length: ' + artists.length);
+            db.addAllArtists(user, artists, socketUtil)
+                .then(function () {
+                    db.getLibrary(user)
+                        .then(function (library) {
+                            socketUtil.alertLibraryAdded(user, library);
                         });
-                })
-                .catch(function (err) {
-                    logger.error(err);
-                    deferred.reject(err);
-                })
+                    deferred.resolve();
+                });
         })
         .catch(function (err) {
             logger.error(err);
             deferred.reject(err);
-        });
+        }));
     return deferred.promise;
 };
 

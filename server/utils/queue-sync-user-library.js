@@ -8,27 +8,39 @@ var socketUtil; // assigned on job creation, need to use global namespace to all
 
 syncLibraryQueue
     .on('active', function (job, jobPromise) {
-        socketUtil.alertSyncQueueStatusChange(job.data.user, 'active');
-        User.findOne({'_id': job.data.user._id}, (err, user) => {
+        if (socketUtil)
+            socketUtil.alertSyncQueueStatusChange(job.data.user, 'active');
+        User.findOne({
+            '_id': job.data.user._id
+        }, (err, user) => {
             if (err)
                 logger.error(err);
-            user.sync_queue.status = 'active';
-            user.save();
+            if (user) {
+                user.sync_queue.status = 'active';
+                user.save();
+            }
         });
     })
     .on('failed', function (job, err) {
-        User.findOne({'_id': job.data.user._id}, (err, user) => {
+        User.findOne({
+            '_id': job.data.user._id
+        }, (err, user) => {
             if (err)
                 logger.error(err);
-            user.sync_queue.id = undefined;
-            user.sync_queue.status = 'not queued';
-            user.save();
+            if (user) {
+                user.sync_queue.id = undefined;
+                user.sync_queue.status = 'not queued';
+                user.save();
+            }
         });
     })
     .on('completed', function (job, result) {
         logger.info(job.data.user.name + ' finished their sync library job.');
-        socketUtil.alertSyncQueueStatusChange(job.data.user, 'completed');
-        User.findOne({'_id': job.data.user._id}, (err, user) => {
+        if (socketUtil)
+            socketUtil.alertSyncQueueStatusChange(job.data.user, 'completed');
+        User.findOne({
+            '_id': job.data.user._id
+        }, (err, user) => {
             if (err)
                 logger.error(err);
             user.sync_queue.id = undefined;
@@ -59,12 +71,19 @@ libraryQueue = {
      */
     createJob: function (user) {
         var deferred = Q.defer();
-        syncLibraryQueue.add({user: user}, {
-            attempts: 3
-        })
+        syncLibraryQueue.add({
+                user: user
+            }, {
+                attempts: 3
+            })
             .then(function (job) {
                 // add job information to db
-                User.update({'_id': user._id}, {'sync_queue.id':job.jobId, 'sync_queue.status': 'enqueued'}, function (err) {
+                User.update({
+                    '_id': user._id
+                }, {
+                    'sync_queue.id': job.jobId,
+                    'sync_queue.status': 'enqueued'
+                }, function (err) {
                     if (err) {
                         deferred.reject(err);
                     } else {
@@ -77,7 +96,9 @@ libraryQueue = {
 
     removeJob: function (user) {
         var deferred = Q.defer();
-        User.findOne({'_id': user._id}, function (err, user) {
+        User.findOne({
+            '_id': user._id
+        }, function (err, user) {
             if (err) {
                 deferred.reject(err);
             }
@@ -102,7 +123,9 @@ libraryQueue = {
 
     getJobStatus: function (user) {
         var deferred = Q.defer();
-        User.findOne({'_id': user._id}, function (err, user) {
+        User.findOne({
+            '_id': user._id
+        }, function (err, user) {
             if (err) {
                 deferred.reject(err);
             } else if (user === null) {
@@ -127,9 +150,11 @@ libraryQueue = {
 
     },
 
-    enqueueScheduledSyncs: function() {
+    enqueueScheduledSyncs: function () {
         var deferred = Q.defer();
-        User.find({'sync_queue.scheduled': true}, function(err, users) {
+        User.find({
+            'sync_queue.scheduled': true
+        }, function (err, users) {
             if (err) {
                 deferred.reject(err);
             }
@@ -149,7 +174,7 @@ libraryQueue = {
      * this is run on startup to expose the socket utility to the queue service
      * @param mSocketUtil
      */
-    setSocketUtil: function(mSocketUtil) {
+    setSocketUtil: function (mSocketUtil) {
         socketUtil = mSocketUtil;
     }
 };
