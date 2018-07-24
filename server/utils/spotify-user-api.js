@@ -37,9 +37,10 @@ Api.prototype.syncLibrary = function (user, socketUtil) {
     var api = this,
         deferred = Q.defer();
     api.getAccessToken(user)
-        .then((mUser) => {
-            if (mUser)
-                return this.setAccessToken(mUser);
+        .then((accessToken) => {
+            if (accessToken) {
+                user.accessToken = accessToken.token;
+            }
             return this.spotifyApi.setAccessToken(user.accessToken);
         })
         .then(() => api.getLibraryArtists(user)
