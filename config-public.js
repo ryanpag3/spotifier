@@ -12,7 +12,14 @@ config.spotify.playlistDescription = 'This is a BETA feature. There may be bugs.
 // turn on for more verbose debugging output
 config.verboseMode = true;
 
-
+config.log = {
+    fileLevel: 'debug',
+    consoleLevel: 'debug',
+    timestampPattern: 'YYYY-MM-DD HH:mm:ss',
+    datePattern: 'YYYY-MM-DD',
+    maxSize: '20m',
+    maxFiles: '' // never delete
+}
 module.exports = config;
 
 

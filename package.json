@@ -1,5 +1,5 @@
 {
-  "name": "spotify-notifier",
+  "name": "spotifier",
   "version": "1.0.0",
   "description": "A new music notifier for spotify",
   "main": "server.js",
@@ -50,7 +50,8 @@
     "rxjs": "^5.5.3",
     "socket.io": "^2.1.1",
     "spotify-web-api-node": "^3.1.1",
-    "winston": "^3.0.0-rc1",
+    "winston": "^3.0.0",
+    "winston-daily-rotate-file": "^3.3.0",
     "zone.js": "^0.8.18"
   },
   "devDependencies": {
