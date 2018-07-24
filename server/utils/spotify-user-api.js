@@ -317,6 +317,7 @@ Api.prototype.emptyPlaylist = function (user) {
         .then(function (playlist) {
             var positions = getPositions(playlist.body.tracks.total);
             if (positions.length > 0) {
+                logger.debug('removing tracks by position');
                 api.removeTracksFromPlaylistByPosition(user.name, user.playlist.id, positions, playlist.body.snapshot_id)
                     .then(function () {
                         deferred.resolve();
