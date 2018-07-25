@@ -1,37 +1,14 @@
-# spotifier.io
+# spotifier.io (v2)
+Hello, 
 
-spotifier.io is a web application that aims to make tracking new releases on Spotify efficient, reliable, and effortless
-for the user. It utilizes node.js and express for routing, mongodb for session storage and database management, redis
-for running long processes in a queue, and angular for front-end.
+Welcome to the v2 branch. If you would like the current build, please refer to master or development.
 
-## Getting Started
+I have decided to take another look at this project in order to bring it to scale. Spotify has recently disabled new release notifications (email, push) leading to increased demand for this service. 
 
-Getting started developing for spotifier.io is easy. First, `clone` the repository to your development directory of choice. Then run `npm install` to initialize the required node modules. 
+Due to the fact that I built spotifier.io while largely learning how to build web applications I failed to architect it in a scalable and efficient way. Instead of rewriting, I have decided to make the following enhancements to lead to a 2.0 architecture and release.
 
-You will need to setup a file called `config-private.js` and the directory `./private/` which you create. Use the template `config-private-template.js` in the root folder to easily input your variables.
+1. Offload processing to job-handler service using message queues.
+2. Improve API request scaling.
+3. Redesign UI and include native mobile support.
 
-Follow the directions in the config template to get setup.
-
-You will also need to run your own local mongo and redis servers for the application to run properly. 
-
-#### To setup mongo/redis check out the following links:
-
-[mongodb](https://www.mongodb.com/download-center#community)
-
-*note:* we are running our db on the `spotifier` instance. Run `use spotifier` in your mongo cli to switch and be able
-to manage collections.
-
-
-[redis](https://redis.io/download)
-
-
-## Running the tests
-
-Unit tests are written with `chai`, `sinon`, and `mocha`. They are found in the `./tests/` directory and can be run
-from the command line with `mocha <test-file-name>.js`
-
-## Authors
-
-* **Ryan Page** - [ryanpage42](https://github.com/ryanpage42)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+Progress is ongoing. Please hit me up if you are interested in contributing!
