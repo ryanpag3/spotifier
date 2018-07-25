@@ -9,3 +9,6 @@ spotifier/logs/log.json
 spotifier/logs/human.log
 spotifier/package-lock.json
 .vscode/
+/node_modules/logger/node_modules
+/node_modules/message-queue/node_modules
+/job-handler/node_modules

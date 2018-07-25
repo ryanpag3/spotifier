@@ -1,0 +1,21 @@
+{
+  "name": "job-handler",
+  "version": "1.0.0",
+  "description": "Job Handler",
+  "main": "server/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "-"
+  },
+  "author": "Ryan Page",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "express": "^4.16.3",
+    "logger": "file:../node_modules/logger",
+    "rsmq-promise": "^1.0.1",
+    "rsmq-worker": "^0.5.2"
+  }
+}
