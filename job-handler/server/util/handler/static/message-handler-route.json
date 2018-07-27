@@ -1,0 +1,4 @@
+{
+    "getartistdetails" : "artist-details-handler.js",
+    "syncuserlibrary" : "synclibrary-handler.js"
+}
