@@ -19,18 +19,18 @@ if (process.env.NODE_ENV) {
         true, // start job right now
         'America/Los_Angeles'); // set time zone
 
-    new CronJob('00 00 00 * * 0-6', function () {
-            logger.info('running validate artist details job!');
-            var db = new Db();
-            db.validateArtistDetails();
+    // new CronJob('00 00 00 * * 0-6', function () {
+    //         logger.info('running validate artist details job!');
+    //         var db = new Db();
+    //         db.validateArtistDetails();
 
-            logger.info('running scheduled library syncs');
-            syncLibraryQueue.enqueueScheduledSyncs()
-                .then(function() {
-                    logger.info('syncs have been scheduled');
-                });
-        },
-        null,
-        true,
-        'America/Los_Angeles')
+    //         logger.info('running scheduled library syncs');
+    //         syncLibraryQueue.enqueueScheduledSyncs()
+    //             .then(function() {
+    //                 logger.info('syncs have been scheduled');
+    //             });
+    //     },
+    //     null,
+    //     true,
+    //     'America/Los_Angeles')
 }
