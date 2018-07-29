@@ -7,12 +7,19 @@ var mongoose = require('mongoose'),
     sampleData = require('../sample-test-data'),
     User = new require('../../server/models/user'),
     Artist = new require('../../server/models/artist'),
+    configPrivate = require('../../private/config-private'),
     getArtistDetailsQueue = require('../../server/utils/queue-get-artist-details');
 mongoose.Promise = require('bluebird');
 
-mongoose.connect('mongodb://localhost/spotifier_test', {
-    useMongoClient: true
-});
+var options = {
+    keepAlive: 1,
+    connectTimeoutMS: 30000,
+    useMongoClient: true,
+    user: configPrivate.test.db.user,
+    pass: configPrivate.test.db.password
+};
+
+mongoose.connect(configPrivate.test.db.ip, options);
 
 describe('sync library queue utility', function () {
     // before each unit test

@@ -8,12 +8,19 @@ var expect = require('chai').expect,
     releaseScanner = require('../../server/utils/new-releases'),
     Db = require('../../server/utils/db'),
     testHelper = require('../test-helpers'),
+    configPrivate = require('../../private/config-private'),
     sampleData = require('../sample-test-data');
 mongoose.Promise = require('bluebird');
 
-mongoose.connect('mongodb://localhost/spotifier_test', {
-    useMongoClient: true
-});
+var options = {
+    keepAlive: 1,
+    connectTimeoutMS: 30000,
+    useMongoClient: true,
+    user: configPrivate.test.db.user,
+    pass: configPrivate.test.db.password
+};
+
+mongoose.connect(configPrivate.test.db.ip, options);
 
 describe('email-handler tests', function () {
     // run before each unit test

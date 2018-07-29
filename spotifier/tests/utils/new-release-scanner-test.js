@@ -1,22 +1,23 @@
 /** unit testing for new-release-scanner.js **/
 var expect = require('chai').expect,
     mongoose = require('mongoose'),
-    sinon = require('sinon'),
-    fs = require('fs'),
     User = require('../../server/models/user'),
     Artist = require('../../server/models/artist'),
-    email = require('../../server/utils/email'),
     logger = require('../../server/utils/logger'),
-    Db = require('../../server/utils/db'),
     testHelper = require('../test-helpers'),
-    sampleData = require('../sample-test-data'),
-    spotifyApiServer = require('../../server/utils/spotify-server-api'),
+    configPrivate = require('../../private/config-private'),
     releaseScanner = require('../../server/utils/new-releases.js');
-    mongoose.Promise = require('bluebird');
+mongoose.Promise = require('bluebird');
 
-mongoose.connect('mongodb://localhost/spotifier_test', {
-    useMongoClient: true
-});
+var options = {
+    keepAlive: 1,
+    connectTimeoutMS: 30000,
+    useMongoClient: true,
+    user: configPrivate.test.db.user,
+    pass: configPrivate.test.db.password
+};
+
+mongoose.connect(configPrivate.test.db.ip, options);
 
 describe('new-release-scanner unit tests', function () {
     // before each unit test

@@ -11,15 +11,22 @@ var expect = require('chai').expect,
     queueGetArtistDetails = require('../../server/utils/queue-get-artist-details'),
     logger = require('../../server/utils/logger'),
     User = require('../../server/models/user'),
-    Artist = require('../../server/models/artist');
+    Artist = require('../../server/models/artist'),
+    configPrivate = require('../../private/config-private');
 
 mongoose.Promise = require('bluebird');
 playlist = rewire('../../server/utils/playlist-handler');
 
 // connect to dummy database
-mongoose.connect('mongodb://localhost/spotifier_test', {
-    useMongoClient: true
-});
+var options = {
+    keepAlive: 1,
+    connectTimeoutMS: 30000,
+    useMongoClient: true,
+    user: configPrivate.test.db.user,
+    pass: configPrivate.test.db.password
+};
+
+mongoose.connect(configPrivate.test.db.ip, options);
 
 describe('playlist handler', function () {
     var spotifyUser;

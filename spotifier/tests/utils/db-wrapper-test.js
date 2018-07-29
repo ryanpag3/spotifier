@@ -7,11 +7,18 @@ var Db = require('../../server/utils/db');
 var User = new require('../../server/models/user');
 var Artist = new require('../../server/models/artist');
 var logger = require('../../server/utils/logger');
+var configPrivate = require('../../private/config-private');
 mongoose.Promise = require('bluebird');
 
-mongoose.connect('mongodb://localhost/spotifier_test', {
-    useMongoClient: true
-});
+var options = {
+    keepAlive: 1,
+    connectTimeoutMS: 30000,
+    useMongoClient: true,
+    user: configPrivate.test.db.user,
+    pass: configPrivate.test.db.password
+};
+
+mongoose.connect(configPrivate.test.db.ip, options);
 
 describe('db-wrapper', function () {
     var db = null;

@@ -6,13 +6,20 @@ var expect = require('chai').expect,
     sampleData = require('../sample-test-data'),
     SpotifyApiUser = require('../../server/utils/spotify-user-api'),
     User = require('../../server/models/user'),
+    configPrivate = require('../../private/config-private'),
     Artist = require('../../server/models/artist');
 
 // deprecated promise library fix
 mongoose.Promise = require('bluebird');
-mongoose.connect('mongodb://localhost/spotifier_test', {
-    useMongoClient: true
-});
+var options = {
+    keepAlive: 1,
+    connectTimeoutMS: 30000,
+    useMongoClient: true,
+    user: configPrivate.test.db.user,
+    pass: configPrivate.test.db.password
+};
+
+mongoose.connect(configPrivate.test.db.ip, options);
 
 describe('spotify-user-api.js unit tests', function () {
     var spotifyUser;
