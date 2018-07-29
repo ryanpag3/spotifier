@@ -332,7 +332,7 @@ var self = module.exports = {
                         logger.info('writing cached releases to file...');
                         fs.writeFile(path.join(__dirname, './cache/cached-new-releases.txt'), JSON.stringify(cachedReleases, null, 4), {
                             encoding: 'utf-8',
-                            flag: 'w'
+                            flag: 'a'
                         }, function (err) {
                             if (err) {
                                 logger.error('write file error thrown!');
