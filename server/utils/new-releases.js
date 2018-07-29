@@ -195,27 +195,39 @@ var startScan = function (sendEmails) {
     // scan for new releases
     scan()
         .then(function () {
-            playlistHandler.updateNewReleasePlaylists()
-                .then(function () {
-                    // resume job queues
-                    syncLibraryQueue.resume();
-                    getArtistDetailsQueue.resume();
-                    if (sendEmails === true) {
-                        // send new release emails
-                        emailHandler.sendNewReleaseEmails()
-                            .then(function () {
-                                logger.info('EMAIL SERVICE RESOLVED');
-                                deferred.resolve();
-                            });
-                    } else {
+            // resume job queues
+            syncLibraryQueue.resume();
+            getArtistDetailsQueue.resume();
+            if (sendEmails === true) {
+                // send new release emails
+                emailHandler.sendNewReleaseEmails()
+                    .then(function () {
+                        logger.info('EMAIL SERVICE RESOLVED');
                         deferred.resolve();
-                    }
-                })
-                .catch(function (err) {
-                    logger.error(err);
-                    deferred.reject(err);
-                });
-
+                    });
+            } else {
+                deferred.resolve();
+            }
+            // playlistHandler.updateNewReleasePlaylists()
+            //     .then(function () {
+            //         // resume job queues
+            //         syncLibraryQueue.resume();
+            //         getArtistDetailsQueue.resume();
+            //         if (sendEmails === true) {
+            //             // send new release emails
+            //             emailHandler.sendNewReleaseEmails()
+            //                 .then(function () {
+            //                     logger.info('EMAIL SERVICE RESOLVED');
+            //                     deferred.resolve();
+            //                 });
+            //         } else {
+            //             deferred.resolve();
+            //         }
+            //     })
+            //     .catch(function (err) {
+            //         logger.error(err);
+            //         deferred.reject(err);
+            //     });
         })
         .catch(function (err) {
             logger.error(err);
