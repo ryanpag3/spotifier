@@ -36,6 +36,7 @@
     "helmet": "^3.9.0",
     "kue": "^0.11.6",
     "log4js": "^3.0.2",
+    "mocha-junit-reporter": "^1.17.0",
     "mongoose": "^4.13.6",
     "moniker": "^0.1.2",
     "nodemailer": "^4.4.0",
