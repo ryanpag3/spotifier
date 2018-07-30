@@ -334,6 +334,8 @@ var self = module.exports = {
                         if (!fs.existsSync(path.join(__dirname, './cache'))) 
                             fs.mkdirSync(path.join(__dirname, './cache'));
 
+                        logger.info(JSON.stringify(cachedReleases, null, 4));
+
                         fs.writeFile(path.join(__dirname, './cache/cached-new-releases.txt'), JSON.stringify(cachedReleases, null, 4), {
                             encoding: 'utf-8',
                             flag: 'w'
