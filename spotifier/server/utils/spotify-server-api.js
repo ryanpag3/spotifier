@@ -655,7 +655,7 @@ var self = module.exports = {
                                     if (!process.env.NODE_ENV) {
                                         logger.info('writing cached releases to file...');
                                         
-                                        if (!fs.existsSync(path.join(__dirname, './cache')))
+                                        if (!fs.existsSync(path.join(__dirname, './cache'))) 
                                             fs.mkdirSync(path.join(__dirname, './cache'));
                                         
                                             fs.writeFile(path.join(__dirname, './cache/cached-new-releases.txt'), JSON.stringify(cachedReleases, null, 4), {
@@ -663,7 +663,7 @@ var self = module.exports = {
                                             flag: 'w'
                                         }, function (err) {
                                             if (err) {
-                                                logger.error('write file error thrown!');
+                                                logger.error('> write file error thrown!');
                                                 logger.error(err, err.stack);
                                             }
                                         });
