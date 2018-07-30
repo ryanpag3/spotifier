@@ -330,6 +330,10 @@ var self = module.exports = {
                         cachedReleases.syncDate = new Date();
                         cachedReleases.releases = releases;
                         logger.info('writing cached releases to file...');
+
+                        if (!fs.existsSync(path.join(__dirname, './cache'))) 
+                            fs.mkdirSync(path.join(__dirname, './cache'));
+
                         fs.writeFile(path.join(__dirname, './cache/cached-new-releases.txt'), JSON.stringify(cachedReleases, null, 4), {
                             encoding: 'utf-8',
                             flag: 'w'
