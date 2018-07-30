@@ -332,7 +332,7 @@ var self = module.exports = {
                         logger.info('writing cached releases to file...');
                         fs.writeFile(path.join(__dirname, './cache/cached-new-releases.txt'), JSON.stringify(cachedReleases, null, 4), {
                             encoding: 'utf-8',
-                            flag: 'a'
+                            flag: 'w'
                         }, function (err) {
                             if (err) {
                                 logger.error('write file error thrown!');
@@ -654,9 +654,13 @@ var self = module.exports = {
                                     cachedReleases.releases = releases;
                                     if (!process.env.NODE_ENV) {
                                         logger.info('writing cached releases to file...');
-                                        fs.writeFile(path.join(__dirname, './cache/cached-new-releases.txt'), JSON.stringify(cachedReleases, null, 4), {
+                                        
+                                        if (!fs.existsSync(path.join(__dirname, './cache')))
+                                            fs.mkdirSync(path.join(__dirname, './cache'));
+                                        
+                                            fs.writeFile(path.join(__dirname, './cache/cached-new-releases.txt'), JSON.stringify(cachedReleases, null, 4), {
                                             encoding: 'utf-8',
-                                            flag: 'a'
+                                            flag: 'w'
                                         }, function (err) {
                                             if (err) {
                                                 logger.error('write file error thrown!');
