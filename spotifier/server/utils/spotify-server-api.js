@@ -336,8 +336,6 @@ var self = module.exports = {
                         if (!fs.existsSync(path.join(__dirname, './cache'))) 
                             fs.mkdirSync(path.join(__dirname, './cache'));
 
-                        logger.info(JSON.stringify(cachedReleases, null, 4));
-
                         fs.writeFile(path.join(__dirname, './cache/cached-new-releases.txt'), JSON.stringify(cachedReleases, null, 4), {
                             encoding: 'utf-8',
                             flag: 'w'
@@ -532,8 +530,7 @@ var self = module.exports = {
     },
 
     buildAlphaQueryArr: (digits) => {
-        let alphUpper = 'a'; // FIXME:
-        // let alphUpper = 'ABCDEFGHIJKLMONPQRSTUVWXYZ0123456789';
+        let alphUpper = 'ABCDEFGHIJKLMONPQRSTUVWXYZ0123456789';
         let length = alphUpper.length;
         let queries = [];
         for (let i = 0; i < length; i++) {
