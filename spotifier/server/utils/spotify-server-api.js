@@ -320,7 +320,7 @@ var self = module.exports = {
             return self.refreshClientToken()
                 .then(() => self.getNewReleaseLen())
                 .then((length) => {
-                    console.log('new release length: ' + length);
+                    logger.info('new release length: ' + length);
                     if (length < 10000)
                         return self.queryNewReleases('tag:new');
                     return self.chunkAndQueryNewReleases();
@@ -329,7 +329,8 @@ var self = module.exports = {
                     if (!process.env.NODE_ENV) {
                         cachedReleases.syncDate = new Date();
                         cachedReleases.releases = releases;
-                        logger.info('writing cached releases to file with length: ' + cachedReleases.releases.length);
+                        let keys = Object.keys(releases);
+                        logger.info('writing cached releases to file with length: ' + keys.length);
 
                         if (!fs.existsSync(path.join(__dirname, './cache'))) 
                             fs.mkdirSync(path.join(__dirname, './cache'));
