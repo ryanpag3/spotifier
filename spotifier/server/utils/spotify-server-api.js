@@ -327,6 +327,7 @@ var self = module.exports = {
                 })
                 .then((releases) => {
                     if (!process.env.NODE_ENV) {
+                        cachedReleases = {};
                         cachedReleases.syncDate = new Date();
                         cachedReleases.releases = releases;
                         let keys = Object.keys(releases);
