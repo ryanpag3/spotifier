@@ -329,7 +329,7 @@ var self = module.exports = {
                     if (!process.env.NODE_ENV) {
                         cachedReleases.syncDate = new Date();
                         cachedReleases.releases = releases;
-                        logger.info('writing cached releases to file...');
+                        logger.info('writing cached releases to file with length: ' + cachedReleases.length);
 
                         if (!fs.existsSync(path.join(__dirname, './cache'))) 
                             fs.mkdirSync(path.join(__dirname, './cache'));
