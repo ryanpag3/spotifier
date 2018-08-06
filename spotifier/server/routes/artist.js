@@ -22,7 +22,7 @@ router.post('/search', function(req, res) {
                 req.session.save(function(err){
                     // catch serialization error
                     if (err) {
-                        logger.error(err);
+                        logger.error(err.stack.toString());
                     }
                 });
             }
@@ -33,12 +33,12 @@ router.post('/search', function(req, res) {
                     })
                 })
                 .catch(function(err) {
-                    logger.error(err);
+                    logger.error(err.stack.toString());
                 })
         })
         // catch refresh access token api error
         .catch(function(err) {
-            logger.error(err);
+            logger.error(err.stack.toString());
         });
 });
 

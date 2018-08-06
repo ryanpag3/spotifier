@@ -27,7 +27,7 @@ var self = module.exports = {
                 deferred.resolve();
             })
             .catch(function (err) {
-                logger.error(err);
+                logger.error(err.stack.toString())
                 deferred.reject(err);
             });
         return deferred.promise;
@@ -52,12 +52,12 @@ var self = module.exports = {
                             })
                             .catch(function (err) {
                                 logger.error('get most recent details error')
-                                logger.error(err);
+                                logger.error(err.stack.toString())
                                 deferred.reject(err); // job failed, will restart
                             })
                     })
                     .catch(function (err) {
-                        logger.error(err);
+                        logger.error(err.stack.toString())
                         deferred.reject(err); // job failed, will restart
                     })
             })
@@ -163,7 +163,7 @@ var self = module.exports = {
                         }
                     })
                     .catch(function (err) {
-                        logger.error(err);
+                        logger.error(err.stack.toString())
                         deferred.reject(err);
                     })
             } else { // no releases of type
@@ -213,7 +213,7 @@ var self = module.exports = {
                     }
                 })
                 .catch(function (err) {
-                    logger.error(err);
+                    logger.error(err.stack.toString())
                     run();
                 })
         }
@@ -361,7 +361,8 @@ var self = module.exports = {
 
         let p = path.join(__dirname, './cache/cached-new-releases.txt');
         let cachedReleases = fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf-8')) : '{}';
-        
+        let keys = Object.keys(cachedReleases);
+        logger.info('cached releases length: ' + keys); 
         if (cachedReleases) {
             cachedReleases = cachedReleases;
         }
@@ -384,7 +385,7 @@ var self = module.exports = {
             })
             .catch((err) => {
                 logger.error('getSearchQe')
-                logger.error(err);
+                logger.error(err.stack.toString())
                 return -1;
             })
     },
@@ -688,7 +689,7 @@ var self = module.exports = {
                     }
                 })
                 .catch(function (err) {
-                    logger.error(err);
+                    logger.error(err.stack.toString())
                 });
         } else {
             deferred.resolve(cachedReleases.releases);
@@ -737,7 +738,7 @@ var self = module.exports = {
                     })
             })
             .catch(function (err) {
-                logger.error(err);
+                logger.error(err.stack.toString())
                 deferred.reject('**REFRESH CLIENT TOKEN**' + err);
             });
         return deferred.promise;

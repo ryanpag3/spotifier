@@ -28,7 +28,7 @@ Db.prototype.createUser = function (mUser) {
         'name': mUser.name
     }, function (err, user) {
         if (err) {
-            logger.error(err);
+            logger.error(err.stack.toString())
         }
         // check if exists
         if (user === null) {
@@ -163,7 +163,7 @@ Db.prototype.addArtist = function (user, artist, socketUtil) {
     // query for artist
     Artist.findOne(query, function (err, qArtist) {
         if (err) {
-            logger.error(err);
+            logger.error(err.stack.toString())
         }
         // if exists
         if (qArtist) {
@@ -232,7 +232,7 @@ Db.prototype.removeArtist = function (user, artist) {
         'name': user.name
     }, function (err, user) {
         if (err) {
-            logger.error(err);
+            logger.error(err.stack.toString())
         }
         // query for artist information, remove user objectId from tracking array
         Artist.findOneAndUpdate({
@@ -244,7 +244,7 @@ Db.prototype.removeArtist = function (user, artist) {
             },
             function (err, artist) {
                 if (err) {
-                    logger.error(err);
+                    logger.error(err.stack.toString())
                 }
                 if (artist) {
                     // remove artist ObjectId from user tracking array
@@ -280,7 +280,7 @@ Db.prototype.updateArtist = function (artist) {
         'spotify_id': artist.spotify_id
     }, artist, function (err, artist) {
         if (err) {
-            logger.error(err);
+            logger.error(err.stack.toString())
         }
     })
 };
@@ -303,7 +303,7 @@ Db.prototype.assignArtist = function (user, artist) {
         }
     }, function (err) {
         if (err) {
-            logger.error(err);
+            logger.error(err.stack.toString())
             deferred.reject(err);
         }
         // if user is not already tracking artist, push id to tracking list
@@ -315,7 +315,7 @@ Db.prototype.assignArtist = function (user, artist) {
             }
         }, function (err) {
             if (err) {
-                logger.error(err);
+                logger.error(err.stack.toString())
                 deferred.reject(err);
             } else {
                 deferred.resolve();
@@ -344,7 +344,7 @@ Db.prototype.artistNewReleaseFound = function (artist) {
         }
     }, function (err) {
         if (err) {
-            logger.error(err);
+            logger.error(err.stack.toString())
         }
         logger.info('>>> added new release info for ' + artist.name);
     })
@@ -389,7 +389,7 @@ Db.prototype.userExists = function (mUser) {
         '_id': mUser._id
     }, function (err, user) {
         if (err) {
-            logger.error(err);
+            logger.error(err.stack.toString())
         }
         deferred.resolve(user !== null);
     });
@@ -407,7 +407,7 @@ Db.prototype.emailExists = function (mUser) {
         '_id': mUser._id
     }, function (err, user) {
         if (err) {
-            logger.error(err);
+            logger.error(err.stack.toString())
         }
         deferred.resolve(user !== undefined && user.email.address !== undefined);
     });
@@ -425,7 +425,7 @@ Db.prototype.emailConfirmed = function (mUser) {
         '_id': mUser._id
     }, function (err, user) {
         if (err) {
-            logger.error(err);
+            logger.error(err.stack.toString())
         }
         deferred.resolve(user !== null && user.email.confirmed === true);
     });
@@ -470,7 +470,7 @@ Db.prototype.removeEmail = function (user) {
         }
     }, function (err) {
         if (err) {
-            logger.error(err);
+            logger.error(err.stack.toString())
             deferred.reject(err);
         } else {
             deferred.resolve();
@@ -536,7 +536,7 @@ Db.prototype.unsubscribeEmail = function (email) {
         }
     }, function (err) {
         if (err) {
-            logger.error(err);
+            logger.error(err.stack.toString())
             deferred.reject();
         } else {
             deferred.resolve();
@@ -585,7 +585,7 @@ Db.prototype.validateArtistDetails = function () {
         ]
     }, function (err, artists) {
         if (err) {
-            logger.error(err);
+            logger.error(err.stack.toString())
         }
         for (var i = 0; i < artists.length; i++) {
             getArtistDetailsQueue.createJob(artists[i]);

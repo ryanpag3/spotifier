@@ -117,7 +117,7 @@ function updatePlaylist(user) {
                 })
                 .catch(function (err) {
                     logger.error('ERROR: addReleaseTracksToPlaylist');
-                    logger.error(err);
+                    logger.error(err.stack.toString());
                     logger.error('----------------------------------------------');
                     logger.error('FAIL CASE')
                     logger.error(user);
@@ -169,7 +169,7 @@ function playlistResetNeeded(user) {
                 deferred.resolve(false); // skip this weeks reset
             })
             .catch(function (err) {
-                logger.error(err);
+                logger.error(err.stack.toString());
             });
     } else {
         userResetDate = new Date(userResetDate); // instantiate for comparator
@@ -184,7 +184,7 @@ function playlistResetNeeded(user) {
                     deferred.resolve(true);
                 })
                 .catch(function (err) {
-                    logger.error(err);
+                    logger.error(err.stack.toString())
                 })
         } else {
             logger.debug('INVALID - RESET NOT NEEDED');
@@ -217,7 +217,7 @@ function serializeUserResetDate(user) {
         '_id': user._id
     }, function (err, nUser) {
         if (err) {
-            logger.error(err);
+            logger.error(err.stack.toString())
         }
 
         if (nUser.playlist) {
@@ -230,7 +230,7 @@ function serializeUserResetDate(user) {
 
         nUser.save(function(err, mUser) {
             if (err) {
-                logger.error(err);
+                logger.error(err.stack.toString())
             }
             deferred.resolve(mUser);
         });

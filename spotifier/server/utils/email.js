@@ -80,7 +80,7 @@ Email.prototype.sendNewReleaseEmails = function () {
             }
         }, function (err, users) {
             if (err) {
-                logger.error(err);
+                logger.error(err.stack.toString())
             }
             if (users && users.length > 0) { // if users still have new_releases pending
                 var master = users[0]; // master is the user we will query for all matching artist patterns with
@@ -99,7 +99,7 @@ Email.prototype.sendNewReleaseEmails = function () {
                     var addresses = [];
                     // catch err
                     if (err) {
-                        logger.error(err);
+                        logger.error(err.stack.toString())
                     }
 
                     // build the recipients
@@ -116,7 +116,7 @@ Email.prototype.sendNewReleaseEmails = function () {
                         var newReleaseEmail = new EmailTemplate(templateDir);
                         // catch err
                         if (err) {
-                            logger.error(err);
+                            logger.error(err.stack.toString())
                         }
 
                         var unsubUrl = process.env.NODE_ENV ? 'https://spotifier.io/unsubscribe' : 'http://localhost:3000/unsubscribe';
@@ -127,7 +127,7 @@ Email.prototype.sendNewReleaseEmails = function () {
                         }, function (err, result) {
                             // catch err
                             if (err) {
-                                logger.error(err);
+                                logger.error(err.stack.toString())
                             } else if (validateTemplate(result)) {
                                 var today = new Date(Date.now()).toLocaleDateString('en-US');
                                 // define email options
@@ -153,7 +153,7 @@ Email.prototype.sendNewReleaseEmails = function () {
                                             }
                                         }, function (err) {
                                             if (err) {
-                                                logger.error(err);
+                                                logger.error(err.stack.toString())
                                             }
                                             logger.info('cleared users pending new releases');
                                             sendNewReleaseBatch(); // process next release batch and send
@@ -161,7 +161,7 @@ Email.prototype.sendNewReleaseEmails = function () {
 
                                     })
                                     .catch(function (err) {
-                                        logger.error(err);
+                                        logger.error(err.stack.toString())
                                         // if email fails to send, we set a backoff of 2 mins before retrying
                                         setTimeout(function () {
                                             sendNewReleaseBatch();
@@ -211,7 +211,7 @@ Email.prototype.sendConfirmationEmail = function (user) {
                 // render email template
                 confirmEmail.render(templateVals, function (err, result) {
                     if (err) {
-                        logger.error(err);
+                        logger.error(err.stack.toString())
                     } else if (validateTemplate(result)) {
                         var mailOptions = {
                             from: configPrivate.domain.email,
@@ -270,7 +270,7 @@ Email.prototype.confirm = function (query) {
                     }
                 }, function (err) {
                     if (err) {
-                        logger.error(err);
+                        logger.error(err.stack.toString());
                         deferred.reject(err);
                     } else {
                         deferred.resolve();
@@ -283,7 +283,7 @@ Email.prototype.confirm = function (query) {
             }
         } else {
             var error = 'user not found!';
-            logger.error(error);
+            logger.error(error.stack.toString())
             deferred.reject(error);
         }
     });

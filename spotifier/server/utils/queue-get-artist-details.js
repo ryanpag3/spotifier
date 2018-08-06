@@ -42,7 +42,7 @@ artistDetailsQueue.process(2, function (job, done) {
             done(null, artist);
         })
         .catch(function (err) {
-            logger.error(err);
+            logger.error(err.stack.toString())
             done(new Error(err));
         })
 });
@@ -52,7 +52,7 @@ artistDetailsQueue.process(2, function (job, done) {
  */
 artistDetailsQueue
     .on('error', function (err) {
-        logger.error(err);
+        logger.error(err.stack.toString())
     })
     .on('failed', function (job, err) {
         logger.info('get artist details job failed, restarting...');

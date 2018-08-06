@@ -14,7 +14,7 @@ syncLibraryQueue
             '_id': job.data.user._id
         }, (err, user) => {
             if (err)
-                logger.error(err);
+                logger.error(err.stack.toString())
             if (user) {
                 user.sync_queue.status = 'active';
                 user.save();
@@ -26,7 +26,7 @@ syncLibraryQueue
             '_id': job.data.user._id
         }, (err, user) => {
             if (err)
-                logger.error(err);
+                logger.error(err.stack.toString())
             if (user) {
                 user.sync_queue.id = undefined;
                 user.sync_queue.status = 'not queued';
@@ -42,7 +42,7 @@ syncLibraryQueue
             '_id': job.data.user._id
         }, (err, user) => {
             if (err)
-                logger.error(err);
+                logger.error(err.stack.toString())
             user.sync_queue.id = undefined;
             user.sync_queue.status = 'not queued';
             user.save();

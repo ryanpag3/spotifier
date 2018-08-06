@@ -42,7 +42,7 @@ Socket.prototype.alertArtistDetailsChange = function (artist) {
 
     Artist.findOne({'spotify_id': artist.spotify_id}, 'users_tracking', function (err, qArtist) {
         if (err) {
-            logger.error(err);
+            logger.error(err.stack.toString())
         }
         if (qArtist) {
             for (var i = 0; i < qArtist.users_tracking.length; i++) {

@@ -54,11 +54,11 @@ describe('new-release-scanner unit tests', function () {
                         }, 0);
                     })
                     .catch(function (err) {
-                        logger.error(err);
+                        logger.error(err.stack.toString())
                     });
             })
             .catch(function (err) {
-                logger.error(err);
+                logger.error(err.stack.toString())
             });
 
     });

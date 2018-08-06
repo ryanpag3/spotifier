@@ -96,7 +96,7 @@ module.exports = {
                         flag: 'w'
                     }, function (err) {
                         if (err) {
-                            logger.error(err);
+                            logger.error(err.stack.toString())
                         } else {
                             var waitTime = 30000;
                             setTimeout(function () {
@@ -162,7 +162,7 @@ module.exports = {
                                     };
                                     Artist.create(artist, function (err) {
                                         if (err) {
-                                            logger.error(err);
+                                            logger.error(err.stack.toString())
                                         } else {
                                             i++;
                                             logger.debug('random artist ' + (i-1) + '/' + n + ' has been created.');
@@ -180,7 +180,7 @@ module.exports = {
                                 }
                             })
                             .catch(function (err) {
-                                logger.error(err);
+                                logger.error(err.stack.toString())
                                 i--;
                                 insertNewArtist();
                             })
@@ -200,7 +200,7 @@ module.exports = {
                                     };
                                     Artist.create(artist, function (err) {
                                         if (err) {
-                                            logger.error(err);
+                                            logger.error(err.stack.toString())
                                         } else {
                                             i++;
                                             logger.debug('random artist ' + (i-1) + '/' + n + ' has been created.');
@@ -217,7 +217,7 @@ module.exports = {
                                 }
                             })
                             .catch(function (err) {
-                                logger.error(err);
+                                logger.error(err.stack.toString())
                                 i--;
                                 insertNewArtist();
                             })
@@ -297,19 +297,19 @@ module.exports = {
                 // maybe an updateMany with a filter would be a better approach
                 User.remove({}, function (err) {
                     if (err) {
-                        logger.error(err);
+                        logger.error(err.stack.toString())
                     }
                     User.insertMany(users, function (err) {
                         if (err) {
-                            logger.error(err);
+                            logger.error(err.stack.toString())
                         }
                         Artist.remove({}, function (err) {
                             if (err) {
-                                logger.error(err);
+                                logger.error(err.stack.toString())
                             }
                             Artist.insertMany(artists, function (err) {
                                 if (err) {
-                                    logger.error(err);
+                                    logger.error(err.stack.toString())
                                 } else {
                                     deferred.resolve();
                                 }

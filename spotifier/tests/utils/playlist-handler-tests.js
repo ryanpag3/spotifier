@@ -99,7 +99,7 @@ describe('playlist handler', function () {
                 })
                 .catch(function (err) {
                     logger.error('unit test error thrown...');
-                    logger.error(err);
+                    logger.error(err.stack.toString())
                 });
         });
     });
@@ -186,7 +186,7 @@ describe('playlist handler', function () {
                 .catch(function (err) {
                     // rewire throws err to catch block
                     logger.error('ERROR: should return true when it is time to reset the playlist');
-                    logger.error(err);
+                    logger.error(err.stack.toString())
                 });
         });
 
@@ -201,7 +201,7 @@ describe('playlist handler', function () {
                 .catch(function (err) {
                     // rewire throws err to catch block
                     logger.error('ERROR: should return false when it is not time to reset the playlist');
-                    logger.error(err);
+                    logger.error(err.stack.toString())
                 });
         });
     });

@@ -57,7 +57,7 @@ Api.prototype.syncLibrary = function (user, socketUtil) {
                 });
         })
         .catch(function (err) {
-            logger.error(err);
+            logger.error(err.stack.toString())
             deferred.reject(err);
         }));
     return deferred.promise;
@@ -178,7 +178,7 @@ Api.prototype.getLibraryArtists = function (user) {
             })
             // catch get access token error
             .catch(function (err) {
-                logger.error(err);
+                logger.error(err.stack.toString())
             });
     }
     // begin recursive call
@@ -223,7 +223,7 @@ Api.prototype.searchArtists = function (user, query) {
                     deferred.resolve(results);
                 })
                 .catch(function (err) {
-                    logger.error(err);
+                    logger.error(err.stack.toString())
                     deferred.reject(err);
                 })
         });
@@ -250,7 +250,7 @@ Api.prototype.playlistExists = function (user) {
                 return resolve(JSON.parse(result));
             })
             .catch(function (err) {
-                logger.error(err);
+                logger.error(err.stack.toString())
                 return resolve(false);
             })
     });

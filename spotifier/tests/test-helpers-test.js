@@ -49,7 +49,7 @@ describe('test-helper unit tests', function () {
             }
             Artist.remove({}, function (err, result) { // drop artist collection
                 if (err) {
-                    logger.error(err);
+                    logger.error(err.stack.toString())
                 }
                 done(); // callback
             })
@@ -106,7 +106,7 @@ describe('test-helper unit tests', function () {
                                 })
                             })
                             .catch(function (err) {
-                                logger.error(err);
+                                logger.error(err.stack.toString())
                             })
                     })
             })
@@ -147,7 +147,7 @@ describe('test-helper unit tests', function () {
                 done();
             })
             .catch(function(err) {
-                this.logger.error(err);
+                this.logger.error(err.stack.toString())
             })
     });
 });

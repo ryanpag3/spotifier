@@ -47,7 +47,7 @@ describe('email-handler tests', function () {
                         done();
                     })
                     .catch(function (err) {
-                        logger.error(err);
+                        logger.error(err.stack.toString())
                     });
             })
     });
@@ -70,19 +70,19 @@ describe('email-handler tests', function () {
                                        done();
                                    })
                                    .catch(function(err) { // catch getUser err
-                                       logger.error(err);
+                                       logger.error(err.stack.toString())
                                    })
                            })
                            .catch(function(err) { // catch confirm err
-                               logger.error(err);
+                               logger.error(err.stack.toString())
                            })
                    })
                    .catch(function(err) { // catch setConfirmCode err
-                       logger.error(err);
+                       logger.error(err.stack.toString())
                    })
            })
             .catch(function(err) { // catch insert err
-                logger.error(err);
+                logger.error(err.stack.toString())
             })
     });
 
@@ -104,11 +104,11 @@ describe('email-handler tests', function () {
                             })
                     })
                     .catch(function(err) { // catch setConfirmCode err
-                        logger.error(err);
+                        logger.error(err.stack.toString())
                     })
             })
             .catch(function(err) { // catch insert err
-                logger.error(err);
+                logger.error(err.stack.toString())
             })
     });
 
