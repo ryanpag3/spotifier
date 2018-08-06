@@ -4,7 +4,7 @@
   "description": "A new music notifier for spotify",
   "main": "server.js",
   "scripts": {
-    "test": "mocha tests/run-tests.js"
+    "test": "./report.xml mocha ./tests/run-tests.js --colors --reporter mocha-jenkins-reporter"
   },
   "repository": {
     "type": "git",
@@ -61,6 +61,7 @@
     "chai": "^4.1.1",
     "jenkins-mocha": "^6.0.0",
     "mocha": "^5.2.0",
+    "mocha-jenkins-reporter": "^0.3.12",
     "nyc": "^12.0.2",
     "rewire": "^2.5.2",
     "sinon": "^6.1.4"
