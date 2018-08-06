@@ -355,14 +355,14 @@ var self = module.exports = {
     },
 
     getCachedReleases: () => {
-        logger.info('getting cached releases');
+        logger.info('> getting cached releases');
         // if (process.env.NODE_ENV) // dont use caching until we upgrade server mem
         //     return '{}';
 
         let p = path.join(__dirname, './cache/cached-new-releases.txt');
         let cachedReleases = fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf-8')) : '{}';
         let keys = Object.keys(cachedReleases);
-        logger.info('cached releases length: ' + keys); 
+        logger.info('cached releases length: ' + keys.length); 
         if (cachedReleases) {
             cachedReleases = cachedReleases;
         }
