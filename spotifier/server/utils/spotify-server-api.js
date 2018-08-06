@@ -367,7 +367,7 @@ var self = module.exports = {
             logger.error(e.stack.toString());
             cachedReleases = {};
         }
-        let keys = Object.keys(cachedReleases);
+        let keys = Object.keys(cachedReleases.releases);
         logger.info('cached releases length: ' + keys.length); 
         if (cachedReleases) {
             cachedReleases = cachedReleases;
