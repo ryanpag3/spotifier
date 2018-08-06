@@ -360,7 +360,13 @@ var self = module.exports = {
         //     return '{}';
 
         let p = path.join(__dirname, './cache/cached-new-releases.txt');
-        let cachedReleases = fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf-8')) : '{}';
+        let cachedReleases;
+        try {
+            cachedReleases = fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf-8')) : {};
+        } catch (e) {
+            logger.error(e.stack.toString());
+            cachedReleases = {};
+        }
         let keys = Object.keys(cachedReleases);
         logger.info('cached releases length: ' + keys.length); 
         if (cachedReleases) {
