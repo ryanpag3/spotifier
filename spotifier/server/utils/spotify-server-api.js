@@ -537,7 +537,7 @@ var self = module.exports = {
     },
 
     buildAlphaQueryArr: (digits) => {
-        let alphUpper = 'ABCDEFGHIJKLMONPQRSTUVWXYZ0123456789';
+        let alphUpper = 'ABCDEFGHIJKLMONPQRSTUVWXYZ0123456789'; 
         let length = alphUpper.length;
         let queries = [];
         for (let i = 0; i < length; i++) {
