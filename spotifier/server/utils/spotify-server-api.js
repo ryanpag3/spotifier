@@ -342,14 +342,14 @@ var self = module.exports = {
                         }, function (err) {
                             if (err) {
                                 logger.error('write file error thrown!');
-                                logger.error(err, err.stack);
+                                logger.error(err.stack.toString());
                             }
                         });
                     }
                     resolve(releases);
                 })
                 .catch((err) => {
-                    logger.error(new Error(err));
+                    logger.error(err.stack.toString());
                 });
         });
     },
@@ -360,7 +360,6 @@ var self = module.exports = {
         //     return '{}';
 
         let p = path.join(__dirname, './cache/cached-new-releases.txt');
-        logger.info(fs.existsSync(p));
         let cachedReleases;
         try {
             cachedReleases = fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf-8')) : {};
@@ -421,7 +420,7 @@ var self = module.exports = {
                             })
                             .catch((err) => {
                                 offset -= 50;
-                                logger.error(new Error(err));
+                                logger.error(err.stack.toString());
                             }));
                     }, {
                         concurrency: 5
@@ -450,11 +449,11 @@ var self = module.exports = {
                                         releases[album.spotify_id] ? releases[album.spotify_id].push(album) : releases[album.spotify_id] = [album];
                                     } catch (e) {
                                         logger.info('handled spotify corrupted object');
-                                        logger.error(e.toString());
+                                        logger.error(e.stack.toString());
                                     }
                                 }
                             } catch (e) {
-                                logger.error(new Error(e));
+                                logger.error(e.stack.toString());
                             }
                         }
                         logger.info('releases length ' + Object.keys(releases).length);
@@ -542,7 +541,7 @@ var self = module.exports = {
     },
 
     buildAlphaQueryArr: (digits) => {
-        let alphUpper = 'ABCDEFGHIJKLMONPQRSTUVWXYZ0123456789'; 
+        let alphUpper = process.env.NODE_ENV ? 'ABCDEFGHIJKLMONPQRSTUVWXYZ0123456789' : 'A'; 
         let length = alphUpper.length;
         let queries = [];
         for (let i = 0; i < length; i++) {
@@ -555,7 +554,7 @@ var self = module.exports = {
 
     buildAlphaQueryMatrix: (character, digits) => {
         // let's not waste our time in dev       
-        let alphUpper = process.env.NODE_ENV ? 'ABCDEFGHIJKLMONPQRSTUVWXYZ0123456789' : 'A';
+        let alphUpper = 'ABCDEFGHIJKLMONPQRSTUVWXYZ0123456789';
         let alphLower = 'abcdefghijklmnopqrstuvwxyz';
         let length = alphUpper.length;
         let alphaCombinations = alphUpper.split('');
@@ -588,7 +587,7 @@ var self = module.exports = {
                 let valArr = queries[i].split(':');
                 notStr += valArr[1] + ' NOT album:';
             } catch (e) {
-                logger.error(e, e.stack);
+                logger.error(e.stack.toString());
             }
 
         }
@@ -655,7 +654,7 @@ var self = module.exports = {
                                         releases[album.spotify_id] ? releases[album.spotify_id].push(album) : releases[album.spotify_id] = [album];
                                     } catch (e) {
                                         logger.info('handled spotify corrupted object');
-                                        logger.error(e, e.stack);
+                                        logger.error(e.stack.toString());
                                     }
                                     // releases.push(album);
                                     // if (!artistAdded[album.name]){
@@ -682,7 +681,7 @@ var self = module.exports = {
                                         }, function (err) {
                                             if (err) {
                                                 logger.error('> write file error thrown!');
-                                                logger.error(err, err.stack);
+                                                logger.error(err.stack.toString());
                                             }
                                         });
                                     }
@@ -690,7 +689,7 @@ var self = module.exports = {
                                 }
                             })
                             .catch(function (err) {
-                                logger.error(err, err.stack);
+                                logger.error(err.stack.toString());
                                 if (runAttempts < 50000) {
                                     logger.debug('Run attempt: ' + runAttempts);
                                     runAttempts++;
