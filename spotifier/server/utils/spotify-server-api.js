@@ -549,7 +549,7 @@ var self = module.exports = {
     },
 
     buildAlphaQueryMatrix: (character, digits) => {
-        // let's not waste our time in dev      
+        // let's not waste our time in dev       
         let alphUpper = process.env.NODE_ENV ? 'ABCDEFGHIJKLMONPQRSTUVWXYZ0123456789' : 'A';
         let alphLower = 'abcdefghijklmnopqrstuvwxyz';
         let length = alphUpper.length;
