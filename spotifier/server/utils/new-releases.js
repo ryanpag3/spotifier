@@ -92,7 +92,7 @@ function scan() {
                                     // todo: fix code duplication
                                     i++; // move pointer right
                                     if (i < releaseSpotifyIds.length) { // if we have not checked all new releases
-                                        i % 1000 == 0 ? logger.info(i + '/' + releaseSpotifyIds.length) : null;
+                                        if(i % 1000 == 0) logger.info(i + '/' + releaseSpotifyIds.length);
                                         run();
                                     } else {
                                         logger.info('done processing new releases!');
@@ -141,7 +141,7 @@ function scan() {
                                         // todo: fix code duplication
                                         i++; // move pointer right
                                         if (i < releaseSpotifyIds.length) { // if we have not checked all new releases
-                                            i % 1000 == 0 ? logger.info(i + '/' + releaseSpotifyIds.length) : null;
+                                            if(i % 1000 == 0) logger.info(i + '/' + releaseSpotifyIds.length);
                                             run();
                                         } else {
                                             logger.info('done processing new releases!');
