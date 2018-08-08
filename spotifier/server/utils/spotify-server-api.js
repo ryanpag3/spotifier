@@ -360,6 +360,7 @@ var self = module.exports = {
         //     return '{}';
 
         let p = path.join(__dirname, './cache/cached-new-releases.txt');
+        logger.info(fs.existsSync(p));
         let cachedReleases;
         try {
             cachedReleases = fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf-8')) : {};
