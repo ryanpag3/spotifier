@@ -108,7 +108,7 @@ module.exports = {
                     });
                 })
                 .catch((err) => {
-                    logger.error(err.stack.toString());
+                    logger.error(err.toString());
                 });
         } else {
             // logger.debug('getArtists', 'resolving cached releases');

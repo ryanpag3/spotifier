@@ -43,7 +43,7 @@ router.get('/sync', function (req, res) {
             res.status(200).send();
         })
         .catch(function (err) { // catch refresh access token error
-            logger.error(err.stack.toString());
+            logger.error(err.toString());
         });
 });
 
@@ -188,7 +188,7 @@ function refreshAccessToken(req) {
                 req.session.passport.user.accessToken = accessToken;
                 req.session.save(function (err) {
                     if (err) {
-                        logger.error(err.stack.toString());
+                        logger.error(err.toString());
                     }
                     deferred.resolve();
                 });

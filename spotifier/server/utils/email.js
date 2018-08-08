@@ -270,7 +270,7 @@ Email.prototype.confirm = function (query) {
                     }
                 }, function (err) {
                     if (err) {
-                        logger.error(err.stack.toString());
+                        logger.error(err.toString());
                         deferred.reject(err);
                     } else {
                         deferred.resolve();

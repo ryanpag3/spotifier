@@ -62,7 +62,7 @@ router.get('/callback',
                 req.session.passport.user._id = user._id;
                 req.session.save(function (err) {
                     if (err) {
-                        logger.error(err.stack.toString());
+                        logger.error(err.toString());
                     }
                 });
                 db.emailExists(user)
@@ -85,7 +85,7 @@ router.get('/callback',
                     })
             })
             .catch(function (err) { // create user err catch
-                logger.error(err.stack.toString());
+                logger.error(err.toString());
             });
 
 

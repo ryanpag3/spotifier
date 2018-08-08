@@ -9,7 +9,7 @@ module.exports = {
                 logger.info('Message was successfully handled.');
             })
             .catch((err) => {
-                logger.error(err.stack.toString());
+                logger.error(err.toString());
             });
     }
 }

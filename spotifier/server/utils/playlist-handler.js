@@ -117,7 +117,7 @@ function updatePlaylist(user) {
                 })
                 .catch(function (err) {
                     logger.error('ERROR: addReleaseTracksToPlaylist');
-                    logger.error(err.stack.toString());
+                    logger.error(err.toString());
                     logger.error('----------------------------------------------');
                     logger.error('FAIL CASE')
                     logger.error(user);
@@ -169,7 +169,7 @@ function playlistResetNeeded(user) {
                 deferred.resolve(false); // skip this weeks reset
             })
             .catch(function (err) {
-                logger.error(err.stack.toString());
+                logger.error(err.toString());
             });
     } else {
         userResetDate = new Date(userResetDate); // instantiate for comparator

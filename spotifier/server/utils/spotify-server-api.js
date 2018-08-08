@@ -342,14 +342,14 @@ var self = module.exports = {
                         }, function (err) {
                             if (err) {
                                 logger.error('write file error thrown!');
-                                logger.error(err.stack.toString());
+                                logger.error(err.toString());
                             }
                         });
                     }
                     resolve(releases);
                 })
                 .catch((err) => {
-                    logger.error(err.stack.toString());
+                    logger.error(err.toString());
                 });
         });
     },
@@ -420,7 +420,7 @@ var self = module.exports = {
                             })
                             .catch((err) => {
                                 offset -= 50;
-                                logger.error(err.stack.toString());
+                                logger.error(err.toString());
                             }));
                     }, {
                         concurrency: 5
@@ -681,7 +681,7 @@ var self = module.exports = {
                                         }, function (err) {
                                             if (err) {
                                                 logger.error('> write file error thrown!');
-                                                logger.error(err.stack.toString());
+                                                logger.error(err.toString());
                                             }
                                         });
                                     }
@@ -689,7 +689,7 @@ var self = module.exports = {
                                 }
                             })
                             .catch(function (err) {
-                                logger.error(err.stack.toString());
+                                logger.error(err.toString());
                                 if (runAttempts < 50000) {
                                     logger.debug('Run attempt: ' + runAttempts);
                                     runAttempts++;

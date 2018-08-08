@@ -32,7 +32,7 @@ describe('test-helper unit tests', function () {
                 done();
             })
             .catch((err) => {
-                logger.error(err.stack.toString());
+                logger.error(err.toString());
             });
     });
 

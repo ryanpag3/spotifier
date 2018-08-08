@@ -46,7 +46,7 @@ function scan() {
                 }, function (err, artist) {
                     if (err) {
                         logger.error('mongo error thrown!');
-                        logger.error(err.stack.toString());
+                        logger.error(err.toString());
                     }
                     // if exists and has a recent_release that has been set
                     if (artist !== null && artist.recent_release.id !== undefined) {
@@ -99,7 +99,7 @@ function scan() {
                                     }
                                 })
                                 .catch(function (err) {
-                                    logger.error(err.stack.toString());
+                                    logger.error(err.toString());
                                     run();
                                 })
                         } else {
@@ -147,7 +147,7 @@ function scan() {
                                         }
                                     })
                                     .catch(function (err) {
-                                        logger.error(err.stack.toString());
+                                        logger.error(err.toString());
                                         run();
                                     });
                             } else {
@@ -175,7 +175,7 @@ function scan() {
             }
         })
         .catch(function (err) {
-            logger.error(err.stack.toString());
+            logger.error(err.toString());
         });
     return deferred.promise;
 }
@@ -212,13 +212,13 @@ var startScan = function (sendEmails) {
                     }
                 })
                 .catch(function (err) {
-                    logger.error(err.stack.toString());
+                    logger.error(err.toString());
                     deferred.reject(err);
                 });
 
         })
         .catch(function (err) {
-            logger.error(err.stack.toString());
+            logger.error(err.toString());
             deferred.reject(err);
         });
     return deferred.promise;
