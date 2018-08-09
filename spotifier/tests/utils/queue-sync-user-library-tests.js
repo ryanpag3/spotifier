@@ -57,6 +57,7 @@ describe('sync library queue utility', function () {
 
     describe('calls remove job method', function () {
         it('it should resolve when the job has successfully been removed from the queue', function(done) {
+            this.timeout(5000);
             testHelper.insert(sampleData.getPassUser())
                 .then(function(user) {
                     syncUserLibraryQueue.createJob(user)
