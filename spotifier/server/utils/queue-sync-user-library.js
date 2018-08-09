@@ -102,6 +102,7 @@ libraryQueue = {
             if (err) {
                 deferred.reject(err);
             }
+            logger.debug('found user to remove job');
             syncLibraryQueue.getJob(user.sync_queue.id)
                 .then(function (job) {
                     logger.info('attempting to remove ' + user.name + ' job.');
