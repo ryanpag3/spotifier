@@ -104,6 +104,7 @@ libraryQueue = {
             }
             syncLibraryQueue.getJob(user.sync_queue.id)
                 .then(function (job) {
+                    logger.info('attempting to remove ' + user.name + ' job.');
                     if (job) {
                         job.remove()
                             .then(function () {
