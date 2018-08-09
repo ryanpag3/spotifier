@@ -62,6 +62,7 @@ describe('sync library queue utility', function () {
                 .then(function(user) {
                     syncUserLibraryQueue.createJob(user)
                         .then(function() {
+                            console.log('***> USER ' + user);
                             syncUserLibraryQueue.removeJob(user)
                                 .then(function() {
                                     done();
