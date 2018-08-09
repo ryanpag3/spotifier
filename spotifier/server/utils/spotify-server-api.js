@@ -541,7 +541,7 @@ var self = module.exports = {
     },
 
     buildAlphaQueryArr: (digits) => {
-        let alphUpper = process.env.NODE_ENV ? 'ABCDEFGHIJKLMONPQRSTUVWXYZ0123456789' : 'A'; 
+        let alphUpper = process.env.NODE_ENV ? 'ABCDEFGHIJKLMONPQRSTUVWXYZ0123456789' : '1'; 
         let length = alphUpper.length;
         let queries = [];
         for (let i = 0; i < length; i++) {
