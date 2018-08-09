@@ -3,9 +3,8 @@ var RSMQWorker = require("rsmq-worker");
 var worker = new RSMQWorker("getartistdetails-handler");
 
 worker.on("message", function (msg, next, id) {
-    // process your message
-    // logger.info("Message id : " + id);
-    // logger.info(JSON.stringify(msg));
+    logger.info("Message id : " + id);
+    logger.info(JSON.stringify(msg));
     next();
 });
 

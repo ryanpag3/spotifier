@@ -1,0 +1,26 @@
+{
+  "name": "spotifier-v2",
+  "version": "1.0.0",
+  "description": "Hello,",
+  "main": "-",
+  "dependencies": {
+    "db": "^1.0.0",
+    "message-handler": "^1.0.0",
+    "message-queue": "^1.0.0",
+    "logger": "^1.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ryanpage42/spotifier.git"
+  },
+  "author": "",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/ryanpage42/spotifier/issues"
+  },
+  "homepage": "https://github.com/ryanpage42/spotifier#readme"
+}

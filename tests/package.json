@@ -1,0 +1,16 @@
+{
+  "name": "tests",
+  "version": "1.0.0",
+  "description": "",
+  "main": "run-all-tests.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "logger": "file:../node_modules/logger",
+    "message-queue": "file:../node_modules/message-queue",
+    "rsmq-promise": "^1.0.1"
+  }
+}
