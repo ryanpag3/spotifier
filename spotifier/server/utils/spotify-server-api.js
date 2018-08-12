@@ -213,7 +213,7 @@ var self = module.exports = {
                     }
                 })
                 .catch(function (err) {
-                    logger.error(err.stack.toString())
+                    logger.error(err.toString())
                     run();
                 })
         }
