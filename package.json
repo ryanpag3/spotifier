@@ -4,10 +4,11 @@
   "description": "Hello,",
   "main": "-",
   "dependencies": {
+    "chai": "^4.1.2",
     "db": "^1.0.0",
+    "logger": "^1.0.0",
     "message-handler": "^1.0.0",
-    "message-queue": "^1.0.0",
-    "logger": "^1.0.0"
+    "message-queue": "^1.0.0"
   },
   "devDependencies": {},
   "scripts": {
