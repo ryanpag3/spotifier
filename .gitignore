@@ -13,3 +13,4 @@ spotifier/package-lock.json
 /node_modules/message-queue/node_modules
 /job-handler/node_modules
 /tests/node_modules
+node_modules/spotify-api/node_modules
