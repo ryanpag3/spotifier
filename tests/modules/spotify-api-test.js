@@ -6,7 +6,5 @@ describe('spotify-api-test.js', () => {
     it('should set a valid access token with a valid refresh token', () => {
         let refreshToken = pConfig.spotify.testRefreshToken;
         let api = new SpotifyApi(refreshToken);
-        logger.info(api.refreshToken)
-        api.initializeApi();
     });
 });
