@@ -5,7 +5,7 @@ let SpotifyApi = require('spotify-api');
 
 describe('spotify-api-test.js', () => {
     let REFRESH_TOKEN = pConfig.spotify.testRefreshToken;
-    it('should set a valid access token with a valid refresh token', (done) => {
+    it('should set a valid access token with a valid refresh token', function(done) {
         let api = new SpotifyApi(REFRESH_TOKEN);
         api.initialize()
             .then(() => {
@@ -20,7 +20,7 @@ describe('spotify-api-test.js', () => {
             });
     });
 
-    it('should set a valid access token without a refresh token', (done) => {
+    it('should set a valid access token without a refresh token', function(done) {
         let api = new SpotifyApi();
         api.initialize()
             .then(() => {
@@ -35,7 +35,7 @@ describe('spotify-api-test.js', () => {
             });
     });
 
-    it ('should grant a new token when the current one is expired', (done) => {
+    it ('should grant a new token when the current one is expired', function(done) {
         let api = new SpotifyApi();
         api.initialize()
             .then(() => {
@@ -52,4 +52,28 @@ describe('spotify-api-test.js', () => {
                 }
             });
     });
+
+    it ('should get an artists most recent release with client token', function(done) {
+        this.timeout(3000);
+        let artistId = '4RnBFZRiMLRyZy0AzzTg2C'; // RTJ!
+        let api = new SpotifyApi();
+        api.getArtistNewRelease(artistId)
+            .then((release) => {
+                expect(release.spotify_id).to.be.equal(artistId);
+                expect(release.recent_release).to.not.be.undefined;
+                done();
+            });
+    });
+
+    it('should get an artists most recent release with a user token', function(done) {
+        this.timeout(3000);
+        let artistId = '4RnBFZRiMLRyZy0AzzTg2C'; // RTJ!
+        let api = new SpotifyApi(REFRESH_TOKEN);
+        api.getArtistNewRelease(artistId)
+            .then((release) => {
+                expect(release.spotify_id).to.be.equal(artistId);
+                expect(release.recent_release).to.not.be.undefined;
+                done();
+            });
+    })
 });
