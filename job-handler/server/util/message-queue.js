@@ -11,11 +11,15 @@ artistDetailsWorker.on("message", function (msg, next, id) {
         logger.error(e);
     }
 
-    let api = new SpotifyApi();
+    let api = new SpotifyApi(msg.token);
     api.getArtistNewRelease(msg.artist_id)
         .then((release) => mq.createArtistDetailsResponse(release))
         .catch((err) => {
             logger.error(err.toString());
+            // try again
+            setTimeout(() => {
+                mq.createArtistDetailsJob(msg.artist_id, msg.token);
+            }, 1000);
         });
     next();
 });

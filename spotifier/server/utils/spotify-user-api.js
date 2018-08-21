@@ -51,9 +51,10 @@ Api.prototype.syncLibrary = function (user, socketUtil) {
                 .then(function () {
                     db.getLibrary(user)
                         .then(function (library) {
+                            logger.info('**** alerting library added');
                             socketUtil.alertLibraryAdded(user, library);
+                            deferred.resolve();
                         });
-                    deferred.resolve();
                 });
         })
         .catch(function (err) {

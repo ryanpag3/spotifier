@@ -91,7 +91,7 @@ Db.prototype.getUser = function (mUser) {
  */
 Db.prototype.addAllArtists = function (user, artists, socketUtil) {
     var db = this,
-        i = this._addIndex,
+        // i = this._addIndex,
         deferred = Q.defer();
 
     if (!user || !user._id) {
@@ -99,6 +99,7 @@ Db.prototype.addAllArtists = function (user, artists, socketUtil) {
         return deferred.promise;
     }
 
+    let promises = [];    
     User.findOne({
         '_id': user._id
     }, function (err, user) {
@@ -106,22 +107,31 @@ Db.prototype.addAllArtists = function (user, artists, socketUtil) {
             deferred.reject(err);
         }
 
-        go(); // start recursive call
-        function go() {
-            // add artist
-            db.addArtist(user, artists[i], socketUtil)
-                .then(function () {
-                    i++;
-                    if (i < artists.length) {
-                        setTimeout(go, 0);
-                    } else {
-                        deferred.resolve(); // end of artist array reached, resolve
-                    }
-                })
-                .catch(function (err) {
-                    deferred.reject(err); // add artist threw error, reject
-                });
+        for (let i = 0; i < artists.length; i++){
+            promises.push(db.addArtist(user, artists[i], socketUtil));
         }
+        
+        Promise.all(promises)
+            .then((results) => {
+                deferred.resolve();
+            });
+        
+        // go(); // start recursive call
+        // function go() {
+        //     // add artist
+        //     db.addArtist(user, artists[i], socketUtil)
+        //         .then(function () {
+        //             i++;
+        //             if (i < artists.length) {
+        //                 setTimeout(go, 0);
+        //             } else {
+        //                 deferred.resolve(); // end of artist array reached, resolve
+        //             }
+        //         })
+        //         .catch(function (err) {
+        //             deferred.reject(err); // add artist threw error, reject
+        //         });
+        // }
     });
 
     return deferred.promise;
@@ -155,7 +165,6 @@ Db.prototype.addArtist = function (user, artist, socketUtil) {
     var db = this;
     var deferred = Q.defer(),
         getArtistDetailsQueue = require('./queue-get-artist-details');
-
     // query for user
     // define query parameters
     var query = {
@@ -174,7 +183,7 @@ Db.prototype.addArtist = function (user, artist, socketUtil) {
                     if (!qArtist.recent_release.id) {
                         // initialize a get details job and pass socketUtil object
                         // getArtistDetailsQueue.createJob(qArtist);
-                        mq.createArtistDetailsJob(qArtist.spotify_id);
+                        mq.createArtistDetailsJob(qArtist.spotify_id, user.refresh_token);
                     } else {
                         if (socketUtil) {
                             socketUtil.alertArtistDetailsChange(qArtist);
@@ -204,7 +213,7 @@ Db.prototype.addArtist = function (user, artist, socketUtil) {
                 } else {
                     // initialize a get details job and pass socketUtil object
                     // getArtistDetailsQueue.createJob(artist);
-                    mq.createArtistDetailsJob(artist.spotify_id);
+                    mq.createArtistDetailsJob(artist.spotify_id, user.refresh_token);
                 }
                 // associate user and artist
                 db.assignArtist(user, artist)

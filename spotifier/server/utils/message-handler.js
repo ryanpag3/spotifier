@@ -7,14 +7,16 @@ let Db = require('./db');
 
 module.exports = function (socketUtil) {
     artistDetailsWorker.on("message", function (msg, next, id) {
-        logger.info('message received');
         try {
             msg = JSON.parse(msg);
         } catch (e) {
             logger.error(e);
         }
 
+        logger.info('artist details response received: ' + msg.details.spotify_id);
+
         if (socketUtil) {
+            logger.debug('firing socket');
             socketUtil.alertArtistDetailsChange(msg.details);
         }
         let db = new Db();
