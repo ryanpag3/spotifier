@@ -75,5 +75,14 @@ describe('spotify-api-test.js', () => {
                 expect(release.recent_release).to.not.be.undefined;
                 done();
             });
-    })
+    });
+
+    it('should throw an error when the api has not been initialized yet', function(done) {
+        let api = new SpotifyApi();
+        api.getRecentRelease('1234')
+            .catch((err) => {
+                expect(err).to.not.be.undefined;
+                done();
+            });
+    });
 });
