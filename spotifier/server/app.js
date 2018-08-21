@@ -62,6 +62,9 @@ const setupApp = function(app, express, socketUtil) {
 
     }));
 
+    // start queue listener
+    require('./utils/message-handler')(socketUtil);
+
     // pass socketUtility to queues
     syncLibraryQueue.setSocketUtil(socketUtil);
     getArtistDetailsQueue.setSocketUtil(socketUtil);

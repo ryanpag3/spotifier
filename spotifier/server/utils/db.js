@@ -7,7 +7,8 @@ var Q = require('q'),
     User = new require('../models/user.js'),
     Artist = new require('../models/artist.js'),
     publicConfig = require('../../config-public.js'),
-    logger = require('./logger');
+    logger = require('./logger'),
+    mq = require('message-queue');
 
 /**
  * @constructor
@@ -172,7 +173,8 @@ Db.prototype.addArtist = function (user, artist, socketUtil) {
                     // if artist details have not been added
                     if (!qArtist.recent_release.id) {
                         // initialize a get details job and pass socketUtil object
-                        getArtistDetailsQueue.createJob(qArtist);
+                        // getArtistDetailsQueue.createJob(qArtist);
+                        mq.createArtistDetailsJob(qArtist.spotify_id);
                     } else {
                         if (socketUtil) {
                             socketUtil.alertArtistDetailsChange(qArtist);
@@ -201,7 +203,8 @@ Db.prototype.addArtist = function (user, artist, socketUtil) {
                     deferred.reject(err);
                 } else {
                     // initialize a get details job and pass socketUtil object
-                    getArtistDetailsQueue.createJob(artist);
+                    // getArtistDetailsQueue.createJob(artist);
+                    mq.createArtistDetailsJob(artist.spotify_id);
                 }
                 // associate user and artist
                 db.assignArtist(user, artist)
@@ -588,7 +591,8 @@ Db.prototype.validateArtistDetails = function () {
             logger.error(err.stack.toString())
         }
         for (var i = 0; i < artists.length; i++) {
-            getArtistDetailsQueue.createJob(artists[i]);
+            // getArtistDetailsQueue.createJob(artists[i]);
+            mq.createArtistDetailsJob(artists[i].spotify_id);
         }
     })
 };

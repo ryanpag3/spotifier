@@ -1,14 +1,22 @@
 const logger = require('logger');
+const mq = require('message-queue');
 var RSMQWorker = require("rsmq-worker");
-var artistDetailsWorker = new RSMQWorker("getartistdetails-handler");
+var artistDetailsWorker = new RSMQWorker(mq.ARTIST_DETAILS_QUEUE);
 let SpotifyApi = require('spotify-api');
 
 artistDetailsWorker.on("message", function (msg, next, id) {
+    try {
+        msg = JSON.parse(msg);
+    } catch (e) {
+        logger.error(e);
+    }
+
     let api = new SpotifyApi();
-    logger.info("Message id : " + id);
-    logger.info(JSON.stringify(msg));
-
-
+    api.getArtistNewRelease(msg.artist_id)
+        .then((release) => mq.createArtistDetailsResponse(release))
+        .catch((err) => {
+            logger.error(err.toString());
+        });
     next();
 });
 

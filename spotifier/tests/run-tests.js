@@ -6,12 +6,18 @@ var client = redis.createClient();
 var logger = require('../server/utils/logger');
 
  describe('Run all unit tests', function() {
+    
+    before(function(done) {
+        require('../../job-handler/server/server');
+        done();
+    });
+    
     /**
      * Global before each for all child test cases
      */
-    beforeEach(function(done) {
+    after(function(done) {
         client.flushall(function(err, success) {
-            // logger.debug('Flushed redis store.');
+            // logger.debug('Flushed redis store.');      
             done();
         });
     });

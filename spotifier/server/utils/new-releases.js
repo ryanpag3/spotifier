@@ -7,7 +7,8 @@ var CronJob = require('cron').CronJob,
     spotifyApiServer = require('../utils/spotify-server-api'),
     emailHandler = require('./email'),
     logger = require('./logger'),
-    playlistHandler = require('./playlist-handler');
+    playlistHandler = require('./playlist-handler'),
+    mq = require('message-queue');
 
 
 /**
@@ -85,7 +86,8 @@ function scan() {
                                                 'recent_release': release
                                             },
                                             function (err, artist) {
-                                                getArtistDetailsQueue.createJob(artist);
+                                                // getArtistDetailsQueue.createJob(artist);
+                                                mq.createArtistDetailsJob(artist.spotify_id);
                                             });
                                         db.artistNewReleaseFound(artist);
                                     }
@@ -134,7 +136,8 @@ function scan() {
                                                     'recent_release': release
                                                 },
                                                 function (err, artist) {
-                                                    getArtistDetailsQueue.createJob(artist);
+                                                    // getArtistDetailsQueue.createJob(artist);
+                                                    mq.createArtistDetailsJob(artist.spotify_id);
                                                 });
                                             db.artistNewReleaseFound(artist);
                                         }
