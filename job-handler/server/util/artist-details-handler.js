@@ -2,9 +2,15 @@ const handlerUtil = require('./job-handler-util');
 const logger = require('logger');
 const mq = require('message-queue');
 let RSMQWorker = require("rsmq-worker");
-let rsmq = require('rsmq-promise');
+let RSMQPromise = require('rsmq-promise');
 let artistDetailsWorker = new RSMQWorker(mq.ARTIST_DETAILS_QUEUE);
 let SpotifyApi = require('spotify-api');
+let pConfig = require('../../../private/config-private');
+
+let rsmq = new RSMQPromise({
+    host: pConfig.redis.host,
+    port: pConfig.redis.port
+});
 
 artistDetailsWorker.on("message", function (msg, next, id) {
     try {
@@ -17,25 +23,30 @@ artistDetailsWorker.on("message", function (msg, next, id) {
     api.getArtistNewRelease(msg.artist_id)
         .then((release) => mq.createArtistDetailsResponse(release))
         .catch((err) => {
-            rsmq.getQueueAttributes({qname: mq.ARTIST_DETAILS_QUEUE})
-                .then((attrs) => {
-                    logger.debug('Current queue size: ' + attrs.msgs);
-                });
-            // logger.error(err.toString().toLowerCase().includes('too many requests'));
-            if (!err.toString().toLowerCase().includes('too many requests'))
-                logger.error(err.toString());
-            // try again
-            setTimeout(() => {
-                let nextAttempt = msg.attempt + 1;
-                mq.createArtistDetailsJob(msg.artist_id, msg.token, nextAttempt);
-            }, handlerUtil.getBackoff(msg.attempt));
+            logger.error(JSON.stringify(err));
         });
-    next();
+
+    setTimeout(() => {
+        next();
+    }, 100);
+    
 });
 
 // optional error listeners
 artistDetailsWorker.on('error', function (err, msg) {
-    console.log("ERROR", err, msg.id);
+    rsmq.getQueueAttributes({
+            qname: mq.ARTIST_DETAILS_QUEUE
+        })
+        .then((attrs) => {
+            logger.debug('Current queue size: ' + attrs.msgs);
+        });
+    // logger.error(err.toString().toLowerCase().includes('too many requests'));
+    // if (!err.toString().toLowerCase().includes('too many requests'))
+    logger.error(err.toString());
+    // try again
+    let nextAttempt = msg.attempt + 1;
+    mq.createArtistDetailsJob(msg.artist_id, msg.token, nextAttempt);
+    logger.error(":) ERROR", msg.id);
 });
 artistDetailsWorker.on('exceeded', function (msg) {
     console.log("EXCEEDED", msg.id);
