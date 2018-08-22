@@ -1,4 +1,4 @@
 module.exports = () => {
     require('message-queue'); // initial setup
-    require('./util/message-queue'); // expose local listeners
+    require('./util/artist-details-handler'); // expose local listeners
 };

@@ -1,7 +1,9 @@
+const handlerUtil = require('./job-handler-util');
 const logger = require('logger');
 const mq = require('message-queue');
-var RSMQWorker = require("rsmq-worker");
-var artistDetailsWorker = new RSMQWorker(mq.ARTIST_DETAILS_QUEUE);
+let RSMQWorker = require("rsmq-worker");
+let rsmq = require('rsmq-promise');
+let artistDetailsWorker = new RSMQWorker(mq.ARTIST_DETAILS_QUEUE);
 let SpotifyApi = require('spotify-api');
 
 artistDetailsWorker.on("message", function (msg, next, id) {
@@ -15,11 +17,18 @@ artistDetailsWorker.on("message", function (msg, next, id) {
     api.getArtistNewRelease(msg.artist_id)
         .then((release) => mq.createArtistDetailsResponse(release))
         .catch((err) => {
-            logger.error(err.toString());
+            rsmq.getQueueAttributes({qname: mq.ARTIST_DETAILS_QUEUE})
+                .then((attrs) => {
+                    logger.debug('Current queue size: ' + attrs.msgs);
+                });
+            // logger.error(err.toString().toLowerCase().includes('too many requests'));
+            if (!err.toString().toLowerCase().includes('too many requests'))
+                logger.error(err.toString());
             // try again
             setTimeout(() => {
-                mq.createArtistDetailsJob(msg.artist_id, msg.token);
-            }, 1000);
+                let nextAttempt = msg.attempt + 1;
+                mq.createArtistDetailsJob(msg.artist_id, msg.token, nextAttempt);
+            }, handlerUtil.getBackoff(msg.attempt));
         });
     next();
 });

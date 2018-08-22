@@ -4,6 +4,7 @@
   "description": "Hello,",
   "main": "-",
   "dependencies": {
+    "bull": "^3.4.7",
     "chai": "^4.1.2",
     "db": "^1.0.0",
     "logger": "^1.0.0",
