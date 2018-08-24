@@ -26,10 +26,9 @@ artistDetailsWorker.on("message", function (msg, next, id) {
             logger.error(JSON.stringify(err));
         });
 
-    setTimeout(() => {
+    setTimeout(function() {
         next();
-    }, 100);
-    
+    }, 20);
 });
 
 // optional error listeners

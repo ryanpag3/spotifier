@@ -15,3 +15,4 @@ spotifier/package-lock.json
 /tests/node_modules
 node_modules/spotify-api/node_modules
 private/
+node_modules/test-helper/node_modules
