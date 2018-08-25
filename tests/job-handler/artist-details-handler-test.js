@@ -7,6 +7,7 @@ describe('artist-details-handler-test.js', function() {
     before(function(done) {
         mq.deleteQueue(mq.ARTIST_DETAILS_QUEUE)
             .then(() => mq.deleteQueue(mq.ARTIST_DETAILS_RESPONSE_Q))
+            .then(() => mq.setupQueues())
             .then(() => done());
     });
 
@@ -23,11 +24,12 @@ describe('artist-details-handler-test.js', function() {
     })
 
     it('should be able to handle a large number of requests to the same token without error', function(done) {
-        let timeoutMillis = 15000;
+        let mq = require('message-queue');
+        let timeoutMillis = 10000;
         this.timeout(timeoutMillis * 3); // double for processing
-        let server = require('../../job-handler/server/server'); // 
+        let server = require('../../job-handler/server/server');
         let runTheJewelsId = '4RnBFZRiMLRyZy0AzzTg2C';
-       let numberOfJobs = 3;
+       let numberOfJobs = 300000;
        let promises = [];
         for (let i = 0; i < numberOfJobs; i++) {
             promises.push(i);
@@ -35,7 +37,7 @@ describe('artist-details-handler-test.js', function() {
 
         // prevent thread blocking issue with job creation and sending
         Promise.map(promises, (promise) => {
-            return Promise.delay(5000).then(() => mq.createArtistDetailsJob(runTheJewelsId));
+            return Promise.delay(0).then(() => mq.createArtistDetailsJob(runTheJewelsId));
         },{
             concurrency: 100
         }).then((res) => {
