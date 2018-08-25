@@ -2,6 +2,7 @@ const express = require('express');
 const logger = require('logger');
 const app = express();
 const config = require('../config');
+const artistDetailsHandler = require('./util/artist-details-handler');
 
 require('./server-setup')();
 
@@ -12,6 +13,7 @@ let s = {
         logger.info('closing job handler server...');
         return server.close(function() {
             logger.info('server closed!');
+            artistDetailsHandler.quit();
         });
     }
 }

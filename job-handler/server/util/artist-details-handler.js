@@ -26,9 +26,17 @@ artistDetailsWorker.on("message", function (msg, next, id) {
             logger.error(JSON.stringify(err));
         });
 
-    setTimeout(function() {
-        next();
-    }, 20);
+
+    setTimeout(function () {
+        try {
+            next();
+        } catch (e) {
+            // library throws uncaught exception if you are running worker while closing job
+            if (!e.toString().toLowerCase().includes('deletemessage'))
+                logger.error(e.toString());
+        }
+    }, 50);
+
 });
 
 // optional error listeners
@@ -56,3 +64,5 @@ artistDetailsWorker.on('timeout', function (msg) {
 
 logger.info('starting artist details worker');
 artistDetailsWorker.start();
+
+module.exports = artistDetailsWorker;

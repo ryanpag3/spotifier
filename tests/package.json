@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bluebird": "^3.5.1",
     "chai": "^4.1.2",
     "logger": "file:../node_modules/logger",
     "message-queue": "file:../node_modules/message-queue",
