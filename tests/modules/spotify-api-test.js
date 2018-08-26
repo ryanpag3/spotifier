@@ -85,4 +85,13 @@ describe('spotify-api-test.js', () => {
                 done();
             });
     });
+
+    it('should include the original artist id in the error response', function(done) {
+        let api = new SpotifyApi();
+        api.getArtistNewRelease('1234')
+            .catch((err) => {
+                expect(err.artistId).to.be.equal('1234');
+                done();
+            });
+    });
 });

@@ -29,7 +29,7 @@ describe('artist-details-handler-test.js', function() {
         this.timeout(timeoutMillis * 3); // double for processing
         let server = require('../../job-handler/server/server');
         let runTheJewelsId = '4RnBFZRiMLRyZy0AzzTg2C';
-       let numberOfJobs = 300000;
+       let numberOfJobs = 5000;
        let promises = [];
         for (let i = 0; i < numberOfJobs; i++) {
             promises.push(i);
