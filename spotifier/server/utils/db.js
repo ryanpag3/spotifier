@@ -163,8 +163,8 @@ Db.prototype.getAllArtists = function () {
  */
 Db.prototype.addArtist = function (user, artist, socketUtil) {
     var db = this;
-    var deferred = Q.defer(),
-        getArtistDetailsQueue = require('./queue-get-artist-details');
+    var deferred = Q.defer();
+
     // query for user
     // define query parameters
     var query = {

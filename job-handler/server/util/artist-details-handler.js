@@ -23,8 +23,6 @@ artistDetailsWorker.on("message", function (msg, next, id) {
     api.getArtistNewRelease(msg.artist_id)
         .then((release) => mq.createArtistDetailsResponse(release))
         .catch((err) => {
-            logger.error('*** ' + JSON.stringify(err));
-            logger.info('RETRYING WITH ID: ' + err.artistId);
             mq.createArtistDetailsJob(err.artistId, err.token);
         });
 
@@ -37,7 +35,7 @@ artistDetailsWorker.on("message", function (msg, next, id) {
             if (!e.toString().toLowerCase().includes('deletemessage'))
                 logger.error(e.toString());
         }
-    }, 50);
+    }, 75);
 
 });
 
