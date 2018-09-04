@@ -6,6 +6,7 @@ MODULE[1]="logger"
 MODULE[2]="message-queue"
 MODULE[3]="spotify-api"
 MODULE[4]="test-helper"
+MODULE[5]="models"
 
 # define processes/services
 SERVICE[0]="spotifier"
