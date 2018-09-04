@@ -94,4 +94,33 @@ describe('spotify-api-test.js', () => {
                 done();
             });
     });
+
+    it('syncLibrary should throw an error when attempting to sync a users library without valid refresh token', function(done) {
+        // TODO:
+        this.timeout(1);
+    });
+
+    it('syncLibrary should sync a users library without error', function(done) {
+        this.timeout(30000);
+        let api = new SpotifyApi(REFRESH_TOKEN);
+        let user = {
+            name: 'test-user'
+        };
+        api.syncLibrary(user)
+            .then((results) => {
+                logger.info(JSON.stringify(results));
+            });
+    });
+
+    it('getUserArtists should throw an error if the api object has not been properly initialized', function(done) {
+        // TODO:
+        this.timeout(1);
+    });
+
+    it('getUserLibraryArtists should throw an error if api object is not initialized properly', function(done) {
+        // TODO:
+        this.timeout(1);
+    });
+
+    
 });
