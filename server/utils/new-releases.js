@@ -1,5 +1,7 @@
 var CronJob = require('cron').CronJob,
     Q = require('q'),
+    moment = require('moment'),
+    Promise = require('bluebird'),
     Artist = require('../models/artist'),
     Db = require('./db'),
     getArtistDetailsQueue = require('./queue-get-artist-details'),
@@ -11,6 +13,102 @@ var CronJob = require('cron').CronJob,
 
 
 /**
+ * scan for new releases
+ */
+function scan() {
+    logger.info('STARTING NEW RELEASE SCAN');
+    return Artist.find({})
+        .then(async (artists) => {
+            return await checkForReleases(artists);
+        })
+        .catch((err) => {
+            logger.error('Error while attempting to scan for artists: ' + err.toString());
+        });
+}
+
+/**
+ * Iterate through artists and check if newest release is newer than db
+ * TODO: rewrite with promise.map
+ */
+async function checkForReleases(artists) {
+    return await Promise.map(artists, async (artist) => {
+        // await Promise.delay(0);
+        return await checkForRelease(artist);
+    }, {
+        concurrency: 3
+    });
+}
+
+/**
+ * check for new release 
+ */
+async function checkForRelease(artist) {
+    let release;
+    try {
+        release = await spotifyApiServer.getRecentRelease(artist);
+    } catch (e) {
+        logger.error(`Could not get recent release for release scan processing. Reason: ${e}`);
+        return;
+    }
+
+    if (!artist.recent_release || !artist.recent_release.id)
+        return await flagNewRelease(artist, release);
+
+    const recentReleaseDate = moment(release.release_date);
+    const currentReleaseDate = moment(artist.recent_release.release_date);
+
+    if (moment(recentReleaseDate).isAfter(currentReleaseDate))
+        return await flagNewRelease(artist, release);
+
+}
+
+/**
+ * flag artist for new release
+ */
+async function flagNewRelease(artist, release) {
+    const db = new Db();
+
+    if (!hasDifferentTitle(artist.recent_release.title, release.name))
+        return;
+    release = processRelease(release);
+    const releaseMsg = `* ${artist.name} | ${release.title} *`;
+    logger.info('new release!');
+    logger.info(('*').repeat(releaseMsg.length));
+    logger.info(releaseMsg);
+    logger.info(('*').repeat(releaseMsg.length));
+
+    const updatedArtist = await Artist.findOneAndUpdate({
+        _id: artist._id
+    }, {
+        recent_release: release
+    });
+    getArtistDetailsQueue.createJob(updatedArtist);
+    db.artistNewReleaseFound(updatedArtist);
+}
+
+/**
+ * normalize object, remove gunk
+ */
+function processRelease(release) {
+    return {
+        id: release.id,
+        title: release.name,
+        release_date: release.release_date,
+        images: release.images,
+        url: release.external_urls.spotify
+    }
+}
+
+/**
+ * Spotify will sometimes re-upload releases with slightly different
+ * formatting and new ID. This validates that the titles are different.
+ */
+function hasDifferentTitle(titleA, titleB) {
+    return removeSpecial(titleA).toLowerCase() !== removeSpecial(titleB).toLowerCase();
+}
+
+/**
+ * @deprecated
  * cron job will be run every 24 hours at a predetermined time
  * the job will iterate through every artist in the master list
  * if an artist has already been detailed and a release has been found for that day, we skip
@@ -26,7 +124,7 @@ var CronJob = require('cron').CronJob,
  * 4. add all users for that combination to a bulk email, send email, and clear their new release fields
  *  todo: refactor to limit code duplication
  * */
-function scan() {
+function scanOld() {
     logger.info('scan started!');
     var deferred = Q.defer();
     spotifyApiServer.getNewReleases()
@@ -69,7 +167,7 @@ function scan() {
                                     // TODO: remove when done debugging
                                     logger.debug('title check: ' + (removeSpecial(release.title).toLowerCase() !== removeSpecial(artist.recent_release.title).toLowerCase()));
                                     logger.debug('date check: ' + release.release_date + ' > ' + artist.recent_release.release_date + ' : ' + (release.release_date > artist.recent_release.release_date));
-                                    
+
                                     // if titles do not match and release date is more present
                                     if (removeSpecial(release.title).toLowerCase() !==
                                         removeSpecial(artist.recent_release.title).toLowerCase() &&
@@ -112,7 +210,7 @@ function scan() {
                                         album.release_date = new Date(album.release_date);
                                         artist.recent_release.release_date = new Date(artist.recent_release.release_date);
                                         logger.debug(album.release_date + ' > ' + artist.recent_release.release_date + ' :' + (album.release_date > artist.recent_release.release_date))
-                                        logger.debug(album.release_date  + ' <= ' + currentDate + ' :' + (album.release_date.getTime() <= currentDate.getTime()));
+                                        logger.debug(album.release_date + ' <= ' + currentDate + ' :' + (album.release_date.getTime() <= currentDate.getTime()));
                                         if ((album.release_date > artist.recent_release.release_date) && (album.release_date.getTime() <= currentDate.getTime())) {
                                             // todo: move this code block to it's own method
 

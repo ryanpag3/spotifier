@@ -12,10 +12,13 @@ var expect = require('chai').expect,
     sampleData = require('../sample-test-data'),
     spotifyApiServer = require('../../server/utils/spotify-server-api'),
     releaseScanner = require('../../server/utils/new-releases.js');
-    mongoose.Promise = require('bluebird');
+    mongoose.Promise = require('bluebird'),
+    configPrivate = require('../../private/config-private');
 
-mongoose.connect('mongodb://localhost/spotifier_test', {
-    useMongoClient: true
+mongoose.connect(configPrivate.test.db.ip, {
+    useMongoClient: true,
+    user: configPrivate.test.db.user,
+    pass: configPrivate.test.db.password
 });
 
 describe('new-release-scanner unit tests', function () {
@@ -35,7 +38,7 @@ describe('new-release-scanner unit tests', function () {
 
     it('should update users who are tracking artists with notifications', function (done) {
         var numUsers = 1,
-            numArtists = 10,
+            numArtists = 20,
             numAssigns = 100;
         this.timeout(60000 * 10); // staging a sample database takes a little while due to artist lookup on spotify
         testHelper.stageSampleNewReleaseDb(numUsers, numArtists, numAssigns)
