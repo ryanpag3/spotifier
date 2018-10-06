@@ -15,9 +15,9 @@ var CronJob = require('cron').CronJob,
 /**
  * scan for new releases
  */
-function scan() {
+async function scan() {
     logger.info('STARTING NEW RELEASE SCAN');
-    return Artist.find({})
+    return await Artist.find({})
         .then(async (artists) => {
             return await checkForReleases(artists);
         })
@@ -33,9 +33,13 @@ function scan() {
 async function checkForReleases(artists) {
     return await Promise.map(artists, async (artist) => {
         // await Promise.delay(0);
+        logger.debug(`checking for release for ${artist.name}`);
         return await checkForRelease(artist);
     }, {
         concurrency: 3
+    })
+    .catch((err) => {
+        logger.error('Error while checking for releases: ' + err.stack.toString());
     });
 }
 
@@ -48,14 +52,19 @@ async function checkForRelease(artist) {
         release = await spotifyApiServer.getRecentRelease(artist);
     } catch (e) {
         logger.error(`Could not get recent release for release scan processing. Reason: ${e}`);
+        return; // move along
+    }
+
+    if (!release) {
+        logger.error('Could not find recent release for ' + artist.name);
         return;
     }
 
     if (!artist.recent_release || !artist.recent_release.id)
         return await flagNewRelease(artist, release);
 
-    const recentReleaseDate = moment(release.release_date);
-    const currentReleaseDate = moment(artist.recent_release.release_date);
+    const recentReleaseDate = moment(new Date(release.release_date));
+    const currentReleaseDate = moment(new Date(artist.recent_release.release_date));
 
     if (moment(recentReleaseDate).isAfter(currentReleaseDate))
         return await flagNewRelease(artist, release);
