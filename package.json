@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "A new music notifier for spotify",
   "main": "server.js",
-  "scripts": {},
+  "scripts": {
+    "start-w": "nodemon server/server.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://gitlab.com/ryanpage/spotify-notifier.git"

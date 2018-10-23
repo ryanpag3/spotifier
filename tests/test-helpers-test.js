@@ -110,23 +110,6 @@ describe('test-helper unit tests', function () {
             })
     });
 
-    it('stageSpotifyUser should add artists to database and assign them to spotify user as new releases', function (done) {
-        this.timeout(5000);
-        var numOfReleases = 20;
-        testHelper.stageSpotifyUser(numOfReleases)
-            .then(function (user) {
-                Artist.find({}, function (err, artists) {
-                    expect(artists).to.have.lengthOf(numOfReleases);
-                    User.findOne({
-                        'name': user.name
-                    }, function (err, user) {
-                        expect(user.new_releases).to.exist;
-                        done();
-                    })
-                })
-            })
-    });
-
     it('stageSpotifyUser should create a playlist for the test user', function(done) {
         this.timeout(60000);
         testHelper.stageSpotifyUser(10)

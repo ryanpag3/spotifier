@@ -38,7 +38,7 @@ describe('new-release-scanner unit tests', function () {
 
     it('should update users who are tracking artists with notifications', function (done) {
         var numUsers = 1,
-            numArtists = 20,
+            numArtists = 50,
             numAssigns = 100;
         this.timeout(60000 * 10); // staging a sample database takes a little while due to artist lookup on spotify
         testHelper.stageSampleNewReleaseDb(numUsers, numArtists, numAssigns)

@@ -9,7 +9,8 @@ var CronJob = require('cron').CronJob,
     spotifyApiServer = require('../utils/spotify-server-api'),
     emailHandler = require('./email'),
     logger = require('./logger'),
-    playlistHandler = require('./playlist-handler');
+    playlistHandler = require('./playlist-handler')
+    spotifyAPI = require('./spotify-api');
 
 
 /**
@@ -49,7 +50,11 @@ async function checkForReleases(artists) {
 async function checkForRelease(artist) {
     let release;
     try {
-        release = await spotifyApiServer.getRecentRelease(artist);
+        const spotApi = new SpotifyAPI();
+        await spotApi.initialize();
+        release = await spotApi.getArtistNewRelease(artist.spotify_id);
+
+        // release = await spotifyApiServer.getRecentRelease(artist);
     } catch (e) {
         logger.error(`Could not get recent release for release scan processing. Reason: ${e}`);
         return; // move along

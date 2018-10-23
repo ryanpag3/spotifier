@@ -1,17 +1,17 @@
 var Q = require('q'),
     fs = require('fs'),
     path = require('path'),
-    JSONStream = require('JSONStream'),
+    Promise = require('bluebird'),
     Db = require('../server/utils/db'),
     logger = require('../server/utils/logger'),
     User = require('../server/models/user'),
     Artist = require('../server/models/artist'),
     sampleData = require('./sample-test-data'),
     spotifyServerApi = require('../server/utils/spotify-server-api'),
-    queueGetArtistDetails = require('../server/utils/queue-get-artist-details'),
-    playlistHandler = require('../server/utils/playlist-handler');
+    playlistHandler = require('../server/utils/playlist-handler')
+    SpotifyAPI = require('../server/utils/spotify-api');
 
-module.exports = {
+module.exports = self = {
     insert: function (user) {
         var deferred = Q.defer();
         User.create(user, function (err, user) {
@@ -50,6 +50,7 @@ module.exports = {
         return deferred.promise;
     },
 
+
     /**
      * TODO: fix wordy documentation
      * For testing, we don't want to query spotify every time we run our methods. In production
@@ -57,7 +58,7 @@ module.exports = {
      * need to cache artist results. This method caches the results of getNewReleases() into a file
      * and only refreshes the cache if 24 hours have passed.
      */
-    getArtists: function () {
+    getArtistsOld: function () {
         var deferred = Q.defer();
         var date = new Date();
         date.setDate(date.getDate() - 7); // move date back one week
@@ -117,7 +118,67 @@ module.exports = {
         return deferred.promise;
     },
 
+    getOldRelease: async (artistId) => {
+        console.log('getting old release')
+        const spotAPI = new SpotifyAPI();
+        await spotAPI.initialize();
+        const albums = await spotAPI.getArtistAlbums(artistId);
+        if (albums.length == 1) return albums[0];
+        return albums[1];
+    },
+
+    randomizeReleases: async (albums) => {
+        let randomized = [];
+        await Promise.map(albums, async (album) => {
+            if (Math.random() <= .5) {
+                album = await self.getOldRelease(album.artists[0].id)
+            };
+            randomized.push(album);
+        });
+
+        return randomized.map((album) => {
+            const release = {
+                id: album.id,
+                title: album.name,
+                release_date: album.release_date,
+                images: album.images,
+                url: album.external_urls.spotify
+            }
+            return {
+                name: album.artists[0].name,
+                spotify_id: album.artists[0].id,
+                recent_release: release
+            }
+        });
+    },
+
     /**
+     * get n number of indeterminate releases
+     */
+    getArtists: async (n) => {
+        const sAPI = new SpotifyAPI()
+        await sAPI.initialize();
+        const albums = await sAPI.getAlbums(n);
+        return self.randomizeReleases(albums);
+    },  
+
+    /**
+     * add random artists
+     */
+    addRandomArtists: async (n) => {
+        try {
+            const artists = await self.getArtists(n);
+            await Promise.map(artists, async artist => {
+                return await Artist.create(artist)
+            })
+        } catch (e) {
+            console.log(e);
+        }
+    },
+
+
+    /**
+     * @deprecated
      * TODO: fix wordy documentation
      * add n amount of random artists to the artists database. This will grab artists only
      * that have releases in the past two weeks and will assign either their most recent release
@@ -127,7 +188,7 @@ module.exports = {
      * reason for checking second recent releases on the release server.
      * @param n: amount of artists to add
      */
-    addRandomArtists: function (n) {
+    addRandomArtistsOld: function (n) {
         var deferred = Q.defer();
         if (n === undefined) {
             throw new Error('n cannot be undefined!');
@@ -334,7 +395,7 @@ module.exports = {
 
         logger.debug('Staging spotify user');
 
-        this.getArtists()
+        this.getArtists(numReleases)
             .then(function (releases) {
                 new User(spotifyUser).save(
                     function (err, user) {
@@ -358,7 +419,7 @@ module.exports = {
     stageArtistUser: function (user, artist) {
         var deferred = Q.defer();
         var db = new Db();
-        db.addArtist(user, artist)
+        return db.addArtist(user, artist)
             .then(function () {
                 return flagUserArtistRelease(user, artist);
             });
