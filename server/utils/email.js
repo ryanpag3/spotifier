@@ -131,7 +131,7 @@ Email.prototype.sendNewReleaseEmails = function () {
                         }, function (err, result) {
                             // catch err
                             if (err) {
-                                logger.error(err);
+                                logger.error('unable to render release email: ' + err);
                             } else if (validateTemplate(result)) {
                                 var today = new Date(Date.now()).toLocaleDateString('en-US');
                                 // define email options
