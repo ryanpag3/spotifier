@@ -67,9 +67,9 @@ async function checkForRelease(artist) {
 
     if (!artist.recent_release || !artist.recent_release.id)
         return await flagNewRelease(artist, release);
-
-    const recentReleaseDate = moment(new Date(release.release_date));
-    const currentReleaseDate = moment(new Date(artist.recent_release.release_date));
+    // console.log(release);
+    const recentReleaseDate = moment(release.release_date);
+    const currentReleaseDate = moment(artist.recent_release.release_date);
 
     if (moment(recentReleaseDate).isAfter(currentReleaseDate))
         return await flagNewRelease(artist, release);
@@ -82,10 +82,10 @@ async function checkForRelease(artist) {
 async function flagNewRelease(artist, release) {
     const db = new Db();
 
-    if (!hasDifferentTitle(artist.recent_release.title, release.name))
+    if (!hasDifferentTitle(artist.recent_release.title, release.recent_release.title))
         return;
-    release = processRelease(release);
-    const releaseMsg = `* ${artist.name} | ${release.title} *`;
+    // release = processRelease(release);
+    const releaseMsg = `* ${artist.name} | ${release.recent_release.title} *`;
     logger.info('new release!');
     logger.info(('*').repeat(releaseMsg.length));
     logger.info(releaseMsg);
@@ -94,7 +94,7 @@ async function flagNewRelease(artist, release) {
     const updatedArtist = await Artist.findOneAndUpdate({
         _id: artist._id
     }, {
-        recent_release: release
+        recent_release: release.recent_release
     });
     getArtistDetailsQueue.createJob(updatedArtist);
     db.artistNewReleaseFound(updatedArtist);

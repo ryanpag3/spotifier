@@ -32,7 +32,7 @@ function Api() {
  * only happen through this entry point.
  * @returns {Q.Promise<T>}
  */
-Api.prototype.syncLibrary = function (user, socketUtil) {
+Api.prototype.syncLibraryOld = function (user, socketUtil) {
     logger.info('attempting to sync ' + user.name + '\'s library.');
     var api = this,
         deferred = Q.defer();

@@ -27,6 +27,7 @@ Socket.prototype.alertSyncQueueStatusChange = function (user, status) {
 };
 
 Socket.prototype.alertLibraryAdded = function (user, library) {
+    console.log('alerting library is added!');
     if (this.users[user._id]){
         this.users[user._id].emit('library-added', library);
     }

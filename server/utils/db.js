@@ -105,22 +105,18 @@ Db.prototype.addAllArtists = function (user, artists, socketUtil) {
             deferred.reject(err);
         }
 
-        go(); // start recursive call
-        function go() {
-            // add artist
-            db.addArtist(user, artists[i], socketUtil)
-                .then(function () {
-                    i++;
-                    if (i < artists.length) {
-                        setTimeout(go, 0);
-                    } else {
-                        deferred.resolve(); // end of artist array reached, resolve
-                    }
-                })
-                .catch(function (err) {
-                    deferred.reject(err); // add artist threw error, reject
-                });
-        }
+        let promises = [];
+        artists.map((artist) => {
+            promises.push(db.addArtist(user, artist, socketUtil));
+        });
+
+        Promise.all(promises)
+            .then(() => {
+                deferred.resolve();
+            })
+            .catch((err) => {
+                deferred.reject(err);
+            });
     });
 
     return deferred.promise;

@@ -53,6 +53,7 @@
     max-height: 100px;
     width: 100px;
     max-width: 100px;
+    min-width:100px;
     padding: 2px;
     justify-content: center;
     align-items: center;
@@ -70,13 +71,14 @@
 #album-title {
 
     width: 100%;
-    font-size: 18pt;
+    font-size: 13pt;
+    font-weight: bold;
 }
 
 #artist-name {
     margin-top: 15px;
     width: 100%;
-    font-size: 12pt;
+    font-size: 10pt;
 }
 
 #artist-line {

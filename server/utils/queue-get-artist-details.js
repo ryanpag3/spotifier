@@ -4,47 +4,56 @@ var Queue = require('bull'),
     path = require('path'),
     spotifyApiServer = require('../utils/spotify-server-api'),
     Db = require('./db'),
-    logger = require('./logger');
+    logger = require('./logger')
+    SpotifyAPI = require('./spotify-api');
 var socketUtil;
 
 var artistDetailsQueue = new Queue('artist-details'); // todo add prod redis values
+let spotAPI = new SpotifyAPI();
 
 /**
  * This gets run for each job. 2 is the concurrency for the job, so we run 2 at a time. Job is
  * an object with identifying information. Done is a callback.
  */
-artistDetailsQueue.process(2, function (job, done) {
-    spotifyApiServer.getRecentRelease(job.data.artist)
-        .then(function (album) {
-            var artist;
-            if (album) {
-                artist = {
-                    spotify_id: job.data.artist.spotify_id,
-                    recent_release: {
-                        id: album.id,
-                        uri: album.uri,
-                        title: album.name,
-                        release_date: album.release_date,
-                        images: album.images,
-                        url: album.external_urls.spotify
-                    }
-                };
-            } else {
-                artist = {
-                    spotify_id: job.data.artist.spotify_id,
-                    recent_release: {
-                        title: 'No albums currently on Spotify',
-                        release_date: '-'
-                    }
-                }
-            }
-            // return updated artist info
-            done(null, artist);
-        })
-        .catch(function (err) {
-            logger.error(err);
-            done(new Error(err));
-        })
+artistDetailsQueue.process(2, async function (job, done) {
+    try {
+        // console.log(job.data.artist);
+        const artist = await spotAPI.getArtistNewRelease(job.data.artist.spotify_id);
+        done(null, artist);
+    } catch (e) {
+        done(new Error(e));
+    }
+    // spotifyApiServer.getRecentRelease(job.data.artist)
+    //     .then(function (album) {
+    //         var artist;
+    //         if (album) {
+    //             artist = {
+    //                 spotify_id: job.data.artist.spotify_id,
+    //                 recent_release: {
+    //                    id: album.id,
+    //                     uri: album.uri,
+    //                     title: album.name,
+    //                     release_date: album.release_date,
+    //                     images: album.images,
+    //                     url: album.external_urls.spotify
+    //                 }
+    //             };
+    //         } else {
+    //             artist = {
+    //                 spotify_id: job.data.artist.spotify_id,
+    //                 recent_release: {
+    //                     title: 'No albums currently on Spotify',
+    //                     release_date: '-'
+    //                 }
+    //             }
+    //         }
+    //         // return updated artist info
+    //         done(null, artist);
+    //     })
+    //     .catch(function (err) {
+    //         logger.error(err);
+    //         done(new Error(err));
+    //     })
 });
 
 /**

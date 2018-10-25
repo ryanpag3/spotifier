@@ -2,6 +2,7 @@ const logger = require('./logger');
 const pConfig = require('../../private/config-private');
 const SpotifyApiNode = require('spotify-web-api-node');
 const Promise = require('bluebird');
+const DB = require('./db');
 const PerformanceStats = require('./performance-stats');
 
 module.exports = SpotifyApi;
@@ -12,6 +13,7 @@ function SpotifyApi(userRefreshToken, socketUtil) {
     this.accessToken;
     this.tokenExpiresAt;
     this.api; // reference of SpotifyApiNode object on init()
+    this.db = new DB();
     return this;
 };
 
@@ -199,7 +201,15 @@ SpotifyApi.prototype.syncLibrary = function (user) {
     return this.initialize()
         .then(() => this.validateAccessInit())
         .then(() => this.getUserArtists())
-        .then((artists) => this.db.addAllArtists(user, artists));
+        .then(async (artists) => {
+            const library = await this.db.getLibrary(user);
+            this.socketUtil.alertLibraryAdded(user, library);
+            return artists;
+        })
+        .then((artists) => {
+            logger.info(`${user.name} has found their artists with length ${artists.length}`);
+            this.db.addAllArtists(user, artists)
+        });
 };
 
 /**

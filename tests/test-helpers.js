@@ -122,7 +122,8 @@ module.exports = self = {
         console.log('getting old release')
         const spotAPI = new SpotifyAPI();
         await spotAPI.initialize();
-        const albums = await spotAPI.getArtistAlbums(artistId);
+        let albums = await spotAPI.getArtistAlbums(artistId);
+        albums = spotAPI.sortAlbumsByRelease(albums);
         if (albums.length == 1) return albums[0];
         return albums[1];
     },

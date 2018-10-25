@@ -3,6 +3,7 @@ var Queue = require('bull'),
     User = require('../models/user.js'),
     syncLibraryQueue = new Queue('sync-library'), // todo add redis production server values
     SpotifyApiUser = require('./spotify-user-api.js'),
+    SpotifyAPI = require('./spotify-api'),
     logger = require('./logger');
 var socketUtil; // assigned on job creation, need to use global namespace to allow event listener usage
 
@@ -49,15 +50,10 @@ syncLibraryQueue
         });
     });
 
-syncLibraryQueue.process(3, function (job, done) {
-    var api = new SpotifyApiUser();
-    api.syncLibrary(job.data.user, socketUtil)
-        .then(function () {
-            done();
-        })
-        .catch(function (err) {
-            done(new Error('failed to sync library for user: ' + job.data.user.name + '. Reason: ' + err));
-        })
+syncLibraryQueue.process(10, async function (job, done) {
+    const api = new SpotifyAPI(job.data.user.refresh_token, socketUtil);
+    await api.syncLibrary(job.data.user);
+    done();
 });
 
 libraryQueue = {
