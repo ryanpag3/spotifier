@@ -73,6 +73,7 @@ Email.prototype.sendNewReleaseEmails = function () {
     sendNewReleaseBatch();
 
     function sendNewReleaseBatch() {
+        logger.info('trying to send new release batch!');
         // query for users with new_release field not empty
         User.find({
             'new_releases': {

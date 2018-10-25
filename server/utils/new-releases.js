@@ -33,7 +33,7 @@ async function scan() {
  */
 async function checkForReleases(artists) {
     return await Promise.map(artists, async (artist) => {
-        await Promise.delay(10);
+        await Promise.delay(25);
         logger.debug(`checking for release for ${artist.name}`);
         return await checkForRelease(artist);
     }, {
