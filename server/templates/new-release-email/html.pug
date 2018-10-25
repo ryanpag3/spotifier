@@ -18,7 +18,8 @@ div(id='container')
             a(id='link' href=artist.recent_release.url)
                 div(id='artist')
                     div(id='pic-container')
-                        img(id='pic' src=artist.recent_release.images[0].url)
+                        if artist.recent_release.images[0]
+                            img(id='pic' src=artist.recent_release.images[0].url)
                     div(id='details')
                         span(id='album-title') #{artist.recent_release.title}
                         br
