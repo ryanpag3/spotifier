@@ -251,9 +251,11 @@ app.controller('library-controller', ['$scope', '$location', '$rootScope',
          * newest data as well.
          */
         socket.on('library-added', function (library) {
+            console.log(library.length);
             $scope.data = library;
+            $scope.gridOptions.data = $scope.data;
             if ($scope.searchInput === '') {
-                $scope.gridOptions.data = $scope.data.slice();
+                $scope.gridOptions.data = library.slice();
             }
             $scope.$apply();
         });

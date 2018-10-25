@@ -201,14 +201,13 @@ SpotifyApi.prototype.syncLibrary = function (user) {
     return this.initialize()
         .then(() => this.validateAccessInit())
         .then(() => this.getUserArtists())
-        .then(async (artists) => {
-            const library = await this.db.getLibrary(user);
-            this.socketUtil.alertLibraryAdded(user, library);
-            return artists;
-        })
         .then((artists) => {
             logger.info(`${user.name} has found their artists with length ${artists.length}`);
-            this.db.addAllArtists(user, artists)
+            return this.db.addAllArtists(user, artists)
+        })
+        .then(async () => {
+            const library = await this.db.getLibrary(user);
+            this.socketUtil.alertLibraryAdded(user, library);
         });
 };
 
