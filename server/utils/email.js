@@ -161,7 +161,7 @@ Email.prototype.sendNewReleaseEmails = function () {
 
                                     })
                                     .catch(function (err) {
-                                        logger.error(err);
+                                        logger.error('error while sending ' + err);
                                         // if email fails to send, we set a backoff of 2 mins before retrying
                                         setTimeout(function () {
                                             sendNewReleaseBatch();

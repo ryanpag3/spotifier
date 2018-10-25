@@ -304,6 +304,7 @@ var startScan = function (sendEmails) {
     // pause job queues
     syncLibraryQueue.pause();
     getArtistDetailsQueue.pause();
+    logger.info('starting scan ' + (sendEmails == true ? 'and sending emails.': ''));
     // scan for new releases
     scan()
         .then(function () {
