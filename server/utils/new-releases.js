@@ -33,7 +33,7 @@ async function scan() {
  */
 async function checkForReleases(artists) {
     return await Promise.map(artists, async (artist) => {
-        await Promise.delay(25);
+        await Promise.delay(50);
         logger.debug(`checking for release for ${artist.name}`);
         return await checkForRelease(artist);
     }, {
@@ -317,6 +317,9 @@ var startScan = function (sendEmails) {
                     .then(function () {
                         logger.info('EMAIL SERVICE RESOLVED');
                         deferred.resolve();
+                    })
+                    .catch((e) => {
+                        logger.error('email handler threw ' + e);
                     });
             } else {
                 deferred.resolve();

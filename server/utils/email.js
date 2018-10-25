@@ -80,6 +80,7 @@ Email.prototype.sendNewReleaseEmails = function () {
                 $ne: []
             }
         }, function (err, users) {
+            logger.info(`${users.length} users to be notified.`);
             if (err) {
                 logger.error(err);
             }
@@ -97,6 +98,7 @@ Email.prototype.sendNewReleaseEmails = function () {
                         }
                     }]
                 }, function (err, users) {
+                    logger.info(`${users.length} users to be notified in this batch.`);
                     var addresses = [];
                     // catch err
                     if (err) {
@@ -113,6 +115,7 @@ Email.prototype.sendNewReleaseEmails = function () {
                             $in: master.new_releases
                         }
                     }, 'name recent_release', function (err, artists) {
+                        logger.info(`${artists.length} artists in email.`);
                         var templateDir = path.join(__dirname, '../templates', 'new-release-email');
                         var newReleaseEmail = new EmailTemplate(templateDir);
                         // catch err
@@ -139,6 +142,7 @@ Email.prototype.sendNewReleaseEmails = function () {
                                     html: result.html,
                                     text: result.text
                                 };
+                                console.log('attempting to send batch!');
                                 // send
                                 self.send(mailOptions)
                                     .then(function () {
