@@ -33,7 +33,7 @@ async function scan() {
  */
 async function checkForReleases(artists) {
     return await Promise.map(artists, async (artist) => {
-        // await Promise.delay(0);
+        await Promise.delay(10);
         logger.debug(`checking for release for ${artist.name}`);
         return await checkForRelease(artist);
     }, {
@@ -342,7 +342,7 @@ var startScan = function (sendEmails) {
             //     });
         })
         .catch(function (err) {
-            logger.error(err);
+            logger.error('new release scanner error ' + err);
             deferred.reject(err);
         });
     return deferred.promise;
