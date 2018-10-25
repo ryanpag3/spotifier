@@ -10,7 +10,7 @@ var CronJob = require('cron').CronJob,
 // only run these jobs in production environment
 if (process.env.NODE_ENV) {
 
-    new CronJob('00 00 8 * * 0-6', function () {
+    new CronJob('00 00 3 * * 0-6', function () {
             var sendEmails = true;
             logger.info('starting new release scan job!');
             releaseScanner.startScan(sendEmails);
