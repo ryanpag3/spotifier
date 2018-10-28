@@ -4,6 +4,7 @@ var nodemailer = require('nodemailer'),
     EmailTemplate = require('email-templates').EmailTemplate,
     path = require('path'),
     Q = require('q'),
+    Promise = require('bluebird'),
     User = require('../models/user'),
     Artist = require('../models/artist'),
     Db = require('./db'),
@@ -128,7 +129,7 @@ Email.prototype.sendNewReleaseEmails = function () {
                         newReleaseEmail.render({
                             artists: artists,
                             url: unsubUrl
-                        }, function (err, result) {
+                        }, async function (err, result) {
                             // catch err
                             if (err) {
                                 logger.error('unable to render release email: ' + err);
@@ -142,38 +143,74 @@ Email.prototype.sendNewReleaseEmails = function () {
                                     html: result.html,
                                     text: result.text
                                 };
-                                console.log('attempting to send batch!');
-                                // send
-                                self.send(mailOptions)
-                                    .then(function () {
-                                        // remove new_release data from users who we just sent email to
-                                        User.updateMany({
-                                            'new_releases': {
-                                                $all: master.new_releases,
-                                                $size: master.new_releases.length
-                                            }
-                                        }, {
-                                            $set: {
-                                                'new_releases': []
-                                            }
-                                        }, function (err) {
-                                            if (err) {
-                                                logger.error(err);
-                                            }
-                                            logger.info('sent new release batch');
-                                            sendNewReleaseBatch(); // process next release batch and send
-                                        });
+                                let promises = [];
 
+                                console.log('attempting to send batch!');
+                                for (let email of addresses) {
+                                    promises.push({
+                                        from: configPrivate.domain.email,
+                                        to: email,
+                                        subject: `New releases on Spotify for ${today}.`,
+                                        html: result.html,
+                                        text: result.text
                                     })
-                                    .catch(function (err) {
-                                        logger.error('error while sending ' + err);
-                                        // if email fails to send, we set a backoff of 2 mins before retrying
-                                        setTimeout(function () {
-                                            sendNewReleaseBatch();
-                                        }, 120000);
-                                    });
-                            } else {
-                                logger.error('error creating template for confirmation email!');
+                                }
+                                await Promise.map(promises, async emailOptions => {
+                                    try {
+                                        self.send(emailOptions)
+                                    } catch (e) {
+                                        logger.error(`Could not send email to recipient. ${e}`);
+                                    }
+                                }, {
+                                    concurrency: 10
+                                });
+
+                                User.updateMany({
+                                    'new_releases': {
+                                        $all: master.new_releases,
+                                        $size: master.new_releases.length
+                                    }
+                                }, {
+                                    $set: {
+                                        'new_releases': []
+                                    }
+                                }, function (err) {
+                                    if (err) {
+                                        logger.error(err);
+                                    }
+                                    logger.info('sent new release batch');
+                                    sendNewReleaseBatch(); // process next release batch and send
+                                });
+
+                                // // send
+                                // self.send(mailOptions)
+                                //     .then(function () {
+                                //         // remove new_release data from users who we just sent email to
+                                //         User.updateMany({
+                                //             'new_releases': {
+                                //                 $all: master.new_releases,
+                                //                 $size: master.new_releases.length
+                                //             }
+                                //         }, {
+                                //             $set: {
+                                //                 'new_releases': []
+                                //             }
+                                //         }, function (err) {
+                                //             if (err) {
+                                //                 logger.error(err);
+                                //             }
+                                //             logger.info('sent new release batch');
+                                //             sendNewReleaseBatch(); // process next release batch and send
+                                //         });
+
+                                //     })
+                                //     .catch(function (err) {
+                                //         logger.error('error while sending ' + err);
+                                //         // if email fails to send, we set a backoff of 2 mins before retrying
+                                //         setTimeout(function () {
+                                //             sendNewReleaseBatch();
+                                //         }, 120000);
+                                //     });
                             }
                         });
                     });
