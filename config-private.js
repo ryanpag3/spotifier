@@ -3,6 +3,7 @@
  */
 if (process.env.TRAVIS_CI && process.env.TRAVIS_CI === true) {
     module.exports = getTravisConfig();
+    return;
 }
 
 const config = require('./private/config.json');
@@ -68,6 +69,6 @@ function getTravisConfig() {
             }
         }
     }
-    
+
     return config;
 }
