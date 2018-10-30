@@ -9,7 +9,7 @@ jobs:
       - image: nlknguyen/alpine-shellcheck:v0.4.6
       
       # specify the version you desire here
-      - image: circleci/node:latest
+      - image: circleci/node:10
       
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
