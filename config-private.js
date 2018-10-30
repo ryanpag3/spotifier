@@ -1,6 +1,7 @@
 /**
  * load config from environment when running CI build
  */
+console.log(process.env.TRAVIS_CI);
 if (process.env.TRAVIS_CI && process.env.TRAVIS_CI === true) {
     module.exports = getTravisConfig();
     return;
@@ -23,6 +24,7 @@ function validateSpotifyClient(config) {
  * build configuration from environment variables
  */
 function getTravisConfig() {
+    console.log('building travis config');
     const config = {};
 
     config['server_ip'] = process.env.SERVER_IP;
