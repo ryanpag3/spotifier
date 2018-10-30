@@ -2,7 +2,7 @@ language: node_js
 node_js:
   - "node"
 before_install:
-  - "yarn add -g mocha"
+  - "yarn global add mocha"
 cache: yarn
 services:
   - mongodb
