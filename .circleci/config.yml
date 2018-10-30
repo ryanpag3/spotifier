@@ -43,6 +43,8 @@ jobs:
       - run:
           name: Check Scripts
           command: |
+            sudo mkdir /var/log/spotifier
+            sudo chown -R `whoami` /var/log/*
             yarn add global mocha
         
       # run tests!
