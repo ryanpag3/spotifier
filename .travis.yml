@@ -3,6 +3,7 @@ node_js:
   - "node"
 before_install:
   - "yarn global add mocha"
+  - "sudo mkdir /var/log/spotifier"
   - "sudo chown -R `whoami` /var/log/*"
 cache: yarn
 services:
