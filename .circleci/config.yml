@@ -6,10 +6,9 @@ version: 2
 jobs:
   build:
     docker:
-      - image: nlknguyen/alpine-shellcheck:v0.4.6
-      
-      # specify the version you desire here
+      # top level image is the container everything runs in
       - image: circleci/node
+      - image: nlknguyen/alpine-shellcheck:v0.4.6
       
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
