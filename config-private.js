@@ -68,4 +68,6 @@ function getTravisConfig() {
             }
         }
     }
+    
+    return config;
 }
