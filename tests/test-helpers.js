@@ -119,7 +119,6 @@ module.exports = self = {
     },
 
     getOldRelease: async (artistId) => {
-        console.log('getting old release')
         const spotAPI = new SpotifyAPI();
         await spotAPI.initialize();
         let albums = await spotAPI.getArtistAlbums(artistId);
@@ -135,6 +134,8 @@ module.exports = self = {
                 album = await self.getOldRelease(album.artists[0].id)
             };
             randomized.push(album);
+        }, {
+            concurrency: 3
         });
 
         return randomized.map((album) => {

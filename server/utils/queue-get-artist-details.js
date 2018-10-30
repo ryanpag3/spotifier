@@ -23,37 +23,6 @@ artistDetailsQueue.process(2, async function (job, done) {
     } catch (e) {
         done(new Error(e));
     }
-    // spotifyApiServer.getRecentRelease(job.data.artist)
-    //     .then(function (album) {
-    //         var artist;
-    //         if (album) {
-    //             artist = {
-    //                 spotify_id: job.data.artist.spotify_id,
-    //                 recent_release: {
-    //                    id: album.id,
-    //                     uri: album.uri,
-    //                     title: album.name,
-    //                     release_date: album.release_date,
-    //                     images: album.images,
-    //                     url: album.external_urls.spotify
-    //                 }
-    //             };
-    //         } else {
-    //             artist = {
-    //                 spotify_id: job.data.artist.spotify_id,
-    //                 recent_release: {
-    //                     title: 'No albums currently on Spotify',
-    //                     release_date: '-'
-    //                 }
-    //             }
-    //         }
-    //         // return updated artist info
-    //         done(null, artist);
-    //     })
-    //     .catch(function (err) {
-    //         logger.error(err);
-    //         done(new Error(err));
-    //     })
 });
 
 /**

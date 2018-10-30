@@ -12,7 +12,6 @@ var CronJob = require('cron').CronJob,
     playlistHandler = require('./playlist-handler')
     spotifyAPI = require('./spotify-api');
 
-
 /**
  * scan for new releases
  */
@@ -29,7 +28,6 @@ async function scan() {
 
 /**
  * Iterate through artists and check if newest release is newer than db
- * TODO: rewrite with promise.map
  */
 async function checkForReleases(artists) {
     return await Promise.map(artists, async (artist) => {
@@ -37,7 +35,7 @@ async function checkForReleases(artists) {
         logger.debug(`checking for release for ${artist.name}`);
         return await checkForRelease(artist);
     }, {
-        concurrency: 2
+        concurrency: 3
     })
     .catch((err) => {
         logger.error('Error while checking for releases: ' + err.stack.toString());
@@ -53,8 +51,6 @@ async function checkForRelease(artist) {
         const spotApi = new SpotifyAPI();
         await spotApi.initialize();
         release = await spotApi.getArtistNewRelease(artist.spotify_id);
-
-        // release = await spotifyApiServer.getRecentRelease(artist);
     } catch (e) {
         logger.error(`Could not get recent release for release scan processing. Reason: ${e}`);
         return; // move along
@@ -67,7 +63,7 @@ async function checkForRelease(artist) {
 
     if (!artist.recent_release || !artist.recent_release.id)
         return await flagNewRelease(artist, release);
-    // console.log(release);
+    
     const recentReleaseDate = moment(release.release_date);
     const currentReleaseDate = moment(artist.recent_release.release_date);
 
@@ -82,9 +78,12 @@ async function checkForRelease(artist) {
 async function flagNewRelease(artist, release) {
     const db = new Db();
 
+    if (artist.recent_release.id === release.recent_release.id)
+        return;
+
     if (!hasDifferentTitle(artist.recent_release.title, release.recent_release.title))
         return;
-    // release = processRelease(release);
+
     const releaseMsg = `* ${artist.name} | ${release.recent_release.title} *`;
     logger.info('new release!');
     logger.info(('*').repeat(releaseMsg.length));
@@ -96,21 +95,7 @@ async function flagNewRelease(artist, release) {
     }, {
         recent_release: release.recent_release
     });
-    getArtistDetailsQueue.createJob(updatedArtist);
     db.artistNewReleaseFound(updatedArtist);
-}
-
-/**
- * normalize object, remove gunk
- */
-function processRelease(release) {
-    return {
-        id: release.id,
-        title: release.name,
-        release_date: release.release_date,
-        images: release.images,
-        url: release.external_urls.spotify
-    }
 }
 
 /**
@@ -324,26 +309,6 @@ var startScan = function (sendEmails) {
             } else {
                 deferred.resolve();
             }
-            // playlistHandler.updateNewReleasePlaylists()
-            //     .then(function () {
-            //         // resume job queues
-            //         syncLibraryQueue.resume();
-            //         getArtistDetailsQueue.resume();
-            //         if (sendEmails === true) {
-            //             // send new release emails
-            //             emailHandler.sendNewReleaseEmails()
-            //                 .then(function () {
-            //                     logger.info('EMAIL SERVICE RESOLVED');
-            //                     deferred.resolve();
-            //                 });
-            //         } else {
-            //             deferred.resolve();
-            //         }
-            //     })
-            //     .catch(function (err) {
-            //         logger.error(err);
-            //         deferred.reject(err);
-            //     });
         })
         .catch(function (err) {
             logger.error('new release scanner error ' + err);

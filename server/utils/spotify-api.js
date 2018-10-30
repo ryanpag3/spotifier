@@ -133,7 +133,6 @@ SpotifyApi.prototype.getRecentRelease = function (artistId) {
 };
 
 SpotifyApi.prototype.getArtistAlbums = function (artistId) {
-    // logger.debug('getting artist albums');
     let promises = [];
     let albumType = 'album,single';
     return this.validateInit()
@@ -144,19 +143,23 @@ SpotifyApi.prototype.getArtistAlbums = function (artistId) {
             return data.body.total;
         })
         .then((total) => {
-            logger.debug('artist albums found with total: ' + total);
             for (let offset = 0; offset < total; offset += 50) {
-                promises.push(this.api.getArtistAlbums(artistId, {
+                promises.push({
                     limit: 50,
                     offset: offset,
                     album_type: albumType
-                }));
+                });
             }
         })
-        .then(() => Promise.all(promises))
+        .then(async () => {
+            return Promise.map(promises, params => {
+                return this.api.getArtistAlbums(artistId, params);
+            }, {
+                concurrency: 1
+            });
+        })
         .then((queryResults) => {
             let albums = [];
-            // logger.debug('concatting query results with length: ' + queryResults.length);
             for (let i = 0; i < queryResults.length; i++) {
                 albums = albums.concat(queryResults[i].body.items);
             }
