@@ -53,6 +53,10 @@ function getTravisConfig() {
         password: process.env.GMAIL_PASSWORD
     };
 
+    config['domain'] = {
+        email: process.env.GMAIL_USER
+    };
+
     config['test'] = {
         db: {
             ip: process.env.DB_IP,
