@@ -5,10 +5,10 @@ var SpotifyApi = require('spotify-web-api-node'),
     path = require('path'),
     Promise = require('bluebird'),
     logger = require('./logger'),
-    configPrivate = require('../../private/config-private'),
+    configPrivate = require('../../config-private'),
     credentials = {
-        clientId: configPrivate.spotify.clientId,
-        clientSecret: configPrivate.spotify.clientSecret
+        clientId: configPrivate.spotify.client_id,
+        clientSecret: configPrivate.spotify.client_secret
     },
     spotifyApi = new SpotifyApi(credentials); // instantiate api object
 

@@ -12,7 +12,7 @@ var path = require('path'),
     helmet = require('helmet'),
     logger = require('./utils/logger'),
     configPublic = require('../config-public'),
-    configPrivate = require('../private/config-private'),
+    configPrivate = require('../config-private'),
     syncLibraryQueue = require('./utils/queue-sync-user-library'),
     getArtistDetailsQueue = require('./utils/queue-get-artist-details');
     mongoose.Promise = require('bluebird');
@@ -21,8 +21,8 @@ var path = require('path'),
  */
 const setupApp = function(app, express, socketUtil) {
     var redirectUri = (process.env.NODE_ENV ? configPublic.prodUrl : configPublic.url) + '/user/callback',
-        clientSecret = configPrivate.spotify.clientSecret,
-        clientID = configPrivate.spotify.clientId;
+        clientSecret = configPrivate.spotify.client_secret,
+        clientID = configPrivate.spotify.client_id;
 
     var options = {
         keepAlive: 1,

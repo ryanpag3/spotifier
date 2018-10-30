@@ -342,7 +342,7 @@ Db.prototype.artistNewReleaseFound = function (artist) {
         if (err) {
             logger.error(err);
         }
-        logger.info('>>> added new release info for ' + artist.name);
+        // logger.info('>>> added new release info for ' + artist.name);
     })
 };
 

@@ -13,7 +13,7 @@ var expect = require('chai').expect,
     spotifyApiServer = require('../../server/utils/spotify-server-api'),
     releaseScanner = require('../../server/utils/new-releases.js');
     mongoose.Promise = require('bluebird'),
-    configPrivate = require('../../private/config-private');
+    configPrivate = require('../../config-private');
 
 mongoose.connect(configPrivate.test.db.ip, {
     useMongoClient: true,

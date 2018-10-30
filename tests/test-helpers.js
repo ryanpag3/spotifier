@@ -400,7 +400,7 @@ module.exports = self = {
         this.getArtists(numReleases)
             .then(function (releases) {
                 new User(spotifyUser).save(
-                    function (err, user) {
+                    async function (err, user) {
                         if (err) {
                             logger.error('stageSpotifyUser', err);
                         }
@@ -409,21 +409,19 @@ module.exports = self = {
                         var promises = [];
                         for (var i = 0; i < numReleases; i++) {
                             var artist = releases[getRandom(releases.length - 1)];
-                            promise = self.stageArtistUser(user, artist);
-                            promises.push(promise);
+                            await self.stageArtistUser(user, artist);
                         }
-                        Q.all(promises).then(deferred.resolve(self.stagePlaylist(user)));
+                        deferred.resolve(self.stagePlaylist(user));
                     });
             });
         return deferred.promise;
     },
 
     stageArtistUser: function (user, artist) {
-        var deferred = Q.defer();
         var db = new Db();
         return db.addArtist(user, artist)
             .then(function () {
-                return flagUserArtistRelease(user, artist);
+                return self.flagUserArtistRelease(user, artist);
             });
     },
 
@@ -449,14 +447,15 @@ module.exports = self = {
         User.findOne({
             '_id': user._id
         }, function (err, user) {
-            logger.debug('creating playlist for user');
-            playlistHandler.createPlaylist(user._id)
-                .then(function (user) {
-                    deferred.resolve(user);
-                })
-                .catch(function (err) {
-                    deferred.reject(err);
-                });
+            deferred.resolve(user);
+            // logger.debug('creating playlist for ' + user.name);
+            // playlistHandler.createPlaylist(user._id)
+            //     .then(function (user) {
+            //         deferred.resolve(user);
+            //     })
+            //     .catch(function (err) {
+            //         deferred.reject(err);
+            //     });
         });
         return deferred.promise;
     },

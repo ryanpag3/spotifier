@@ -5,11 +5,11 @@ var SpotifyApi = require('spotify-web-api-node'),
     Db = require('./db.js'),
     logger = require('./logger'),
     Artist = require('../models/artist'),
-    configPrivate = require('../../private/config-private'),
+    configPrivate = require('../../config-private'),
     configPublic = require('../../config-public'),
     credentials = {
-        clientId: configPrivate.spotify.clientId,
-        clientSecret: configPrivate.spotify.clientSecret
+        clientId: configPrivate.spotify.client_id,
+        clientSecret: configPrivate.spotify.client_secret
     };
 
 // constructor

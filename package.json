@@ -4,6 +4,7 @@
   "description": "A new music notifier for spotify",
   "main": "server.js",
   "scripts": {
+    "test" : "mocha tests/run-tests.js",
     "start-w": "nodemon server/server.js"
   },
   "repository": {

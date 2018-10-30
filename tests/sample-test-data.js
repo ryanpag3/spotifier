@@ -2,7 +2,7 @@
  * contains sample test cases to use on unit tests
  * @type {[null]}
  */
-var privateConfig = require('../private/config-private'),
+var privateConfig = require('../config-private'),
     moniker = require('moniker'),
     potNames = moniker.generator([moniker.noun]);
 
@@ -100,7 +100,7 @@ module.exports = {
         return {
             name: 'unconfirmed-user',
             email: {
-                address: privateConfig.gmail.username,
+                address: privateConfig.gmail.user,
                 confirmed: false
             }
         };
@@ -111,7 +111,7 @@ module.exports = {
         return {
             name: potNames.choose(),
             email: {
-                address: privateConfig.gmail.username,
+                address: privateConfig.gmail.user,
                 confirmed: true
             }
         };
@@ -122,7 +122,7 @@ module.exports = {
         return {
             name: potNames.choose(),
             email: {
-                address: privateConfig.gmail.username,
+                address: privateConfig.gmail.user,
                 confirmed: true
             }
         };
@@ -138,25 +138,25 @@ module.exports = {
 
     getSpotifyAuthenticatedUser: function () {
         return {
-            name: privateConfig.spotify.testUserId,
+            name: privateConfig.test.spotify.user.id,
             email: {
-                address: privateConfig.gmail.username,
+                address: privateConfig.gmail.user,
                 confirmed: true
             },
-            refresh_token: privateConfig.spotify.testRefreshToken
+            refresh_token: privateConfig.test.spotify.user.refresh_token
         };
     },
 
     getSpotifyAuthenticatedUserPlaylistCreated: function () {
         return {
-            name: privateConfig.spotify.testUserId,
+            name: privateConfig.test.spotify.user.id,
             email: {
-                address: privateConfig.gmail.username,
+                address: privateConfig.gmail.user,
                 confirmed: true
             },
-            refresh_token: privateConfig.spotify.testRefreshToken,
+            refresh_token: privateConfig.test.spotify.user.refresh_token,
             playlist: {
-                id: privateConfig.spotify.testPlaylistId,
+                id: privateConfig.test.spotify.user.playlist_id,
                 last_reset: '',
                 enabled: true
             },

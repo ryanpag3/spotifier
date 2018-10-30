@@ -9,7 +9,7 @@ var nodemailer = require('nodemailer'),
     Artist = require('../models/artist'),
     Db = require('./db'),
     logger = require('./logger'),
-    configPrivate = require('../../private/config-private'),
+    configPrivate = require('../../config-private'),
     configPublic = require('../../config-public');
 
 /**
@@ -20,15 +20,15 @@ var Email = function () {
     // are we in production?
     if (process.env.NODE_ENV) {
         this.transporter = nodemailer.createTransport(ses({
-            accessKeyId: configPrivate.awsSecretId,
-            secretAccessKey: configPrivate.awsSecretKey,
+            accessKeyId: configPrivate.aws.secret_id,
+            secretAccessKey: configPrivate.aws.secret_key,
             region: 'us-west-2'
         }));
     } else {
         this.transporter = nodemailer.createTransport({
             service: 'Gmail',
             auth: {
-                user: configPrivate.gmail.username,
+                user: configPrivate.gmail.user,
                 pass: configPrivate.gmail.password
             }
         })

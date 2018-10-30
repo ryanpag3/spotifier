@@ -1,5 +1,5 @@
 const logger = require('./logger');
-const pConfig = require('../../private/config-private');
+const pConfig = require('../../config-private');
 const SpotifyApiNode = require('spotify-web-api-node');
 const Promise = require('bluebird');
 const DB = require('./db');
@@ -29,8 +29,8 @@ SpotifyApi.prototype.initialize = function () {
 
 SpotifyApi.prototype.getSpotifyApi = function (userToken) {
     let api = new SpotifyApiNode({
-        clientId: pConfig.spotify.clientId,
-        clientSecret: pConfig.spotify.clientSecret
+        clientId: pConfig.spotify.client_id,
+        clientSecret: pConfig.spotify.client_secret
     });
     return this.setAccessToken(api, userToken)
         .then(() => {
@@ -73,8 +73,8 @@ SpotifyApi.prototype.getAccessToken = function () {
 
 SpotifyApi.prototype.getServerTokenApi = function () {
     let api = new SpotifyApiNode({
-        clientId: pConfig.spotify.clientId,
-        clientSecret: pConfig.spotify.clientSecret
+        clientId: pConfig.spotify.client_id,
+        clientSecret: pConfig.spotify.client_secret
     });
     return api.clientCredentialsGrant()
         .then((data) => {
