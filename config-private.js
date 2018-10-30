@@ -2,7 +2,7 @@
  * load config from environment when running CI build
  */
 console.log(process.env.TRAVIS_CI === true)
-if (process.env.TRAVIS_CI && process.env.TRAVIS_CI === true) {
+if (process.env.TRAVIS_CI) {
     module.exports = getTravisConfig();
 } else {
     const config = require('./private/config.json');
