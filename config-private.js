@@ -1,16 +1,14 @@
 /**
  * load config from environment when running CI build
  */
-console.log(process.env.TRAVIS_CI);
+console.log(process.env.TRAVIS_CI === true)
 if (process.env.TRAVIS_CI && process.env.TRAVIS_CI === true) {
     module.exports = getTravisConfig();
-    return;
+} else {
+    const config = require('./private/config.json');
+    validateSpotifyClient(config);
+    module.exports = config;
 }
-
-const config = require('./private/config.json');
-validateSpotifyClient(config);
-module.exports = config;
-
 
 function validateSpotifyClient(config) {
     if (process.env.NODE_ENV) {
