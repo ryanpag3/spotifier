@@ -17,7 +17,7 @@ jobs:
       - image: circleci/redis
 
     working_directory: ~/repo
-    parrallelism: 1
+    parallelism: 1
 
     steps:
       - checkout
