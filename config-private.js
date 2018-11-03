@@ -1,9 +1,8 @@
 /**
  * load config from environment when running CI build
  */
-console.log(process.env.TRAVIS_CI === true)
-if (process.env.TRAVIS_CI) {
-    module.exports = getTravisConfig();
+if (process.env.CI_CD) {
+    module.exports = getCICDConfig();
 } else {
     const config = require('./private/config.json');
     validateSpotifyClient(config);
@@ -21,8 +20,8 @@ function validateSpotifyClient(config) {
 /**
  * build configuration from environment variables
  */
-function getTravisConfig() {
-    console.log('building travis config');
+function getCICDConfig() {
+    console.log('building cicd config');
     const config = {};
 
     config['server_ip'] = process.env.SERVER_IP;
