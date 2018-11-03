@@ -35,7 +35,7 @@ async function checkForReleases(artists) {
         logger.debug(`checking for release for ${artist.name}`);
         return await checkForRelease(artist);
     }, {
-        concurrency: 3
+        concurrency: 2
     })
     .catch((err) => {
         logger.error('Error while checking for releases: ' + err.stack.toString());
