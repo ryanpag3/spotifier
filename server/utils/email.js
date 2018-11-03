@@ -157,7 +157,8 @@ Email.prototype.sendNewReleaseEmails = function () {
                                 }
                                 await Promise.map(promises, async emailOptions => {
                                     try {
-                                       return await self.send(emailOptions);
+                                        logger.info(`Sending email to ${emailOptions.to}`);
+                                        return await self.send(emailOptions);
                                     } catch (e) {
                                         logger.error(`Could not send email to recipient. ${e}`);
                                     }
