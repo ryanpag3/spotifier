@@ -3,6 +3,7 @@ var expect = require('chai').expect,
     sinon = require('sinon'),
     mongoose = require('mongoose'),
     testHelper = require('../test-helpers'),
+    redis = require('../../server/utils/redis'),
     sampleData = require('../sample-test-data'),
     SpotifyApiUser = require('../../server/utils/spotify-user-api'),
     User = require('../../server/models/user'),
@@ -18,8 +19,8 @@ describe('spotify-user-api.js unit tests', function () {
     var spotifyUser;
 
     beforeEach(function (done) { // before each test
-        var mins = 10;
-        this.timeout(mins * 60000);
+        this.timeout(15000);
+        redis.flushall();
         var numReleases = 20;
         testHelper.stageSpotifyUser(numReleases)
             .then(function (mSpotifyUser) {

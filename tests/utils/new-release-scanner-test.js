@@ -13,6 +13,7 @@ var expect = require('chai').expect,
     spotifyApiServer = require('../../server/utils/spotify-server-api'),
     releaseScanner = require('../../server/utils/new-releases.js');
     mongoose.Promise = require('bluebird'),
+    redis = require('../../server/utils/redis'),
     configPrivate = require('../../config-private');
 
 mongoose.connect(configPrivate.test.db.ip, {
@@ -24,6 +25,7 @@ mongoose.connect(configPrivate.test.db.ip, {
 describe('new-release-scanner unit tests', function () {
     // before each unit test
     beforeEach(function (done) {
+        redis.flushall();
         done();
     });
 

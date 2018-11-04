@@ -6,6 +6,7 @@ var sampleData = require('../sample-test-data');
 var Db = require('../../server/utils/db');
 var User = new require('../../server/models/user');
 var Artist = new require('../../server/models/artist');
+const redis = require('../../server/utils/redis');
 var logger = require('../../server/utils/logger');
 mongoose.Promise = require('bluebird');
 
@@ -19,6 +20,7 @@ describe('db-wrapper', function () {
     beforeEach(function (done) {
         // instantiate new db object
         db = new Db();
+        redis.flushall();
         done();
     });
     // after each unit test

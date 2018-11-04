@@ -5,6 +5,7 @@ var expect = require('chai').expect,
     fs = require('fs'),
     User = require('../../server/models/user'),
     Artist = require('../../server/models/artist'),
+    redis = require('../../server/utils/redis'),
     email = require('../../server/utils/email'),
     Db = require('../../server/utils/db'),
     testHelper = require('../test-helpers'),
@@ -20,6 +21,7 @@ mongoose.connect('mongodb://localhost/spotifier_test', {
 describe('spotify-server-api unit tests', function () {
     // before each unit test
     beforeEach(function (done) {
+        redis.flushall();
         done();
     });
 

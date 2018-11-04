@@ -8,7 +8,8 @@ var expect = require('chai').expect,
     releaseScanner = require('../../server/utils/new-releases'),
     Db = require('../../server/utils/db'),
     testHelper = require('../test-helpers'),
-    sampleData = require('../sample-test-data');
+    sampleData = require('../sample-test-data'),
+    redis = require('../../server/utils/redis');
 mongoose.Promise = require('bluebird');
 
 mongoose.connect('mongodb://localhost/spotifier_test', {
@@ -18,6 +19,7 @@ mongoose.connect('mongodb://localhost/spotifier_test', {
 describe('email-handler tests', function () {
     // run before each unit test
     beforeEach(function (done) {
+        redis.flushall();
         done();
     });
 
