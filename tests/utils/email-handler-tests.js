@@ -106,9 +106,25 @@ describe('email-handler tests', function () {
     });
 
     it('should resolve after all users have been notified of their new releases', function(done) {
-        var numUsers = 1,
-            numArtists = 10,
-            numAssigns = 100;
+        var numUsers = 7,
+            numArtists = 15,
+            numAssigns = 1000;
+        this.timeout(60000 * numArtists); // staging the database takes a little while
+        // (number of users, number of artists, number of random assignments)
+        testHelper.stageSampleNewReleaseDb(numUsers, numArtists, numAssigns)
+            .then(function() {
+                releaseScanner.startScan(true)
+                    .then(function() {
+                        done();
+                    })
+            })
+    });
+
+
+    it('should send out several emails to users in the same batch', function(done) {
+        var numUsers = 7,
+            numArtists = 2,
+            numAssigns = 1000;
         this.timeout(60000 * numArtists); // staging the database takes a little while
         // (number of users, number of artists, number of random assignments)
         testHelper.stageSampleNewReleaseDb(numUsers, numArtists, numAssigns)

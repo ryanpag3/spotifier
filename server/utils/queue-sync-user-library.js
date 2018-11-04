@@ -44,6 +44,10 @@ syncLibraryQueue
         }, (err, user) => {
             if (err)
                 logger.error(err);
+            if (!user) {
+                logger.debug('User does not exist in database anymore. Ignoring sync_queue status change.');
+                return;
+            }
             user.sync_queue.id = undefined;
             user.sync_queue.status = 'not queued';
             user.save();
@@ -52,7 +56,11 @@ syncLibraryQueue
 
 syncLibraryQueue.process(10, async function (job, done) {
     const api = new SpotifyAPI(job.data.user.refresh_token, socketUtil);
-    await api.syncLibrary(job.data.user);
+    try {
+        await api.syncLibrary(job.data.user);
+    } catch (e) {
+        logger.error(e.toString());
+    }
     done();
 });
 

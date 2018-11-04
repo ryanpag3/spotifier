@@ -147,6 +147,7 @@ Email.prototype.sendNewReleaseEmails = function () {
 
                                 console.log('attempting to send batch!');
                                 for (let email of addresses) {
+                                    logger.info('pushing');
                                     promises.push({
                                         from: configPrivate.domain.email,
                                         to: email,
@@ -163,7 +164,7 @@ Email.prototype.sendNewReleaseEmails = function () {
                                         logger.error(`Could not send email to recipient. ${e}`);
                                     }
                                 }, {
-                                    concurrency: 10
+                                    concurrency: 5
                                 });
 
                                 User.updateMany({

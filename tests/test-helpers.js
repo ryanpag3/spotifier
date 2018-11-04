@@ -413,6 +413,9 @@ module.exports = self = {
                         }
                         deferred.resolve(self.stagePlaylist(user));
                     });
+            })
+            .catch((err) => {
+                logger.error(err.toString());
             });
         return deferred.promise;
     },
@@ -422,7 +425,8 @@ module.exports = self = {
         return db.addArtist(user, artist)
             .then(function () {
                 return self.flagUserArtistRelease(user, artist);
-            });
+            })
+            .catch(err => logger.error(err.toString()));
     },
 
     flagUserArtistRelease: function (user, artist) {
