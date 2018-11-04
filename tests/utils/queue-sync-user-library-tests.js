@@ -72,10 +72,9 @@ describe('sync library queue utility', function () {
 
     describe('enqueueScheduledSyncs', function() {
         it('should create sync library jobs for all users with the valid condition', function(done) {
-            this.timeout(5000);
+            this.timeout(15000);
             testHelper.stageSpotifyUser(20)
                 .then(function(user) {
-                    console.log('did we make it fam')
                     syncUserLibraryQueue.enqueueScheduledSyncs()
                         .then(function() {
                             done();
