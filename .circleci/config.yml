@@ -52,7 +52,9 @@ jobs:
       # - run: yarn test
       - run: mkdir ~/junit
       - run:
-          command: mocha tests/run-tests.js --reporter mocha-junit-reporter
+          command: 
+          yarn add global mocha
+          mocha tests/run-tests.js --reporter mocha-junit-reporter
           environment:
             MOCHA_FILE: junit/test-results.xml
           when: always
