@@ -52,7 +52,7 @@ jobs:
       # - run: yarn test
       - run: mkdir ~/junit
       - run:
-          command: 
+          command: |
           yarn add global mocha
           mocha tests/run-tests.js --reporter mocha-junit-reporter
           environment:
