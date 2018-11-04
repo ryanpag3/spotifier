@@ -48,6 +48,7 @@ jobs:
             sudo chown -R `whoami` /var/log/*
             # yarn add global mocha
             sudo npm i -g mocha
+            sudo npm i -g mocha-junit-reporter
         
       # run tests!
       # - run: yarn test
