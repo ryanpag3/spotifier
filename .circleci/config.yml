@@ -49,4 +49,14 @@ jobs:
             yarn add global mocha
         
       # run tests!
-      - run: yarn test
+      # - run: yarn test
+      - run: mkdir ~/junit
+      - run:
+          command: mocha tests/run-tests.js --reporter mocha-junit-reporter
+          environment:
+            MOCHA_FILE: junit/test-results.xml
+          when: always
+      - store_test_results:
+          path: ~/junit
+      - store_artifacts:
+          path: ~/junit
