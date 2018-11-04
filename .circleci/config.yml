@@ -46,14 +46,14 @@ jobs:
           command: |
             sudo mkdir /var/log/spotifier
             sudo chown -R `whoami` /var/log/*
-            yarn add global mocha
+            # yarn add global mocha
+            sudo npm i -g mocha
         
       # run tests!
       # - run: yarn test
       - run: mkdir ~/junit
       - run:
           command: |
-            yarn add global mocha
             mocha tests/run-tests.js --reporter mocha-junit-reporter
           environment:
             MOCHA_FILE: junit/test-results.xml
