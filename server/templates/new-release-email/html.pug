@@ -8,11 +8,6 @@ div(id='container')
     hr
 
     div(id='body')
-        span Hello!
-        br
-        br
-        span We found some new releases for artists that you are tracking. :)
-
     div(id='artist-body')
         each artist in artists
             a(id='link' href=artist.recent_release.url)
@@ -28,10 +23,6 @@ div(id='container')
 br
 br
 div(id='social-links')
-    span Need help? Want to help? Contact me!
-    br
-    a(id='twitter' href='https://twitter.com/ryanpage_io') Twitter
+    a(id='github' href='https://github.com/ryanpage42') github
     span &nbsp;|&nbsp;
-    a(id='github' href='https://github.com/ryanpage42') Github
-    span &nbsp;|&nbsp;
-    a(id='unsubscr1ibe' href=url) Unsubscribe from Spotifier
+    a(id='unsubscr1ibe' href=url) unsubscribe
