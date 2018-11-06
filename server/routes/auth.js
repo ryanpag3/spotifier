@@ -186,7 +186,27 @@ router.post('/email/unsubscribe', function (req, res) {
  * Will call db handler and remove user emails that bounce.
  */
 router.post('/email/bounce', function (req, res) {
-    // TODO:
+    // console.log('we bounced!');
+    // console.log(req.body);
+    // res.sendStatus(200);
+    const db = new Db();
+    var chunks = [];
+    req.on('data', function (chunk) {
+        chunks.push(chunk);
+    });
+    req.on('end', function () {
+        var body = JSON.parse(chunks.join(''));
+        if (body.Type == 'Notification') {
+            const message = JSON.parse(body.Message);
+            console.log(message.bounce.bouncedRecipients);
+            for (let recipient of message.bounce.bouncedRecipients) {
+                db.unsubscribeEmail(recipient.emailAddress);
+            }
+        } else {
+            console.log(body);
+        }
+    });
+    res.end();
 });
 
 /**
@@ -210,12 +230,12 @@ router.post('/email/delivery', function (req, res) {
 router.post('/setting/playlist-update', function (req, res) {
     var db = new Db();
     db.changeUserPlaylistSetting(req.user._id, req.body.playlistEnabled)
-        .then(function(playlistEnabled) {
+        .then(function (playlistEnabled) {
             return res.status(200).json({
                 playlistEnabled: playlistEnabled
             });
         })
-        .catch(function(err) {
+        .catch(function (err) {
             return res.status(500).json({
                 err: err
             });
@@ -228,27 +248,27 @@ router.post('/setting/playlist-update', function (req, res) {
 router.get('/setting/playlist', function (req, res) {
     var db = new Db();
     db.getUserPlaylistSetting(req.user._id)
-        .then(function(playlistEnabled) {
+        .then(function (playlistEnabled) {
             return res.status(200).json({
                 playlistEnabled: playlistEnabled
             });
         })
-        .catch(function(err) {
+        .catch(function (err) {
             return res.status(500).json({
                 err: err
             });
         });
 });
 
-router.post('/setting/sync-scheduled-update', function(req, res) {
+router.post('/setting/sync-scheduled-update', function (req, res) {
     var db = new Db();
     db.changeUserSyncSchedule(req.user._id, req.body.scheduled)
-        .then(function(enabled) {
+        .then(function (enabled) {
             return res.status(200).json({
                 scheduled: enabled
             });
         })
-        .catch(function(err) {
+        .catch(function (err) {
             return res.status(500).json({
                 err: err
             })
@@ -258,12 +278,12 @@ router.post('/setting/sync-scheduled-update', function(req, res) {
 router.get('/setting/sync-scheduled', function (req, res) {
     var db = new Db();
     db.getUserSyncSchedule(req.user._id)
-        .then(function(scheduled) {
+        .then(function (scheduled) {
             return res.status(200).json({
                 scheduled: scheduled
             });
         })
-        .catch(function(err) {
+        .catch(function (err) {
             return res.status(500).json({
                 err: err
             });

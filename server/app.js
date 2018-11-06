@@ -68,6 +68,12 @@ const setupApp = function(app, express, socketUtil) {
 
     app.use(helmet());
     app.use(cookieParser());
+
+    // // fix content type header for aws
+    // app.use((req, res, next) => {
+    //     req.headers['content-type'] = req.headers['content-type'] || 'application/json';
+    //     next();
+    // });
     app.use(bodyParser.json({limit: '10mb'}));
     app.use(bodyParser.urlencoded({ extended: false, limit: '10mb' }));
     app.use(session({
@@ -82,6 +88,7 @@ const setupApp = function(app, express, socketUtil) {
     // initialize passport
     app.use(passport.initialize());
     app.use(passport.session());
+
 
     // serve angular front end files
     app.use('/', express.static('public', {redirect: false}));

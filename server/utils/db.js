@@ -535,6 +535,7 @@ Db.prototype.unsubscribeEmail = function (email) {
             logger.error(err);
             deferred.reject();
         } else {
+            logger.info('unsubscribed email: ' + email);
             deferred.resolve();
         }
     });

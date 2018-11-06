@@ -25,13 +25,18 @@ var Email = function () {
             region: 'us-west-2'
         }));
     } else {
-        this.transporter = nodemailer.createTransport({
-            service: 'Gmail',
-            auth: {
-                user: configPrivate.gmail.user,
-                pass: configPrivate.gmail.password
-            }
-        })
+        this.transporter = nodemailer.createTransport(ses({
+            accessKeyId: configPrivate.test.aws.secret_id,
+            secretAccessKey: configPrivate.test.aws.secret_key,
+            region: 'us-east-1'
+        }));
+        // this.transporter = nodemailer.createTransport({
+        //     service: 'Gmail',
+        //     auth: {
+        //         user: configPrivate.gmail.user,
+        //         pass: configPrivate.gmail.password
+        //     }
+        // })
     }
 
 };
@@ -264,6 +269,7 @@ Email.prototype.sendConfirmationEmail = function (user) {
                             html: result.html,
                             text: result.text
                         };
+                        logger.info(`Sending confirmation email to ${user.email.address}`);
                         email.send(mailOptions)
                             .then(function (successMsg) {
                                 db.setConfirmCode(user, confirmCode)
@@ -376,5 +382,6 @@ function validateTemplate(template) {
  * @returns {*}
  */
 function validateEmailOptions(options) {
+    if (!options || !options.from || !options.to) return false;
     return options.from && options.to.length > 0 && options.subject && options.html && options.text;
 }
