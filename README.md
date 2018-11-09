@@ -30,8 +30,3 @@ to manage collections.
 Unit tests are written with `chai`, `sinon`, and `mocha`. They are found in the `./tests/` directory and can be run
 from the command line with `mocha <test-file-name>.js`
 
-## Authors
-
-* **Ryan Page** - [ryanpage42](https://github.com/ryanpage42)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
