@@ -1,7 +1,7 @@
 var config = {};
     config.spotify = {};
 
-config.url = 'http://localhost:3000';
+config.url = 'http://localhost:5000';
 config.prodUrl = 'https://spotifier.io';
 config.confirmCodeLength = 16;
 config.placeholderAlbumTitle = 'fetching artist details...';

@@ -16,7 +16,7 @@ var express = require('express'),
 require('./app.js')(app, express, socket); // expose middleware/setup application
 require('./utils/cron'); // initialize cron jobs
 
-httpServer.listen(3000, function () {
-    logger.info('Server successfully launched on port 3000');
+httpServer.listen(5000, function () {
+    logger.info('Server successfully launched on port 5000');
 });
 
