@@ -61,15 +61,17 @@ async function checkForRelease(artist) {
         return;
     }
 
-    if (!artist.recent_release || !artist.recent_release.id)
+    const recentReleaseDate = moment(release.recent_release.release_date);
+    const currentDate = moment();
+    const isValidReleaseDate = moment(recentReleaseDate).isSameOrBefore(currentDate);
+
+    if ((!artist.recent_release || !artist.recent_release.id) && isValidReleaseDate)
         return await flagNewRelease(artist, release);
     
-    const recentReleaseDate = moment(release.release_date);
     const currentReleaseDate = moment(artist.recent_release.release_date);
 
-    if (moment(recentReleaseDate).isAfter(currentReleaseDate))
+    if (moment(recentReleaseDate).isAfter(currentReleaseDate) && isValidReleaseDate)
         return await flagNewRelease(artist, release);
-
 }
 
 /**
@@ -84,7 +86,7 @@ async function flagNewRelease(artist, release) {
     if (!hasDifferentTitle(artist.recent_release.title, release.recent_release.title))
         return;
 
-    const releaseMsg = `* ${artist.name} | ${release.recent_release.title} *`;
+    const releaseMsg = `* ${release.recent_release.release_date} | ${artist.name} | ${release.recent_release.title} *`;
     logger.info('new release!');
     logger.info(('*').repeat(releaseMsg.length));
     logger.info(releaseMsg);
