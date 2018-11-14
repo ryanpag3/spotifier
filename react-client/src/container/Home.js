@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import homeAPI from '../api/homeAPI';
 
 export default class Home extends Component {
     render() {
         return (
-            <div><a onClick={homeAPI.login} href={'#'}>Login</a></div>
+            <div><Link to="" onClick={homeAPI.login}>Login</Link></div>
         );
     }
 }

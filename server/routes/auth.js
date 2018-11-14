@@ -3,10 +3,34 @@
  */
 var express = require('express'),
     passport = require('passport'),
+    SpotifyApi = require('spotify-web-api-node'),
+    randomstring = require('randomstring'),
+    config = require('../../config-public'),
+    pConfig = require('../../private/config.json'),
     Db = require('../utils/db.js'),
     email = require('../utils/email'),
     logger = require('../utils/logger'),
     router = express.Router();
+
+const STATE_KEY = 'spotify_auth_state';
+
+var spotifyCreds = process.env.NODE_ENV ? pConfig.spotify : pConfig.test.spotify;
+var redirectUri = (process.env.NODE_ENV ? config.prodUrl : config.url) + '/api/user/callback';
+const scopes = [
+    'user-read-private',
+    'user-read-email',
+    'user-library-read',
+    'playlist-modify-private',
+    'playlist-modify-public',
+    'playlist-read-private',
+    'playlist-read-collaborative'
+];
+
+const spotifyApi = new SpotifyApi({
+    clientId: spotifyCreds.client_id,
+    clientSecret: spotifyCreds.client_secret,
+    redirectUri: redirectUri
+});
 
 router.get('/login', passport.authenticate('spotify', {
         scope: ['user-read-private', 'user-read-email', 'user-library-read', 'playlist-modify-private', 'playlist-modify-public', 'playlist-read-private', 'playlist-read-collaborative'],
@@ -16,6 +40,16 @@ router.get('/login', passport.authenticate('spotify', {
     function (req, res) {
         // this request redirects to spotify so it wont be called
     });
+
+router.get('/test', function (req, res) {
+    logger.info(JSON.stringify(spotifyCreds.client_id));
+    const state = randomstring.generate(16);
+    res.cookie(STATE_KEY, state);
+    const url = spotifyApi.createAuthorizeURL(scopes, state);
+    logger.info(url)
+    res.send(JSON.stringify(url));
+    // res.redirect('https://www.google.com');
+})
 
 router.get('/logout', function (req, res) {
     req.logout();
@@ -51,10 +85,11 @@ router.get('/status', function (req, res) {
 });
 
 router.get('/callback',
-    passport.authenticate('spotify', {
-        failureRedirect: '/'
-    }),
+    // passport.authenticate('spotify', {
+    //     failureRedirect: '/'
+    // }),
     function (req, res) {
+        console.log('we here?');
         var db = new Db();
         db.createUser(req.user) // creates new user object in db if it doesn't already exist
             .then(function (user) {
