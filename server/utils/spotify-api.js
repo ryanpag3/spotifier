@@ -1,9 +1,14 @@
 const logger = require('./logger');
+const config = require('../../config-public');
 const pConfig = require('../../config-private');
 const SpotifyApiNode = require('spotify-web-api-node');
 const Promise = require('bluebird');
+const request = require('request-promise');
 const DB = require('./db');
 const PerformanceStats = require('./performance-stats');
+
+var SPOTIFY_CREDS = process.env.NODE_ENV ? pConfig.spotify : pConfig.test.spotify;
+var REDIRECT_URI = (process.env.NODE_ENV ? config.prodUrl : config.url) + '/callback';
 
 module.exports = SpotifyApi;
 
@@ -302,7 +307,7 @@ SpotifyApi.prototype.getAlbums = async function (n) {
     const results = await Promise.map(offsets, async (offset) => {
         await Promise.delay(100);
         return await this.api.search('year:2018', ['album'], {
-            limit: 50, 
+            limit: 50,
             offset: offset
         });
     }, {
@@ -325,4 +330,57 @@ SpotifyApi.prototype.getOffsets = function (limit, max) {
         offset += limit;
     }
     return offsets;
+}
+
+SpotifyApi.prototype.handleCodeGrant = async function (code, api) {
+    // console.log({
+    //     clientId: pConfig.spotify.client_id,
+    //     clientSecret: pConfig.spotify.client_secret,
+    //     redirectUri: REDIRECT_URI
+    // })
+    // let api = new SpotifyApiNode({
+    //     clientId: pConfig.spotify.client_id,
+    //     clientSecret: pConfig.spotify.client_secret,
+    //     redirectUri: REDIRECT_URI
+    // });
+    try {
+        const data = JSON.parse(await this.authorizeCodeGrant(code));
+        console.log(data);
+        const {
+            expires_in,
+            access_token,
+            refresh_token
+        } = data;
+        this.refreshToken = refresh_token;
+        this.accessToken = access_token;
+        await this.initialize();
+        this.api.setAccessToken(this.accessToken);
+        const me = await this.api.getMe();
+        console.log(me);
+    } catch (e) {
+        console.log(e);
+        logger.error(e.toString());
+    }
+}
+
+SpotifyApi.prototype.authorizeCodeGrant = async function (code) {
+    const options = {
+        method: 'POST',
+        headers: {
+            'Accept':'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization' : 'Basic ' + Buffer.from(SPOTIFY_CREDS.client_id + ':' + SPOTIFY_CREDS.client_secret).toString('base64')
+        },
+        uri: 'https://accounts.spotify.com/api/token',
+        qs: {
+            grant_type: 'authorization_code',
+            redirect_uri: REDIRECT_URI,
+            code: code
+        }
+    };
+    return request(options);
+}
+
+SpotifyApi.prototype.getMe = async function () {
+
 }

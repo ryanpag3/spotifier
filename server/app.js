@@ -75,13 +75,13 @@ const setupApp = function(app, express, socketUtil) {
     //     req.headers['content-type'] = req.headers['content-type'] || 'application/json';
     //     next();
     // });
-    app.use(cors());
+    // app.use(cors());
 
-    // app.use(function(req, res, next) {
-    //     res.header("Access-Control-Allow-Origin", "*");
-    //     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    //     next();
-    //   });
+    app.use(function(req, res, next) {
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        next();
+      });
     app.use(bodyParser.json({limit: '10mb'}));
     app.use(bodyParser.urlencoded({ extended: false, limit: '10mb' }));
     app.use(session({
@@ -109,7 +109,7 @@ const setupApp = function(app, express, socketUtil) {
     var artistRoute = require('./routes/artist.js');
 
     // routes
-    app.use('/api/user/', authRoute);
+    app.use('/user/', authRoute);
     app.use('/library/', libraryRoute);
     app.use('/artist/', artistRoute);
 

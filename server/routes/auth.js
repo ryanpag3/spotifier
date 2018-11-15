@@ -10,12 +10,14 @@ var express = require('express'),
     Db = require('../utils/db.js'),
     email = require('../utils/email'),
     logger = require('../utils/logger'),
+    mSpotifyApi = require('../utils/spotify-api'), // working on migrating to only using this
     router = express.Router();
 
 const STATE_KEY = 'spotify_auth_state';
+const SPOTIFY_USERNAME = 'spotify_username';
 
 var spotifyCreds = process.env.NODE_ENV ? pConfig.spotify : pConfig.test.spotify;
-var redirectUri = (process.env.NODE_ENV ? config.prodUrl : config.url) + '/api/user/callback';
+var redirectUri = (process.env.NODE_ENV ? config.prodUrl : config.url) + '/callback';
 const scopes = [
     'user-read-private',
     'user-read-email',
@@ -32,6 +34,7 @@ const spotifyApi = new SpotifyApi({
     redirectUri: redirectUri
 });
 
+
 router.get('/login', passport.authenticate('spotify', {
         scope: ['user-read-private', 'user-read-email', 'user-library-read', 'playlist-modify-private', 'playlist-modify-public', 'playlist-read-private', 'playlist-read-collaborative'],
         showDialog: true
@@ -45,6 +48,7 @@ router.get('/test', function (req, res) {
     logger.info(JSON.stringify(spotifyCreds.client_id));
     const state = randomstring.generate(16);
     res.cookie(STATE_KEY, state);
+   // res.cookie(SPOTIFY_USERNAME, Buffer.from(req.user).toString('base64'));
     const url = spotifyApi.createAuthorizeURL(scopes, state);
     logger.info(url)
     res.send(JSON.stringify(url));
@@ -84,48 +88,54 @@ router.get('/status', function (req, res) {
     })
 });
 
-router.get('/callback',
+router.post('/callback',
     // passport.authenticate('spotify', {
     //     failureRedirect: '/'
     // }),
-    function (req, res) {
-        console.log('we here?');
+    async function (req, res) {
+        res.sendStatus(200);
+        // console.log('we here?');
+        // console.log(req.body);
+        const { code } = req.body;
+        console.log(code);
+        const api = new mSpotifyApi();
+        const result = await api.handleCodeGrant(code, spotifyApi);      
         var db = new Db();
-        db.createUser(req.user) // creates new user object in db if it doesn't already exist
-            .then(function (user) {
-                // save the database id in the cookie
-                req.session.passport.user._id = user._id;
-                req.session.save(function (err) {
-                    if (err) {
-                        logger.error(err);
-                    }
-                });
-                db.emailExists(user)
-                    .then(function (exists) {
-                        // if user email does not exist
-                        if (!exists) {
-                            res.redirect('/email');
-                        } else {
-                            db.emailConfirmed(user)
-                                .then(function (confirmed) {
-                                    // if user has not confirmed their email
-                                    if (!confirmed) {
-                                        res.redirect('/confirm-pending');
-                                    } else {
-                                        // user has a confirmed email
-                                        res.redirect('/library');
-                                    }
-                                })
-                        }
-                    })
-            })
-            .catch(function (err) { // create user err catch
-                logger.error(err);
-            });
+        // db.createUser(req.user) // creates new user object in db if it doesn't already exist
+        //     .then(function (user) {
+        //         // save the database id in the cookie
+        //         req.session.passport.user._id = user._id;
+        //         req.session.save(function (err) {
+        //             if (err) {
+        //                 logger.error(err);
+        //             }
+        //         });
+        //         db.emailExists(user)
+        //             .then(function (exists) {
+        //                 // if user email does not exist
+        //                 if (!exists) {
+        //                     res.redirect('/email');
+        //                 } else {
+        //                     db.emailConfirmed(user)
+        //                         .then(function (confirmed) {
+        //                             // if user has not confirmed their email
+        //                             if (!confirmed) {
+        //                                 res.redirect('/confirm-pending');
+        //                             } else {
+        //                                 // user has a confirmed email
+        //                                 res.redirect('/library');
+        //                             }
+        //                         })
+        //                 }
+        //             })
+        //     })
+        //     .catch(function (err) { // create user err catch
+        //         logger.error(err);
+        //     });
 
 
         // DEBUGGING
-        process.env.NODE_ENV ? null : res.redirect('/library');
+        // process.env.NODE_ENV ? null : res.redirect('/library');
     });
 
 /**

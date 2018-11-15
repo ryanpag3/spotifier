@@ -10,7 +10,7 @@ import Register from './container/Register';
 import Library from './container/Library';
 import Unsubscribe from './container/Unsubscribe';
 import Settings from './container/Settings';
-
+import Callback from './container/Callback';
 
 class App extends Component {
   render() {
@@ -18,7 +18,8 @@ class App extends Component {
       <Router>
         <div>
           <Route exact path="/" component={Home}/>
-          <Route exact path="/register" component={Register}/> 
+          <Route exact path="/register" component={Register}/>
+          <Route exact path="/callback" component={Callback}/>
           <Route exact path="/library" component={Library}/>
           <Route exact path="/unsubscribe" component={Unsubscribe}/> 
           <Route exact path="/settings" component={Settings}/>
