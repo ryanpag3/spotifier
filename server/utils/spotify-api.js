@@ -358,7 +358,6 @@ SpotifyApi.prototype.handleCodeGrant = async function (code, api) {
         const me = await this.api.getMe();
         console.log(me);
     } catch (e) {
-        console.log(e);
         logger.error(e.toString());
     }
 }
@@ -382,5 +381,5 @@ SpotifyApi.prototype.authorizeCodeGrant = async function (code) {
 }
 
 SpotifyApi.prototype.getMe = async function () {
-
+    
 }
