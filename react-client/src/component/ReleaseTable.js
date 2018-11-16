@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Header, Image, Table } from 'semantic-ui-react';
+import Button from '@material-ui/core/Button';
 import ReactJson from 'react-json-view';
 import LibraryApi from '../api/libraryAPI';
 
@@ -33,17 +34,53 @@ class ReleaseTable extends Component {
                 <ReactJson src={this.state.library} collapsed="true"></ReactJson>
                 <Table>
                     <Table.Header>
-                    <Table.Row>
-                        {this.table.headers.map(header => {
+                        <Table.Row>
+                            {this.table.headers.map(header => {
+                                return (
+                                    <Table.HeaderCell>{header}</Table.HeaderCell>
+                                );
+                            })}
+                        </Table.Row>
+                    </Table.Header>
+
+                    <Table.Body>
+                        {this.state.library.map(element => {
                             return (
-                                <Table.HeaderCell>{header}</Table.HeaderCell>
+                                <Table.Row>
+                                    <Table.Cell>
+                                        <Button></Button>
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        <Image src={this.getRecentReleaseImg(element)}></Image>
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        {element.name}
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        {element.recent_release.title}
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        {element.recent_release.release_date}
+                                    </Table.Cell>
+                                </Table.Row>
                             );
                         })}
-                    </Table.Row>
-                </Table.Header>
+                    </Table.Body>
                 </Table>
             </div>
         );
+    }
+
+    getRecentReleaseImg(release) {
+        if (!release.recent_release)
+            return '';
+        
+        if(!release.recent_release.images)
+            return '';
+        
+        const imgs = release.recent_release.images;
+        return imgs[imgs.length-1].url;
+        
     }
 }
 
