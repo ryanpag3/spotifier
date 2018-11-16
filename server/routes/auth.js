@@ -103,7 +103,8 @@ router.post('/callback',
             const user = await db.createUser(result);
             const emailExists = await db.emailExists(user);
 
-            // console.log(user);
+            console.log(user.name);
+            console.log(devMode);
             // console.log(emailExists);
             
             if (!devMode && emailExists == false)
@@ -113,6 +114,12 @@ router.post('/callback',
             if (!devMode && emailConfirmed && emailConfirmed == false)
                 return res.redirect('/confirm-pending');
             
+            console.log(url.format({
+                pathname:'/library',
+                query: {
+                    user: JSON.stringify({_id: user._id, name: user.name, refresh_token: user.refresh_token})
+                }
+            }));
             res.redirect(url.format({
                 pathname:'/library',
                 query: {
@@ -120,6 +127,7 @@ router.post('/callback',
                 }
             }));
         } catch (e) {
+            console.log(e);
             return res.redirect('/'); // phone home
         }
 

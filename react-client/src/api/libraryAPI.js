@@ -16,7 +16,7 @@ export default class LibraryAPI extends Component {
 
     static async get() {
         try {
-           const res = await fetch('/library', {method: 'GET', headers: {
+           const res = await fetch('/library/get', {method: 'GET', headers: {
                ...Util.getReactHeader()
            }});
            const json = await res.json();

@@ -27,7 +27,7 @@ router.get('/update', function (req, res) {
         })
 });
 
-router.get('/', (req, res) => {
+router.get('/get', (req, res) => {
     if (req.headers.user) {
         req.user = JSON.parse(Buffer.from(req.headers.user, 'base64'));
     } 
