@@ -1,5 +1,8 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
+
+mongoose.set('useCreateIndex', true);
+
 /**
  * ARTIST MODEL SCHEMA
  * spotify_id: this is the unique artist identifier for spotify

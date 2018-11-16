@@ -5,6 +5,7 @@ var express = require('express'),
     passport = require('passport'),
     SpotifyApi = require('spotify-web-api-node'),
     randomstring = require('randomstring'),
+    url = require('url'),
     config = require('../../config-public'),
     pConfig = require('../../private/config.json'),
     Db = require('../utils/db.js'),
@@ -93,46 +94,34 @@ router.post('/callback',
     //     failureRedirect: '/'
     // }),
     async function (req, res) {
-        res.sendStatus(200);
-        // console.log('we here?');
-        // console.log(req.body);
-        const { code } = req.body;
-        console.log(code);
-        const api = new mSpotifyApi();
-        const result = await api.handleCodeGrant(code, spotifyApi);      
-        var db = new Db();
-        // db.createUser(req.user) // creates new user object in db if it doesn't already exist
-        //     .then(function (user) {
-        //         // save the database id in the cookie
-        //         req.session.passport.user._id = user._id;
-        //         req.session.save(function (err) {
-        //             if (err) {
-        //                 logger.error(err);
-        //             }
-        //         });
-        //         db.emailExists(user)
-        //             .then(function (exists) {
-        //                 // if user email does not exist
-        //                 if (!exists) {
-        //                     res.redirect('/email');
-        //                 } else {
-        //                     db.emailConfirmed(user)
-        //                         .then(function (confirmed) {
-        //                             // if user has not confirmed their email
-        //                             if (!confirmed) {
-        //                                 res.redirect('/confirm-pending');
-        //                             } else {
-        //                                 // user has a confirmed email
-        //                                 res.redirect('/library');
-        //                             }
-        //                         })
-        //                 }
-        //             })
-        //     })
-        //     .catch(function (err) { // create user err catch
-        //         logger.error(err);
-        //     });
+        try {
+            const devMode = process.env.NODE_ENV != 'production';
+            const api = new mSpotifyApi();
+            const db = new Db();
+            const { code } = req.body;
+            const result = await api.handleCodeGrant(code, spotifyApi);      
+            const user = await db.createUser(result);
+            const emailExists = await db.emailExists(user);
 
+            // console.log(user);
+            // console.log(emailExists);
+            
+            if (!devMode && emailExists == false)
+                return res.redirect('/email');
+            
+            const emailConfirmed = await db.emailConfirmed(user);
+            if (!devMode && emailConfirmed && emailConfirmed == false)
+                return res.redirect('/confirm-pending');
+            
+            res.redirect(url.format({
+                pathname:'/library',
+                query: {
+                    user: JSON.stringify({_id: user._id, name: user.name, refresh_token: user.refresh_token})
+                }
+            }));
+        } catch (e) {
+            return res.redirect('/'); // phone home
+        }
 
         // DEBUGGING
         // process.env.NODE_ENV ? null : res.redirect('/library');

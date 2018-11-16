@@ -27,11 +27,30 @@ router.get('/update', function (req, res) {
         })
 });
 
+router.get('/', (req, res) => {
+    if (req.headers.user) {
+        req.user = JSON.parse(Buffer.from(req.headers.user, 'base64'));
+    } 
+    var db = new Db();
+    db.getLibrary(req.user)
+        .then(function (library) {
+            return res.status(200).json({
+                library: library
+            })
+        });
+})
+
 /**
  * This will sync the users library artists with the database, and return an updated list
  * for the client.
  */
 router.get('/sync', function (req, res) {
+    if (req.headers.user) {
+        req.user = JSON.parse(Buffer.from(req.headers.user, 'base64'));
+    }
+    console.log(req.user);
+    // res.sendStatus(200);
+
     refreshAccessToken(req)
         .then(function () {
             syncLibraryJobQueue.createJob(req.user)
@@ -185,7 +204,12 @@ function refreshAccessToken(req) {
         .then(function (accessToken) {
             if (accessToken) {
                 // access token was expired, need to refresh
-                req.session.passport.user.accessToken = accessToken;
+                req.session['passport'] = {
+                    user: {
+                        accessToken: accessToken
+                    }
+                };
+                // req.session.passport.user.accessToken = accessToken;
                 req.session.save(function (err) {
                     if (err) {
                         logger.error(err);
@@ -199,7 +223,7 @@ function refreshAccessToken(req) {
             }
         })
         .catch(function (err) {
-            deferred.reject(err);
+            deferred.reject('error while refreshing access token ' + err);
         });
     return deferred.promise;
 }

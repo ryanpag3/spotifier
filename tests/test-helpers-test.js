@@ -17,6 +17,8 @@ mongoose.connect('mongodb://localhost/spotifier_test', {
     useMongoClient: true
 });
 
+mongoose.set('useCreateIndex', true);
+
 describe('test-helper unit tests', function () {
 
     before(function(done) {

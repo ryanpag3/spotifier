@@ -4,13 +4,16 @@
   "private": true,
   "proxy": "http://localhost:5000",
   "dependencies": {
+    "@material-ui/core": "^3.5.1",
     "http-proxy-middleware": "^0.19.0",
     "query-string": "5",
     "react": "^16.6.1",
     "react-dom": "^16.6.1",
     "react-router-dom": "^4.3.1",
     "react-scripts": "2.1.1",
-    "universal-cookie": "^3.0.4"
+    "semantic-ui-react": "^0.83.0",
+    "universal-cookie": "^3.0.4",
+    "urijs": "^1.19.1"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -1,4 +1,5 @@
 var SpotifyApi = require('spotify-web-api-node'),
+    SpotAPI = require('./spotify-api'),
     spotifyServerApi = require('./spotify-server-api'),
     Q = require('q'),
     request = require('request-promise'),
@@ -44,22 +45,22 @@ Api.prototype.syncLibraryOld = function (user, socketUtil) {
             return this.spotifyApi.setAccessToken(user.accessToken);
         })
         .then(() => api.getLibraryArtists(user)
-        .then(function (artists) {
-            var db = new Db();
-            logger.info(user.name + '\'s library is being added with artist array length: ' + artists.length);
-            db.addAllArtists(user, artists, socketUtil)
-                .then(function () {
-                    db.getLibrary(user)
-                        .then(function (library) {
-                            socketUtil.alertLibraryAdded(user, library);
-                        });
-                    deferred.resolve();
-                });
-        })
-        .catch(function (err) {
-            logger.error(err);
-            deferred.reject(err);
-        }));
+            .then(function (artists) {
+                var db = new Db();
+                logger.info(user.name + '\'s library is being added with artist array length: ' + artists.length);
+                db.addAllArtists(user, artists, socketUtil)
+                    .then(function () {
+                        db.getLibrary(user)
+                            .then(function (library) {
+                                socketUtil.alertLibraryAdded(user, library);
+                            });
+                        deferred.resolve();
+                    });
+            })
+            .catch(function (err) {
+                logger.error(err);
+                deferred.reject(err);
+            }));
     return deferred.promise;
 };
 
@@ -70,26 +71,28 @@ Api.prototype.syncLibraryOld = function (user, socketUtil) {
  * @param user: req.user cookie object
  * @returns: {Promise}
  */
-Api.prototype.getAccessToken = function (user) {
+Api.prototype.getAccessToken = async function (user) {
     var api = this.spotifyApi,
         deferred = Q.defer(),
         currentDate = new Date().getTime(); // in millis
     // if we havent set the expireDate or if the currentDate is past the expireDate
     if (!user.accessToken || user.accessToken.expireDate < currentDate) {
+        const mApi = new SpotAPI(user.refresh_token);
+        await mApi.refreshAccessToken();
         api.setRefreshToken(user.refresh_token);
         // refresh token
-        api.refreshAccessToken()
+        mApi.refreshAccessToken()
             .then(function (data) {
                 // assign access token
                 // api.setAccessToken(data.body.access_token);
                 // return new token
                 deferred.resolve({
-                    token: data.body.access_token,
-                    expireDate: currentDate + (data.body.expires_in * 1000) - 60000
+                    token: data.access_token,
+                    expireDate: currentDate + (data.expires_in * 1000) - 60000
                 });
             })
             .catch(function (err) {
-                deferred.reject(err);
+                deferred.reject('error while refreshing access token: ' + err);
             })
     } else {
         // token doesn't need to be refreshed, return

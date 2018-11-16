@@ -51,11 +51,11 @@ SpotifyApi.prototype.setAccessToken = function (api, refreshToken) {
                 this.setToken(api, data.body);
             });
     }
-    logger.debug('using bearer grant type');
+    logger.debug('using bearer grant type. setting refresh token to: ' + refreshToken);
     api.setRefreshToken(refreshToken);
-    return api.refreshAccessToken()
+    return this.refreshAccessToken()
         .then((data) => {
-            this.setToken(api, data.body);
+            this.setToken(api, data);
         });
 };
 
@@ -251,7 +251,7 @@ SpotifyApi.prototype.getUserLibraryArtists = function () {
 };
 
 SpotifyApi.prototype.getSavedTracks = function () {
-    let concurrency = 7; // magic number, bearer limit
+    let concurrency = 3; // magic number, bearer limit
     let delay = 0;
     let limit = 50;
     let perfStats = new PerformanceStats('SpotifyApi.getSavedTracks()');
@@ -333,19 +333,9 @@ SpotifyApi.prototype.getOffsets = function (limit, max) {
 }
 
 SpotifyApi.prototype.handleCodeGrant = async function (code, api) {
-    // console.log({
-    //     clientId: pConfig.spotify.client_id,
-    //     clientSecret: pConfig.spotify.client_secret,
-    //     redirectUri: REDIRECT_URI
-    // })
-    // let api = new SpotifyApiNode({
-    //     clientId: pConfig.spotify.client_id,
-    //     clientSecret: pConfig.spotify.client_secret,
-    //     redirectUri: REDIRECT_URI
-    // });
     try {
         const data = JSON.parse(await this.authorizeCodeGrant(code));
-        console.log(data);
+        // console.log(data);
         const {
             expires_in,
             access_token,
@@ -353,12 +343,18 @@ SpotifyApi.prototype.handleCodeGrant = async function (code, api) {
         } = data;
         this.refreshToken = refresh_token;
         this.accessToken = access_token;
-        await this.initialize();
-        this.api.setAccessToken(this.accessToken);
-        const me = await this.api.getMe();
-        console.log(me);
+
+        api.setAccessToken(this.accessToken);
+        const me = await api.getMe();
+        console.log(me.body.id);
+        return {
+            expires_in: expires_in,
+            refresh_token: refresh_token,
+            access_token: access_token,
+            name: me.body.id
+        };
     } catch (e) {
-        logger.error(e.toString());
+        logger.error('Could not handle authrization code grant: ' + e);
     }
 }
 
@@ -378,6 +374,30 @@ SpotifyApi.prototype.authorizeCodeGrant = async function (code) {
         }
     };
     return request(options);
+}
+
+SpotifyApi.prototype.getClientAuthHeader = function() {
+    return {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization' : 'Basic ' + Buffer.from(SPOTIFY_CREDS.client_id + ':' + SPOTIFY_CREDS.client_secret).toString('base64')    
+    };
+}
+
+SpotifyApi.prototype.refreshAccessToken = async function(refreshToken) {
+    const options = {
+        method: 'POST',
+        uri : 'https://accounts.spotify.com/api/token',
+        headers: {
+            ...this.getClientAuthHeader()
+        },
+        qs: {
+            grant_type : 'refresh_token',
+            refresh_token : refreshToken || this.refreshToken
+        }
+    }
+    const res = await request(options);
+    this.accessToken = res.access_token;
+    return JSON.parse(res);
 }
 
 SpotifyApi.prototype.getMe = async function () {

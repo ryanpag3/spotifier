@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
+mongoose.set('useCreateIndex', true);
 
 /**
  * USER MODEL SCHEMA
