@@ -236,6 +236,8 @@ SpotifyApi.prototype.getUserLibraryArtists = function () {
             let artists = [];
             for (let i = 0; i < savedTracks.length; i++) {
                 let track = savedTracks[i];
+                logger.info(JSON.stringify(track.artists[0]));
+                let artistUrl = track.artists[0].external_urls.spotify;
                 let artistId = track.artists[0].id;
                 let artistName = track.artists[0].name;
                 if (artistAdded[artistId] !== undefined)
@@ -243,7 +245,8 @@ SpotifyApi.prototype.getUserLibraryArtists = function () {
                 artistAdded[artistId] = true;
                 artists.push({
                     spotify_id: artistId,
-                    name: artistName
+                    name: artistName,
+                    url: artistUrl
                 });
             };
             return artists;
@@ -401,5 +404,5 @@ SpotifyApi.prototype.refreshAccessToken = async function(refreshToken) {
 }
 
 SpotifyApi.prototype.getMe = async function () {
-    
+
 }

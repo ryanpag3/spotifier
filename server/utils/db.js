@@ -186,6 +186,7 @@ Db.prototype.addArtist = function (user, artist, socketUtil) {
             var update = {
                 name: artist.name,
                 spotify_id: artist.spotify_id,
+                url: artist.url,
                 recent_release: artist.recent_release ?
                     artist.recent_release : {
                         title: publicConfig.placeholderAlbumTitle

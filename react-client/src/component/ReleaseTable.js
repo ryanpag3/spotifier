@@ -54,10 +54,10 @@ class ReleaseTable extends Component {
                                         <Image src={this.getRecentReleaseImg(element)}></Image>
                                     </Table.Cell>
                                     <Table.Cell>
-                                        {element.name}
+                                        <a target="_blank" href={element.url}>{element.name}</a>
                                     </Table.Cell>
                                     <Table.Cell>
-                                        {element.recent_release.title}
+                                        <a target="_blank" href={element.recent_release.url}>{element.recent_release.title}</a>
                                     </Table.Cell>
                                     <Table.Cell>
                                         {element.recent_release.release_date}
