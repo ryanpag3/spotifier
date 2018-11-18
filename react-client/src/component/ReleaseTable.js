@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Header, Image, Table } from 'semantic-ui-react';
@@ -5,9 +6,14 @@ import Button from '@material-ui/core/Button';
 import ReactJson from 'react-json-view';
 import LibraryApi from '../api/libraryAPI';
 
-
 class ReleaseTable extends Component {
     releases; // fetched on mount
+
+    state = {
+        column: null,
+        library: [],
+        direction: null,
+      };
 
     table = {
         headers: ['', '', 'Artist', 'New Release', 'Date']
@@ -15,9 +21,9 @@ class ReleaseTable extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            library : []
-        };
+        // this.state = {
+        //     library : []
+        // };
     }
 
     async componentDidMount() {
@@ -28,23 +34,28 @@ class ReleaseTable extends Component {
     };
 
     render() {
+        const { column, library, direction } = this.state;
+
         return (
             <div>
                 ReleaseTable<br/>
-                <ReactJson src={this.state.library} collapsed="true"></ReactJson>
-                <Table>
+                {/* <ReactJson src={this.state.library} collapsed="true"></ReactJson> */}
+                <Table sortable celled fixed>
                     <Table.Header>
                         <Table.Row>
                             {this.table.headers.map(header => {
                                 return (
-                                    <Table.HeaderCell>{header}</Table.HeaderCell>
+                                    <Table.HeaderCell
+                                        sorted={column === header && header != '' ? direction : null}
+                                        onClick={this.handleSort(header)}
+                                    >{header}</Table.HeaderCell>
                                 );
                             })}
                         </Table.Row>
                     </Table.Header>
 
                     <Table.Body>
-                        {this.state.library.map(element => {
+                        {_.map(library, element => {
                             return (
                                 <Table.Row>
                                     <Table.Cell>
@@ -70,6 +81,25 @@ class ReleaseTable extends Component {
             </div>
         );
     }
+
+    handleSort = clickedColumn => () => {
+        const { column, library, direction } = this.state
+    
+        if (column !== clickedColumn) {
+          this.setState({
+            column: clickedColumn,
+            data: _.sortBy(library, [clickedColumn]),
+            direction: 'ascending',
+          })
+    
+          return
+        }
+    
+        this.setState({
+          library: library.reverse(),
+          direction: direction === 'ascending' ? 'descending' : 'ascending',
+        })
+      }
 
     getRecentReleaseImg(release) {
         if (!release.recent_release)
