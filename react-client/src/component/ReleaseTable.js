@@ -33,6 +33,38 @@ class ReleaseTable extends Component {
         this.setState({ library: payload.library });
     };
 
+    handleSort = clickedColumn => () => {
+        console.log('handling sort');
+        const { column, library, direction } = this.state
+    
+        if (column !== clickedColumn) {
+          this.setState({
+            column: clickedColumn,
+            data: _.sortBy(library, [clickedColumn]),
+            direction: 'ascending',
+          })
+    
+          return
+        }
+    
+        this.setState({
+          library: library.reverse(),
+          direction: direction === 'ascending' ? 'descending' : 'ascending',
+        })
+    };
+
+    getRecentReleaseImg(release) {
+        if (!release.recent_release)
+            return '';
+        
+        if(!release.recent_release.images)
+            return '';
+        
+        const imgs = release.recent_release.images;
+        return imgs[imgs.length-1].url;
+        
+    };
+
     render() {
         const { column, library, direction } = this.state;
 
@@ -40,7 +72,9 @@ class ReleaseTable extends Component {
             <div>
                 ReleaseTable<br/>
                 {/* <ReactJson src={this.state.library} collapsed="true"></ReactJson> */}
-                <Table sortable celled fixed>
+                <Table celled>
+
+                {/* <Table sortable celled fixed> */}
                     <Table.Header>
                         <Table.Row>
                             {this.table.headers.map(header => {
@@ -82,36 +116,7 @@ class ReleaseTable extends Component {
         );
     }
 
-    handleSort = clickedColumn => () => {
-        const { column, library, direction } = this.state
-    
-        if (column !== clickedColumn) {
-          this.setState({
-            column: clickedColumn,
-            data: _.sortBy(library, [clickedColumn]),
-            direction: 'ascending',
-          })
-    
-          return
-        }
-    
-        this.setState({
-          library: library.reverse(),
-          direction: direction === 'ascending' ? 'descending' : 'ascending',
-        })
-      }
 
-    getRecentReleaseImg(release) {
-        if (!release.recent_release)
-            return '';
-        
-        if(!release.recent_release.images)
-            return '';
-        
-        const imgs = release.recent_release.images;
-        return imgs[imgs.length-1].url;
-        
-    }
 }
 
 ReleaseTable.propTypes = {

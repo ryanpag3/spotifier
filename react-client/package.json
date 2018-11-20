@@ -13,6 +13,7 @@
     "react-json-view": "^1.19.1",
     "react-router-dom": "^4.3.1",
     "react-scripts": "2.1.1",
+    "semantic-ui-css": "^2.4.1",
     "semantic-ui-react": "^0.83.0",
     "universal-cookie": "^3.0.4",
     "urijs": "^1.19.1"
