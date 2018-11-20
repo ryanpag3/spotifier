@@ -1,0 +1,64 @@
+.list {
+    height: 100vh;
+}
+
+.row {
+    display: flex;
+    align-items: center;
+    padding-left: .5rem;
+    /* background-color: green; */
+}
+
+.flex-row {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    /* background-color: rgb(88, 88, 88); */
+}
+
+.flex-col {
+    display: flex;
+    flex-direction: column;
+    /* background-color: antiquewhite; */
+}
+
+.center-vert {
+    justify-content: center;
+}
+
+.album-art {
+
+    height: 100%;
+}
+
+.album-info {
+    margin-left: .5rem;
+    flex-grow: 1;
+    width: 100%;
+}
+
+.album-img-background {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: black;
+    max-height: 2.5rem;
+    max-width: 4rem;
+    overflow: hidden;
+}
+
+.album-img {
+    height: 5.25rem;
+}
+
+.release-date-container {
+    margin-right: .5rem;
+}
+
+.align-right {
+    flex-direction: row-reverse;
+}
+
+.release {
+    font-weight: bold;
+}

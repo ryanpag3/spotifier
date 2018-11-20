@@ -10,7 +10,8 @@ export default class LibraryAPI extends Component {
                 ...Util.getReactHeader()
             }});
         } catch (e) {
-            this.props.history.push('/error');
+            console.log(e);
+            // this.props.history.push('/error');
         }
     }
 
@@ -19,11 +20,13 @@ export default class LibraryAPI extends Component {
            const res = await fetch('/library/get', {method: 'GET', headers: {
                ...Util.getReactHeader()
            }});
+           console.log(res);
            const json = await res.json();
            console.log(json); 
            return json;
         } catch (e) {
-            this.props.history.push('/error');
+            console.log(e);
+            // this.props.history.push('/error');
         }
     }
 }

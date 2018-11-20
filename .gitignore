@@ -10,3 +10,5 @@ logs/human.log
 package-lock.json
 private-bu/config-private.js
 private/
+.env
+react-client/.env

@@ -8,7 +8,6 @@ class Library extends Component {
     render() {
         return (
             <div>
-                Library<br/><br/>
                 <Button variant="contained" onClick={LibraryApi.sync}>
                     Sync Library
                 </Button><br/><br/>

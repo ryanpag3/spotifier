@@ -1,57 +1,51 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { Header, Image, Table } from 'semantic-ui-react';
-import Button from '@material-ui/core/Button';
+import { List, AutoSizer } from 'react-virtualized';
 import ReactJson from 'react-json-view';
-import LibraryApi from '../api/libraryAPI';
+import libraryAPI from '../api/libraryAPI';
+import './ReleaseTable.css';
 
-class ReleaseTable extends Component {
-    releases; // fetched on mount
+const rowHeight = 50; // todo, make config level
+const overscanRowCount = 3;
 
-    state = {
-        column: null,
-        library: [],
-        direction: null,
-      };
-
-    table = {
-        headers: ['', '', 'Artist', 'New Release', 'Date']
-    };
-
-    constructor(props) {
-        super(props);
-        // this.state = {
-        //     library : []
-        // };
+export default class ReleaseTable extends Component {
+    constructor() {
+        super();
+        this.renderRow = this.renderRow.bind(this);
+        this.state = {
+            list : []
+        };
+        this.initialize();
     }
 
-    async componentDidMount() {
-        // console.log(await LibraryApi.get());
-        // this.state.library = await LibraryApi.get();
-        const payload = await LibraryApi.get();
-        this.setState({ library: payload.library });
-    };
+    async initialize() {
+        console.log('initializing release library');
+        const payload = await libraryAPI.get();
+        this.setState({ list: payload ? payload.library : [] });
+        console.log('get res');
+        console.log(this.state.list);
+    }
 
-    handleSort = clickedColumn => () => {
-        console.log('handling sort');
-        const { column, library, direction } = this.state
-    
-        if (column !== clickedColumn) {
-          this.setState({
-            column: clickedColumn,
-            data: _.sortBy(library, [clickedColumn]),
-            direction: 'ascending',
-          })
-    
-          return
-        }
-    
-        this.setState({
-          library: library.reverse(),
-          direction: direction === 'ascending' ? 'descending' : 'ascending',
-        })
-    };
+    renderRow({ index, key, style }) {
+        return (
+            <div key={key} style={style} className="row">
+                <div className="flex-row center-vert">
+                    <div className="album-art">
+                        <div className="album-img-background">
+                            <img className="album-img" src={this.getRecentReleaseImg(this.state.list[index])} alt=""/>
+                        </div>
+                    </div>
+                    <div className="album-info flex-col center-vert">
+                        <div className="release">{this.state.list[index].recent_release.title}</div>
+                        <div className="name">{this.state.list[index].name}</div>
+                    </div>
+                    <div className="release-date-container flex-row align-right">
+                        <div className="release-date">{this.state.list[index].recent_release.release_date}</div>
+                    </div>
+                </div>
+
+            </div>
+        );
+    }
 
     getRecentReleaseImg(release) {
         if (!release.recent_release)
@@ -66,61 +60,24 @@ class ReleaseTable extends Component {
     };
 
     render() {
-        const { column, library, direction } = this.state;
-
         return (
-            <div>
-                ReleaseTable<br/>
-                {/* <ReactJson src={this.state.library} collapsed="true"></ReactJson> */}
-                <Table celled>
-
-                {/* <Table sortable celled fixed> */}
-                    <Table.Header>
-                        <Table.Row>
-                            {this.table.headers.map(header => {
-                                return (
-                                    <Table.HeaderCell
-                                        sorted={column === header && header != '' ? direction : null}
-                                        onClick={this.handleSort(header)}
-                                    >{header}</Table.HeaderCell>
-                                );
-                            })}
-                        </Table.Row>
-                    </Table.Header>
-
-                    <Table.Body>
-                        {_.map(library, element => {
-                            return (
-                                <Table.Row>
-                                    <Table.Cell>
-                                        <Button></Button>
-                                    </Table.Cell>
-                                    <Table.Cell>
-                                        <Image src={this.getRecentReleaseImg(element)}></Image>
-                                    </Table.Cell>
-                                    <Table.Cell>
-                                        <a target="_blank" href={element.url}>{element.name}</a>
-                                    </Table.Cell>
-                                    <Table.Cell>
-                                        <a target="_blank" href={element.recent_release.url}>{element.recent_release.title}</a>
-                                    </Table.Cell>
-                                    <Table.Cell>
-                                        {element.recent_release.release_date}
-                                    </Table.Cell>
-                                </Table.Row>
-                            );
-                        })}
-                    </Table.Body>
-                </Table>
+            <div className="ReleaseTable">
+                <div className="list">
+                    <AutoSizer>
+                    {
+                        ({width, height}) => {
+                            return <List
+                                width={width}
+                                height={height}
+                                rowHeight={rowHeight}
+                                rowRenderer={this.renderRow}
+                                rowCount={this.state.list.length}
+                                overscanRowCount={overscanRowCount}/>
+                        }
+                    }
+                    </AutoSizer>
+                </div>
             </div>
         );
     }
-
-
 }
-
-ReleaseTable.propTypes = {
-
-};
-
-export default ReleaseTable;
