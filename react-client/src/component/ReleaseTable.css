@@ -19,7 +19,7 @@ a:hover {
 
 .row-container {
     padding-left: .25rem;
-    background-color: rgba(206, 206, 206, 0.151);
+    background-color: rgba(194, 194, 194, 0.205);
 }
 
 .flex-row {
@@ -55,7 +55,7 @@ a:hover {
     width: fit-content;
     align-items: center;
     justify-content: center;
-    background-color: black;
+    background-color: rgb(187, 187, 187);
     margin: .1rem;
 }
 
@@ -84,4 +84,5 @@ a:hover {
 
 .release {
     font-weight: bold;
+    font-size: 1.05rem;
 }
