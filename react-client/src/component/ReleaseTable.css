@@ -5,15 +5,20 @@
 .row {
     display: flex;
     align-items: center;
-    padding-left: .5rem;
+    max-height: 5rem;
     /* background-color: green; */
+}
+
+.row-container {
+    padding-left: .25rem;
 }
 
 .flex-row {
     display: flex;
     flex-direction: row;
     width: 100%;
-    /* background-color: rgb(88, 88, 88); */
+    height: 95%;
+    background-color: rgb(240, 240, 240);
 }
 
 .flex-col {
@@ -27,8 +32,8 @@
 }
 
 .album-art {
-
-    height: 100%;
+    display: flex;
+    justify-content: center;
 }
 
 .album-info {
@@ -39,20 +44,28 @@
 
 .album-img-background {
     display: flex;
+    width: fit-content;
     align-items: center;
     justify-content: center;
     background-color: black;
-    max-height: 2.5rem;
-    max-width: 4rem;
-    overflow: hidden;
 }
 
 .album-img {
-    height: 5.25rem;
+    /* height: 100%;
+    width: 3rem; */
+    width: 3.75rem;
+    height: 88%;
+    background-size: contain;
+    margin: .3rem;
 }
 
 .release-date-container {
     margin-right: .5rem;
+    align-items: center;
+}
+
+.release-date {
+    padding-right: .5rem;
 }
 
 .align-right {

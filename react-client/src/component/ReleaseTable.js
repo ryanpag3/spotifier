@@ -4,8 +4,10 @@ import ReactJson from 'react-json-view';
 import libraryAPI from '../api/libraryAPI';
 import './ReleaseTable.css';
 
-const rowHeight = 50; // todo, make config level
-const overscanRowCount = 3;
+import DummyAlbumArt from '../public/dummy-album-art.png';
+
+const rowHeight = 55; // todo, make config level
+const overscanRowCount = 25;
 
 export default class ReleaseTable extends Component {
     constructor() {
@@ -28,11 +30,9 @@ export default class ReleaseTable extends Component {
     renderRow({ index, key, style }) {
         return (
             <div key={key} style={style} className="row">
-                <div className="flex-row center-vert">
-                    <div className="album-art">
-                        <div className="album-img-background">
-                            <img className="album-img" src={this.getRecentReleaseImg(this.state.list[index])} alt=""/>
-                        </div>
+                <div className="row-container flex-row center-vert">
+                    <div className="album-img-background">
+                        <img className="album-img" src={this.getRecentReleaseImg(this.state.list[index])} alt=""/>
                     </div>
                     <div className="album-info flex-col center-vert">
                         <div className="release">{this.state.list[index].recent_release.title}</div>
@@ -48,11 +48,15 @@ export default class ReleaseTable extends Component {
     }
 
     getRecentReleaseImg(release) {
-        if (!release.recent_release)
-            return '';
+        const backupPath = '../public/dummy-album-art.png';
+        if (!release.recent_release){
+            return DummyAlbumArt;
+        }
         
-        if(!release.recent_release.images)
-            return '';
+        if(!release.recent_release.images) {
+            console.log(backupPath);
+            return DummyAlbumArt;
+        }
         
         const imgs = release.recent_release.images;
         return imgs[imgs.length-1].url;
