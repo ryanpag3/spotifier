@@ -4,27 +4,22 @@ import ReactJson from 'react-json-view';
 import libraryAPI from '../api/libraryAPI';
 import './ReleaseTable.css';
 
-import DummyAlbumArt from '../public/dummy-album-art.png';
+import DummyAlbumArt from '../static/dummy-album-art.png';
 
 const rowHeight = 55; // todo, make config level
 const overscanRowCount = 25;
 
 export default class ReleaseTable extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.renderRow = this.renderRow.bind(this);
         this.state = {
-            list : []
+            library : this.props.library
         };
-        this.initialize();
     }
 
-    async initialize() {
-        console.log('initializing release library');
-        const payload = await libraryAPI.get();
-        this.setState({ list: payload ? payload.library : [] });
-        console.log('get res');
-        console.log(this.state.list);
+    componentWillReceiveProps(newProps) {
+        this.setState({ library: newProps.library });
     }
 
     renderRow({ index, key, style }) {
@@ -32,14 +27,22 @@ export default class ReleaseTable extends Component {
             <div key={key} style={style} className="row">
                 <div className="row-container flex-row center-vert">
                     <div className="album-img-background">
-                        <img className="album-img" src={this.getRecentReleaseImg(this.state.list[index])} alt=""/>
+                        <img className="album-img" src={this.getRecentReleaseImg(this.state.library[index])} alt=""/>
                     </div>
                     <div className="album-info flex-col center-vert">
-                        <div className="release">{this.state.list[index].recent_release.title}</div>
-                        <div className="name">{this.state.list[index].name}</div>
+                        <div className="release">
+                            <a href={this.state.library[index].recent_release.url}>
+                                {this.state.library[index].recent_release.title}
+                            </a>
+                        </div>
+                        <div className="name">
+                            <a href={this.state.library[index].url}>
+                                {this.state.library[index].name}
+                            </a>
+                        </div>
                     </div>
-                    <div className="release-date-container flex-row align-right">
-                        <div className="release-date">{this.state.list[index].recent_release.release_date}</div>
+                    <div className="release-date-container align-right">
+                        <div className="release-date">{new Date(this.state.library[index].recent_release.release_date).toLocaleDateString()}</div>
                     </div>
                 </div>
 
@@ -48,13 +51,11 @@ export default class ReleaseTable extends Component {
     }
 
     getRecentReleaseImg(release) {
-        const backupPath = '../public/dummy-album-art.png';
         if (!release.recent_release){
             return DummyAlbumArt;
         }
         
         if(!release.recent_release.images) {
-            console.log(backupPath);
             return DummyAlbumArt;
         }
         
@@ -75,7 +76,7 @@ export default class ReleaseTable extends Component {
                                 height={height}
                                 rowHeight={rowHeight}
                                 rowRenderer={this.renderRow}
-                                rowCount={this.state.list.length}
+                                rowCount={this.state.library.length}
                                 overscanRowCount={overscanRowCount}/>
                         }
                     }

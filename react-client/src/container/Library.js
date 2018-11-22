@@ -5,13 +5,30 @@ import LibraryApi from '../api/libraryAPI';
 import ReleaseTable from '../component/ReleaseTable';
 
 class Library extends Component {
+    constructor() {
+        super();
+        this.state = {
+            library: []
+        };
+    };
+
+    async initialize() {
+        console.log('initializing user library');
+        const payload = await LibraryApi.get();
+        this.setState({ library: payload ? payload.library : [] });
+    }
+
+    async componentDidMount() {
+        this.initialize();
+    }
+
     render() {
         return (
             <div>
                 <Button variant="contained" onClick={LibraryApi.sync}>
                     Sync Library
                 </Button><br/><br/>
-                <ReleaseTable />
+                <ReleaseTable library={this.state.library}/>
             </div>
         );
     }

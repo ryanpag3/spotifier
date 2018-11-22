@@ -1,3 +1,11 @@
+a {
+    color: inherit;
+}
+
+a:hover {
+    color: rgb(17, 88, 133);
+}
+
 .list {
     height: 100vh;
 }
@@ -11,6 +19,7 @@
 
 .row-container {
     padding-left: .25rem;
+    background-color: rgba(206, 206, 206, 0.151);
 }
 
 .flex-row {
@@ -18,7 +27,6 @@
     flex-direction: row;
     width: 100%;
     height: 95%;
-    background-color: rgb(240, 240, 240);
 }
 
 .flex-col {
@@ -38,7 +46,7 @@
 
 .album-info {
     margin-left: .5rem;
-    flex-grow: 1;
+    flex-grow: 2;
     width: 100%;
 }
 
@@ -48,24 +56,26 @@
     align-items: center;
     justify-content: center;
     background-color: black;
+    margin: .1rem;
 }
 
 .album-img {
-    /* height: 100%;
-    width: 3rem; */
     width: 3.75rem;
-    height: 88%;
+    height: 90%;
     background-size: contain;
-    margin: .3rem;
+    margin: .25rem;
 }
 
 .release-date-container {
+    display: flex;
+    flex-grow: 0;
     margin-right: .5rem;
     align-items: center;
 }
 
 .release-date {
     padding-right: .5rem;
+    font-size: 1.10rem;
 }
 
 .align-right {
