@@ -69,6 +69,7 @@ a:hover {
 .release-date-container {
     display: flex;
     flex-grow: 0;
+    min-width: 7rem;
     margin-right: .5rem;
     align-items: center;
 }

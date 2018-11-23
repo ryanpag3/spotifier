@@ -21,6 +21,7 @@ export default class ReleaseTable extends Component {
 
     componentWillReceiveProps(newProps) {
         this.setState({ library: newProps.library });
+        this.refs.forceUpdateGrid();
     }
 
     getRecentReleaseImg(release) {
@@ -80,6 +81,7 @@ export default class ReleaseTable extends Component {
                     {
                         ({width, height}) => {
                             return <List
+                                ref={ref => this.refs = ref}
                                 width={width}
                                 height={height}
                                 rowHeight={rowHeight}
