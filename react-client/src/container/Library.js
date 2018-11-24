@@ -9,13 +9,7 @@ import SortIndicator from '../component/SortIndicator';
 
 import './Library.css';
 
-const ASCENDING = true;
-const DESCENDING = false;
-const SortTypes = {
-    ARTIST: 'artist',
-    RELEASE: 'release',
-    DATE: 'date'
-};
+const ASCENDING = false;
 
 class Library extends Component {
     constructor(props) {
@@ -33,8 +27,8 @@ class Library extends Component {
         console.log('initializing user library');
         const payload = await LibraryApi.get();
         console.log(payload.library);
-        this.setState({ library: payload ? payload.library : [] });
-        this.setState({ masterLibrary: payload ? payload.library : [] }); // backup for filtering
+        this.setState({ library: payload ? payload.library.slice() : [] });
+        this.setState({ masterLibrary: payload ? payload.library.slice() : [] }); // backup for filtering
     }
 
     async componentDidMount() {
@@ -71,7 +65,15 @@ class Library extends Component {
     }
 
     resetLibraryToMaster() {
-        this.setState({library: this.state.masterLibrary})
+        console.log(this.state);
+        this.setState({
+            library: this.state.masterLibrary.slice(),
+            sort: {
+                type: null,
+                sorted: null
+            }
+        });
+       // console.log(this.state);
     }
 
     sort(sortType) {
@@ -115,10 +117,11 @@ class Library extends Component {
                 </Button>
                 <Input icon='search' placeholder='Search...' onKeyDown={(e) => this.searchArtists(e)} onChange={(e) => this.filterLibrary(e.target.value)}/>
                 <div className={`sortbar-container`}>
-                    <SortIndicator direction={this.state.sort.sorted}/>
-                    <button onClick={() => this.sort('artist')}>Artist</button> |&nbsp;
-                    <button onClick={() => this.sort('release')}>Release</button> |&nbsp;
-                    <button onClick={() =>this.sort('date')}>Date</button>
+                    <SortIndicator direction={this.state.sort.sorted} type={this.state.sort.type}/>
+                    <button onClick={() => this.sort('artist')}>Artist</button>&nbsp;|&nbsp;
+                    <button onClick={() => this.sort('release')}>Release</button>&nbsp;|&nbsp;
+                    <button onClick={() =>this.sort('date')}>Date</button>&nbsp;|&nbsp;
+                    <button onClick={() => this.resetLibraryToMaster()}>Reset</button>
                 </div>
                 <ReleaseTable library={this.state.library}/>
             </div>

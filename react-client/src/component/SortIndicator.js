@@ -8,17 +8,19 @@ const UP = true;
 const DOWN = false;
 
 class SortIndicator extends Component {
-    state = { direction: null }
+    state = { direction: null, type: null }
 
     componentWillReceiveProps(newProps) {
         console.log(newProps);
-        if (this.state.direction === null) {
-            this.setState({ direction: newProps.direction});
-            // this.forceUpdate();
+        if (this.state.direction === null || !this.isSameType(newProps)) { // first sort is ascending
+            this.setState({ direction: newProps.direction, type: newProps.type});
             return;
         }
-        this.setState({ direction: !this.state.direction });
-        // this.forceUpdate();
+        this.setState({ direction: !this.state.direction, type: newProps.type });
+    }
+
+    isSameType(newProps) {
+        return newProps.type === this.state.type;
     }
 
     getArrow(direction) {
@@ -28,7 +30,7 @@ class SortIndicator extends Component {
             case DOWN:
                 return <IoIosArrowRoundDown className={`${css.sortIcon}`}/>
             default:
-                return <IoIosArrowRoundUp className={`${css.sortIcon}`}/>
+                return; 
         }
     }
 
