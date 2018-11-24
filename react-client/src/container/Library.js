@@ -5,6 +5,9 @@ import ArraySort from 'array-sort';
 import Button from '@material-ui/core/Button';
 import LibraryApi from '../api/libraryAPI';
 import ReleaseTable from '../component/ReleaseTable';
+import SortIndicator from '../component/SortIndicator';
+
+import './Library.css';
 
 const ASCENDING = true;
 const DESCENDING = false;
@@ -106,12 +109,13 @@ class Library extends Component {
 
     render() {
         return (
-            <div className="library-container">
+            <div className={`library-container`}>
                 <Button variant="contained" onClick={LibraryApi.sync}>
                     Sync Library
                 </Button>
                 <Input icon='search' placeholder='Search...' onKeyDown={(e) => this.searchArtists(e)} onChange={(e) => this.filterLibrary(e.target.value)}/>
-                <div className="sortbar-container">
+                <div className={`sortbar-container`}>
+                    <SortIndicator direction={this.state.sort.sorted}/>
                     <button onClick={() => this.sort('artist')}>Artist</button> |&nbsp;
                     <button onClick={() => this.sort('release')}>Release</button> |&nbsp;
                     <button onClick={() =>this.sort('date')}>Date</button>

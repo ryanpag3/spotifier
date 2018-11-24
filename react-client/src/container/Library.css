@@ -1,4 +1,9 @@
-.library-container {
+/* .library-container {
     display: flex;
     flex-direction: column; /* revisit */
+/*} */
+
+.sortbar-container {
+    display: flex;
+    align-content: center;
 }
