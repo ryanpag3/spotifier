@@ -9,13 +9,14 @@ import SortIndicator from '../component/SortIndicator';
 
 import './Library.css';
 
-const ASCENDING = false;
+const DESCENDING = false;
 
 class Library extends Component {
     constructor(props) {
         super(props);
         this.state = {
             library: [],
+            selectEnabled: false,
             sort: {
                 type: null, // artist, release, date
                 sorted: null
@@ -26,7 +27,7 @@ class Library extends Component {
     async initialize() {
         console.log('initializing user library');
         const payload = await LibraryApi.get();
-        console.log(payload.library);
+        // console.log(payload.library);
         this.setState({ library: payload ? payload.library.slice() : [] });
         this.setState({ masterLibrary: payload ? payload.library.slice() : [] }); // backup for filtering
     }
@@ -65,7 +66,6 @@ class Library extends Component {
     }
 
     resetLibraryToMaster() {
-        console.log(this.state);
         this.setState({
             library: this.state.masterLibrary.slice(),
             sort: {
@@ -73,7 +73,6 @@ class Library extends Component {
                 sorted: null
             }
         });
-       // console.log(this.state);
     }
 
     sort(sortType) {
@@ -85,12 +84,12 @@ class Library extends Component {
         const sortField = SortFields[sortType];
         this.addDecaseProperty(this.state.library, sortField);
         const result = ArraySort(this.state.library || [], 'sortkey');
-        if (this.state.sort.sorted === ASCENDING) result.reverse();
+        if (this.state.sort.sorted !== DESCENDING) result.reverse();
         this.setState({
             library: result,
             sort: {
                 type: sortType,
-                sorted: this.state.sort.type === sortType ? !this.state.sort.sorted : ASCENDING
+                sorted: this.state.sort.type === sortType ? !this.state.sort.sorted : DESCENDING
             }
         });
     }
@@ -107,6 +106,11 @@ class Library extends Component {
         while(arr.length && (obj = obj[arr.shift()]));
         return obj;
     }
+
+    toggleSelect() {
+        this.setState({ selectEnabled: !this.state.selectEnabled });
+        console.log(this.state);
+    }
     
 
     render() {
@@ -122,8 +126,9 @@ class Library extends Component {
                     <button onClick={() => this.sort('release')}>Release</button>&nbsp;|&nbsp;
                     <button onClick={() =>this.sort('date')}>Date</button>&nbsp;|&nbsp;
                     <button onClick={() => this.resetLibraryToMaster()}>Reset</button>
+                    <button onClick={() => this.toggleSelect()} className="select-toggle">Select</button>
                 </div>
-                <ReleaseTable library={this.state.library}/>
+                <ReleaseTable library={this.state.library} selectEnabled={this.state.selectEnabled}/>
             </div>
         );
     }

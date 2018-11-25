@@ -28,7 +28,7 @@ export default class LibraryAPI extends Component {
                     ...Util.getReactHeader()
                 }
             });
-            console.log(res);
+            // console.log(res);
             if (res.status !== 200)
                 return [];
 

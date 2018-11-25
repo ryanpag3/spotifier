@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
-import { List, AutoSizer } from 'react-virtualized';
+import { List, AutoSizer, Table } from 'react-virtualized';
+import { Checkbox } from 'semantic-ui-react';
 import moment from 'moment';
-import ReactJson from 'react-json-view';
-import libraryAPI from '../api/libraryAPI';
 import './ReleaseTable.css';
 
 import DummyAlbumArt from '../static/dummy-album-art.png';
 
-const rowHeight = 55; // todo, make config level
+const rowHeight = 60; // todo, make config level
 const overscanRowCount = 25;
 
 export default class ReleaseTable extends Component {
@@ -15,13 +14,19 @@ export default class ReleaseTable extends Component {
         super(props);
         this.renderRow = this.renderRow.bind(this);
         this.state = {
-            library : this.props.library
+            library : this.props.library,
+            selectEnabled: this.props.selectEnabled
         };
     }
 
     componentWillReceiveProps(newProps) {
+        this.toggleSelectColumn(newProps.selectEnabled);
         this.setState({ library: newProps.library });
         this.refs.forceUpdateGrid();
+    }
+
+    toggleSelectColumn(enabled) {
+        this.setState({ selectEnabled: enabled });
     }
 
     getRecentReleaseImg(release) {
@@ -43,10 +48,24 @@ export default class ReleaseTable extends Component {
         return new moment(releaseDate).from(now);
     }
 
+    handleSelect(index) {
+        const library = this.state.library;
+        library[index].checked = library[index].checked ? !library[index].checked : true;
+        this.setState({ library: library });
+        console.log(this.state.library[index]);
+    }
+
     renderRow({ index, key, style }) {
         return (
             <div key={key} style={style} className="row">
                 <div className="row-container flex-row center-vert">
+                    {
+                    this.state.selectEnabled === true ?
+                    <div className="select-container">
+                        <Checkbox checked={this.state.library[index].checked} onClick={(e) => this.handleSelect(index)}/>
+                    </div>
+                    : null
+                    }
                     <div className="album-img-background">
                         <img className="album-img" src={this.getRecentReleaseImg(this.state.library[index])} alt=""/>
                     </div>

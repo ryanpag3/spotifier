@@ -87,3 +87,14 @@ a:hover {
     font-weight: bold;
     font-size: 1.05rem;
 }
+
+.select-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 3rem;
+}
+
+.select-toggle {
+    margin-left: auto;
+}
