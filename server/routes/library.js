@@ -12,7 +12,8 @@ var express = require('express'),
     Db = require('../utils/db.js'),
     syncLibraryJobQueue = require('../utils/queue-sync-user-library.js'),
     releaseScanner = require('../utils/new-releases'),
-    logger = require('../utils/logger');
+    logger = require('../utils/logger'),
+    AuthUtil = require('../utils/auth');
 
 /**
  * returns the authenticated user's tracked artist library
@@ -155,6 +156,21 @@ router.post('/remove', function (req, res) {
             })
         });
     return deferred.promise;
+});
+
+router.post('/remove-selected', async function(req, res) {
+    const db = new Db();
+    try {
+        // todo: handle if user deletes localstorage value
+        console.log(req.body.artists);
+        console.log(req.headers);
+        const user = AuthUtil.resolveUserHeader(req.headers.user);
+        console.log(user);
+        db.removeArtists(user, req.body.artists);
+    } catch (e) {
+        console.log(e);
+        res.sendStatus(500); // todo
+    }
 });
 
 /**

@@ -16,7 +16,7 @@ class Library extends Component {
         super(props);
         this.state = {
             library: [],
-            selectEnabled: false,
+            selectEnabled: localStorage.getItem('spotifier_select_enabled') || false,
             sort: {
                 type: null, // artist, release, date
                 sorted: null
@@ -107,11 +107,31 @@ class Library extends Component {
         return obj;
     }
 
-    toggleSelect() {
-        this.setState({ selectEnabled: !this.state.selectEnabled });
-        console.log(this.state);
+    toggleSelectColumn() {
+        const bool = !(String(this.state.selectEnabled) === 'true');
+        localStorage.setItem('spotifier_select_enabled', bool);
+        this.setState({ selectEnabled: bool });
     }
-    
+
+    selectedReleaseCallback(index) {
+        const library = this.state.library;
+        library[index].checked = library[index].checked ? !library[index].checked : true;
+        this.setState({ library: library });
+    }
+
+    toggleSelectAll() {
+        let library = this.state.library;
+        library = library.map((release) => {
+            release.checked =  release.checked !== undefined ? !release.checked : true;
+            return release;
+        });
+        this.setState({ library: library });
+    }
+
+    async removeSelected() {
+        const selected = this.state.library.filter((element) => element.checked === true);
+        const res = await LibraryApi.removeSelected(selected);
+    }
 
     render() {
         return (
@@ -126,9 +146,14 @@ class Library extends Component {
                     <button onClick={() => this.sort('release')}>Release</button>&nbsp;|&nbsp;
                     <button onClick={() =>this.sort('date')}>Date</button>&nbsp;|&nbsp;
                     <button onClick={() => this.resetLibraryToMaster()}>Reset</button>
-                    <button onClick={() => this.toggleSelect()} className="select-toggle">Select</button>
+                    <button onClick={() => this.removeSelected()} className="select-toggle">Remove</button> &nbsp;|&nbsp;
+                    <button onClick={() => this.toggleSelectColumn()}>Select</button> &nbsp;|&nbsp;
+                    <button onClick={() => this.toggleSelectAll()}>Select All</button>
                 </div>
-                <ReleaseTable library={this.state.library} selectEnabled={this.state.selectEnabled}/>
+                <ReleaseTable 
+                    library={this.state.library} 
+                    selectedCallback={(index) => this.selectedReleaseCallback(index)} 
+                    selectEnabled={this.state.selectEnabled} />
             </div>
         );
     }

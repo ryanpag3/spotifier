@@ -12,11 +12,13 @@ const overscanRowCount = 25;
 export default class ReleaseTable extends Component {
     constructor(props) {
         super(props);
+        console.log(typeof this.props.selectEnabled + ' ' + this.props.selectEnabled);
         this.renderRow = this.renderRow.bind(this);
         this.state = {
             library : this.props.library,
-            selectEnabled: this.props.selectEnabled
+            selectEnabled: String(this.props.selectEnabled) === 'true'
         };
+        console.log(this.state);
     }
 
     componentWillReceiveProps(newProps) {
@@ -49,10 +51,7 @@ export default class ReleaseTable extends Component {
     }
 
     handleSelect(index) {
-        const library = this.state.library;
-        library[index].checked = library[index].checked ? !library[index].checked : true;
-        this.setState({ library: library });
-        console.log(this.state.library[index]);
+        this.props.selectedCallback(index);
     }
 
     renderRow({ index, key, style }) {
@@ -60,7 +59,7 @@ export default class ReleaseTable extends Component {
             <div key={key} style={style} className="row">
                 <div className="row-container flex-row center-vert">
                     {
-                    this.state.selectEnabled === true ?
+                    String(this.state.selectEnabled) === 'true' ?
                     <div className="select-container">
                         <Checkbox checked={this.state.library[index].checked} onClick={(e) => this.handleSelect(index)}/>
                     </div>

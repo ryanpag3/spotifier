@@ -40,4 +40,21 @@ export default class LibraryAPI extends Component {
             // this.props.history.push('/error');
         }
     }
+
+    static async removeSelected(artists) {
+        try {
+            const res = await fetch('/library/remove-selected', {
+                method: 'POST',
+                headers: {
+                    ...Util.getReactHeader(),
+                    'Content-Type' : 'application/json'
+                },
+                body: JSON.stringify({
+                    artists: artists
+                })
+            });
+        } catch (e) {
+            console.log(e);
+        }
+    }
 }
