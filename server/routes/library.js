@@ -162,14 +162,12 @@ router.post('/remove-selected', async function(req, res) {
     const db = new Db();
     try {
         // todo: handle if user deletes localstorage value
-        console.log(req.body.artists);
-        console.log(req.headers);
         const user = AuthUtil.resolveUserHeader(req.headers.user);
-        console.log(user);
         db.removeArtists(user, req.body.artists);
+        res.sendStatus(200);
     } catch (e) {
         console.log(e);
-        res.sendStatus(500); // todo
+        res.sendStatus(500);
     }
 });
 

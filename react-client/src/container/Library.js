@@ -130,7 +130,30 @@ class Library extends Component {
 
     async removeSelected() {
         const selected = this.state.library.filter((element) => element.checked === true);
-        const res = await LibraryApi.removeSelected(selected);
+        try {
+            const res = await LibraryApi.removeSelected(selected);
+            const library = this.state.library.filter(element => element.checked !== true);
+            this.setState({ library: library })
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    async deletedCallback(index) {
+        try {
+            const selected = [this.state.library[index]];
+            const res = await LibraryApi.removeSelected(selected);
+            const library = this.state.library.filter(element => JSON.stringify(element) !== JSON.stringify(selected[0]));
+            this.setState({
+                library: library
+            });
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    selectElement(index) {
+
     }
 
     render() {
@@ -153,6 +176,7 @@ class Library extends Component {
                 <ReleaseTable 
                     library={this.state.library} 
                     selectedCallback={(index) => this.selectedReleaseCallback(index)} 
+                    deletedCallback={index => this.deletedCallback(index)}
                     selectEnabled={this.state.selectEnabled} />
             </div>
         );

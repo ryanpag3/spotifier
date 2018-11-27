@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { List, AutoSizer, Table } from 'react-virtualized';
 import { Checkbox } from 'semantic-ui-react';
+import { FiMinusCircle } from 'react-icons/fi';
 import moment from 'moment';
 import './ReleaseTable.css';
 
@@ -54,6 +55,10 @@ export default class ReleaseTable extends Component {
         this.props.selectedCallback(index);
     }
 
+    handleDeleted(index) {
+        this.props.deletedCallback(index);
+    }
+
     renderRow({ index, key, style }) {
         return (
             <div key={key} style={style} className="row">
@@ -81,6 +86,9 @@ export default class ReleaseTable extends Component {
                         </div>
                     </div>
                     <div className="release-date-container align-right">
+                        <div className="delete-btn-container">
+                            <button className="delete-btn" onClick={(index) => this.handleDeleted(index)}><a href="javascript:void(0)"><FiMinusCircle/></a></button>
+                        </div>
                         <div className="release-date" 
                                 title={this.calcHowLongAgo(this.state.library[index].recent_release.release_date)}>
                                 {new Date(this.state.library[index].recent_release.release_date).toLocaleDateString()}

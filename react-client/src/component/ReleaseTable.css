@@ -98,3 +98,8 @@ a:hover {
 .select-toggle {
     margin-left: auto;
 }
+
+.delete-btn {
+    border: none;
+    background-color: transparent;
+}
