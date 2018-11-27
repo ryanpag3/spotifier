@@ -272,19 +272,24 @@ Db.prototype.removeArtist = function (user, artist) {
  * disassociate all artists from user
  */
 Db.prototype.removeArtists = async function (user, artists) {
-    try {
-        const artistIds = artists.map((artist) => {
-            return artist._id;
+    const artistIds = artists.map((artist) => {
+        return artist._id;
+    });
+    console.log(`unassigning ${artistIds} from ${user.name}`);
+    artistIds.map(async (id) => {
+        await User.findOneAndUpdate({
+            '_id': user._id
+        }, {
+            $pull: {
+                'saved_artists': id
+            }
         });
-        console.log(artistIds);
-        artistIds.map(async (id) => {
-            await User.findOneAndUpdate({ '_id' : user._id}, {$pull: {'saved_artists' : id}});
-            await Artist.findOneAndUpdate({'_id' : id }, {'users_tracking' : user._id });
-        })
-        // console.log(u);
-    } catch (e) {
-        console.log(e);
-    }
+        await Artist.findOneAndUpdate({
+            '_id': id
+        }, {
+            'users_tracking': user._id
+        });
+    })
 }
 
 /**

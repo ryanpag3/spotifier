@@ -99,7 +99,29 @@ a:hover {
     margin-left: auto;
 }
 
+.delete-btn-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
 .delete-btn {
     border: none;
     background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    height: 100%;
+}
+
+.delete-link {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.icon-hover:hover {
+    color: rgb(255, 50, 50);
 }

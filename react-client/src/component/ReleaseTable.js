@@ -87,7 +87,7 @@ export default class ReleaseTable extends Component {
                     </div>
                     <div className="release-date-container align-right">
                         <div className="delete-btn-container">
-                            <button className="delete-btn" onClick={(index) => this.handleDeleted(index)}><a href="javascript:void(0)"><FiMinusCircle/></a></button>
+                            <button className="delete-btn" onClick={(e) => this.handleDeleted(index)}><FiMinusCircle className="icon-hover"/></button>
                         </div>
                         <div className="release-date" 
                                 title={this.calcHowLongAgo(this.state.library[index].recent_release.release_date)}>
@@ -107,6 +107,7 @@ export default class ReleaseTable extends Component {
                     {
                         ({width, height}) => {
                             return <List
+                                style={{ outline: 'none' }}
                                 ref={ref => this.refs = ref}
                                 width={width}
                                 height={height}

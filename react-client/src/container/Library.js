@@ -27,7 +27,6 @@ class Library extends Component {
     async initialize() {
         console.log('initializing user library');
         const payload = await LibraryApi.get();
-        // console.log(payload.library);
         this.setState({ library: payload ? payload.library.slice() : [] });
         this.setState({ masterLibrary: payload ? payload.library.slice() : [] }); // backup for filtering
     }
@@ -152,10 +151,6 @@ class Library extends Component {
         }
     }
 
-    selectElement(index) {
-
-    }
-
     render() {
         return (
             <div className={`library-container`}>
@@ -174,6 +169,7 @@ class Library extends Component {
                     <button onClick={() => this.toggleSelectAll()}>Select All</button>
                 </div>
                 <ReleaseTable 
+                    className="release-table"
                     library={this.state.library} 
                     selectedCallback={(index) => this.selectedReleaseCallback(index)} 
                     deletedCallback={index => this.deletedCallback(index)}
