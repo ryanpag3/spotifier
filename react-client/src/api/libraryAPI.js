@@ -1,7 +1,6 @@
 import React, {
     Component
 } from 'react';
-import LocalStorage from '../util/LocalStorage';
 import Util from '../util/Util';
 
 export default class LibraryAPI extends Component {

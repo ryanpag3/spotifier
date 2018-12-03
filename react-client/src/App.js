@@ -10,7 +10,7 @@ import Register from './container/Register';
 import Library from './container/Library';
 import Unsubscribe from './container/Unsubscribe';
 import Settings from './container/Settings';
-import Callback from './container/Callback';
+import Callback from './container/LoginCallback';
 
 class App extends Component {
   render() {

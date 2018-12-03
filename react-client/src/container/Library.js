@@ -6,6 +6,7 @@ import Button from '@material-ui/core/Button';
 import LibraryApi from '../api/libraryAPI';
 import ReleaseTable from '../component/ReleaseTable';
 import SortIndicator from '../component/SortIndicator';
+import Search from '../component/Search';
 
 import './Library.css';
 
@@ -168,6 +169,7 @@ class Library extends Component {
                     <button onClick={() => this.toggleSelectColumn()}>Select</button> &nbsp;|&nbsp;
                     <button onClick={() => this.toggleSelectAll()}>Select All</button>
                 </div>
+                <Search/>
                 <ReleaseTable 
                     className="release-table"
                     library={this.state.library} 

@@ -135,6 +135,19 @@ router.post('/callback',
         // process.env.NODE_ENV ? null : res.redirect('/library');
     });
 
+
+router.get('/access-token', async function(req, res) {
+    try {
+        const spotifyApi = new mSpotifyApi(req.headers.refresh_token);
+        await spotifyApi.initialize(); 
+        const accessToken = spotifyApi.accessToken;
+        res.send(JSON.stringify({access_token: accessToken }));
+    } catch (e) {
+        logger.error(e.toString());
+        res.sendStatus(500);
+    }
+});
+
 /**
  * API endpoint for inserting/updating a user's email into the database.
  */

@@ -33,18 +33,15 @@ class Callback extends Component {
     }
 
     async apiCallback(queryParamObj) {
-        console.log('asd ' + JSON.stringify(queryParamObj));
         const res = await fetch('/user/callback', {
             method: 'post', 
             headers: {'Content-Type': 'application/json'}, 
             body: JSON.stringify(queryParamObj),
             redirect: 'follow'
         });
-        console.log(res);
         const uri = new URI(res.url); 
         const qs = querystring.parse(uri.query());
-        console.log(JSON.parse(qs.user));
-        LocalStorage.insert('spotifier_user', qs.user);
+        LocalStorage.insert(LocalStorage.SPOTIFIER_USER, qs.user);
         this.props.history.push(uri.path());
     }
 

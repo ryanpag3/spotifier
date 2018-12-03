@@ -1,4 +1,6 @@
 export default class LocalStorage {
+    static SPOTIFIER_USER = 'spotifier_user';
+
     static insert(key, value) {
         try {
             localStorage.setItem(key, Buffer.from(value).toString('base64'));
