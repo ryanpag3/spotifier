@@ -5,7 +5,7 @@ import SpotifyApi from '../util/SpotifyApi';
 
 import './Search.css';
 
-const SEARCH_RESULTS_LEN = 5;
+const SEARCH_RESULTS_LEN = 15;
 
 
 class Search extends Component {
@@ -28,6 +28,7 @@ class Search extends Component {
         if (query === '') return;
         try {
             const payload = await this.spotifyApi.search(query);
+            console.log(JSON.parse(payload));
             let results = this.fuzzySort(JSON.parse(payload), query);
             this.setState({ results: results});
             this.setState({ query: query });
@@ -37,8 +38,6 @@ class Search extends Component {
     }
 
     fuzzySort(searchResult, query) {
-        console.log(searchResult);
-        console.log('.......')
         const options = {
             shouldSort: true,
             threshold: 0.6,
@@ -46,7 +45,8 @@ class Search extends Component {
             distance: 100,
             maxPatternLength: 32,
             keys: [
-                'name'
+                'name',
+                'artists.name'
             ]
         }
         const combined = [...searchResult.artists.items, ...searchResult.albums.items, ...searchResult.tracks.items];

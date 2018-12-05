@@ -1,19 +1,35 @@
 import React, { Component } from 'react';
+import { List, AutoSizer } from 'react-virtualized';
+
+const rowHeight = 60; // todo, make config level
+const overscanRowCount = 25;
 
 class SearchResult extends Component {
-    state = {
-        results: [],
-        query: ''
+
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            results: [],
+            query: ''
+        }
+        this.renderRow = this.renderRow.bind(this);
     }
 
     componentWillReceiveProps(newProps) {
         this.setState({ results: newProps.results });
         this.setState({ query: newProps.query });
+        this.refs.forceUpdateGrid();
     }
 
     renderRow({index, key, style}) {
-        if (this.state.results[index] === 0) return;
-        switch(this.state.results[index]) {
+        return (
+            <div key={key} style={style}>{this.renderARow(index)}</div>
+        );
+    }
+    
+    renderARow(index) {
+        switch (this.state.results[index].type) {
             case 'artist':
                 return this.renderArtistRow(index);
             case 'album':
@@ -28,7 +44,8 @@ class SearchResult extends Component {
     renderArtistRow(index) {
         return (
             <div>
-                
+                {this.state.results[index].name}<br/>
+                {this.state.results[index].type}
             </div>
         )
     }
@@ -36,23 +53,50 @@ class SearchResult extends Component {
     renderAlbumRow(index) {
         return (
             <div>
-                
+                {this.state.results[index].name}<br/>
+                {this.getArtistAnchors(index)}<br/>
+                {this.state.results[index].type}
             </div>
         )
+    }
+
+    getArtistAnchors(index) {
+        return this.state.results[index].artists.map((artist) => {
+            return <a href={artist.uri} rel="noopener noreferrer">{artist.name} </a>;
+        });
     }
 
     renderTrackRow(index) {
         return (
             <div>
-
+                {this.state.results[index].name}<br/>
+                {this.getArtistAnchors(index)}<br/>
+                {this.state.results[index].type}
             </div>
         )
     }
 
     render() {
         return (
-            <div>
-                
+            <div className="SearchResult">
+                <div className="list">
+                    <AutoSizer>
+                        {
+                            ({ width, height }) => {
+                                return <List
+                                    style={{ outline: 'none'}}
+                                    ref={ref => this.refs = ref}
+                                    width={width}
+                                    height={height}
+                                    rowHeight={rowHeight}
+                                    rowRenderer={this.renderRow}
+                                    rowCount={this.state.results.length}
+                                    overscanRowCount={overscanRowCount}
+                                />
+                            }
+                        }
+                    </AutoSizer>
+                </div>
             </div>
         );
     }
