@@ -1,5 +1,6 @@
 export default class LocalStorage {
     static SPOTIFIER_USER = 'spotifier_user';
+    static SPOTIFIER_SEARCH_PREFS = 'spotifier_search_prefs';
 
     static insert(key, value) {
         try {

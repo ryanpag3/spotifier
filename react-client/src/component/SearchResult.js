@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { List, AutoSizer } from 'react-virtualized';
 
+import './SearchResult.css';
+
 const rowHeight = 60; // todo, make config level
 const overscanRowCount = 25;
 
@@ -25,6 +27,7 @@ class SearchResult extends Component {
     renderRow({index, key, style}) {
         return (
             <div key={key} style={style}>{this.renderARow(index)}</div>
+            
         );
     }
     
@@ -43,7 +46,7 @@ class SearchResult extends Component {
 
     renderArtistRow(index) {
         return (
-            <div>
+            <div className="search-row">
                 {this.state.results[index].name}<br/>
                 {this.state.results[index].type}
             </div>
@@ -52,7 +55,7 @@ class SearchResult extends Component {
 
     renderAlbumRow(index) {
         return (
-            <div>
+            <div className="search-row">
                 {this.state.results[index].name}<br/>
                 {this.getArtistAnchors(index)}<br/>
                 {this.state.results[index].type}
@@ -62,13 +65,13 @@ class SearchResult extends Component {
 
     getArtistAnchors(index) {
         return this.state.results[index].artists.map((artist) => {
-            return <a href={artist.uri} rel="noopener noreferrer">{artist.name} </a>;
+            return <a key={artist.id} href={artist.uri} rel="noopener noreferrer">{artist.name} </a>;
         });
     }
 
     renderTrackRow(index) {
         return (
-            <div>
+            <div className="search-row">
                 {this.state.results[index].name}<br/>
                 {this.getArtistAnchors(index)}<br/>
                 {this.state.results[index].type}

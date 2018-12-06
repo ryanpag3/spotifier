@@ -1,27 +1,59 @@
 import React, { Component } from 'react';
+import { Checkbox } from 'semantic-ui-react';
 import Fuse from 'fuse.js';
 import SearchResult from './SearchResult';
 import SpotifyApi from '../util/SpotifyApi';
+import LocalStorage from '../util/LocalStorage';
 
 import './Search.css';
 
-const SEARCH_RESULTS_LEN = 15;
+const SEARCH_RESULTS_LEN = 60;
+const DEFAULT_SEARCH_PREFS = {
+    artists: true,
+    albums: false,
+    tracks: false
+}
 
 
 class Search extends Component {
     state = {
         results : [],
-        query: ''
+        query: '',
+        searchPrefs: {
+            artists: true,
+            albums: false,
+            tracks: false
+        }
     }
     spotifyApi = new SpotifyApi();
 
-    constructor(props) {
-        super(props);
+    async componentDidMount() {
+        this.init();
+        await this.spotifyApi.init();
     }
 
-    async componentDidMount() {
-        await this.spotifyApi.init();
-        // await this.spotifyApi.search('A*');
+    init() {
+        this.setInitialSearchPrefs();
+    }
+
+    setInitialSearchPrefs() {
+        const prefsStr = LocalStorage.get(LocalStorage.SPOTIFIER_SEARCH_PREFS, true);
+        if (!prefsStr)
+            return;
+        console.log(prefsStr);
+        const prefs = JSON.parse(prefsStr);
+        this.setState({ searchPrefs: prefs });
+    }
+
+    toggleCheck(key) {
+        let prefs = this.state.searchPrefs;
+        prefs[key] = !prefs[key];
+        this.setState({ searchPrefs: prefs });
+        this.persistSettings();
+    }
+
+    persistSettings() {
+        LocalStorage.insert(LocalStorage.SPOTIFIER_SEARCH_PREFS, JSON.stringify(this.state.searchPrefs));
     }
 
     async search(query) {
@@ -49,11 +81,25 @@ class Search extends Component {
                 'artists.name'
             ]
         }
-        const combined = [...searchResult.artists.items, ...searchResult.albums.items, ...searchResult.tracks.items];
+        const combined = this.buildCombinedResults(searchResult);
         const fuse = new Fuse(combined, options);
         const results = fuse.search(query);
         // console.log(results);
         return results.slice(0, SEARCH_RESULTS_LEN);
+    }
+
+    buildCombinedResults(rawResults) {
+        let combined = [];
+        if (this.state.searchPrefs.artists)
+            combined = [combined, ...rawResults.artists.items];
+
+        if (this.state.searchPrefs.albums)
+            combined = [combined, ...rawResults.albums.items];
+
+        if (this.state.searchPrefs.tracks)
+            combined = [combined, ...rawResults.tracks.items];
+
+        return combined;
     }
 
     normalizeSearchResults(rawResults, maxLength) {
@@ -64,6 +110,11 @@ class Search extends Component {
         return (
             <div className="search-container">
                 <input onChange={(e) => this.search(e.target.value)}></input>
+                <div>
+                    <input type="checkbox" onClick={(e) => this.toggleCheck('artists')} checked={this.state.searchPrefs.artists}/><label> artists </label>
+                    <input type="checkbox" onClick={(e) => this.toggleCheck('albums')} checked={this.state.searchPrefs.albums}/><label> albums </label>
+                    <input type="checkbox" onClick={(e) => this.toggleCheck('tracks')} checked={this.state.searchPrefs.tracks}/><label> tracks </label>
+                </div>
                 <SearchResult query={this.state.query} results={this.state.results}/>
             </div>
         );
