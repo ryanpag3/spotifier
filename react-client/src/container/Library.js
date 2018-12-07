@@ -131,7 +131,7 @@ class Library extends Component {
     async removeSelected() {
         const selected = this.state.library.filter((element) => element.checked === true);
         try {
-            const res = await LibraryApi.removeSelected(selected);
+            await LibraryApi.removeSelected(selected);
             const library = this.state.library.filter(element => element.checked !== true);
             this.setState({ library: library })
         } catch (e) {
@@ -142,7 +142,7 @@ class Library extends Component {
     async deletedCallback(index) {
         try {
             const selected = [this.state.library[index]];
-            const res = await LibraryApi.removeSelected(selected);
+            await LibraryApi.removeSelected(selected);
             const library = this.state.library.filter(element => JSON.stringify(element) !== JSON.stringify(selected[0]));
             this.setState({
                 library: library

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { List, AutoSizer, Table } from 'react-virtualized';
+import { List, AutoSizer } from 'react-virtualized';
 import { Checkbox } from 'semantic-ui-react';
 import { FiMinusCircle } from 'react-icons/fi';
 import moment from 'moment';
@@ -19,7 +19,6 @@ export default class ReleaseTable extends Component {
             library : this.props.library,
             selectEnabled: String(this.props.selectEnabled) === 'true'
         };
-        console.log(this.state);
     }
 
     componentWillReceiveProps(newProps) {

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Checkbox } from 'semantic-ui-react';
+import { IoMdAdd, IoMdClose, IoMdCheckmark } from 'react-icons';
 import Fuse from 'fuse.js';
 import SearchResult from './SearchResult';
 import SpotifyApi from '../util/SpotifyApi';
@@ -8,12 +8,6 @@ import LocalStorage from '../util/LocalStorage';
 import './Search.css';
 
 const SEARCH_RESULTS_LEN = 60;
-const DEFAULT_SEARCH_PREFS = {
-    artists: true,
-    albums: false,
-    tracks: false
-}
-
 
 class Search extends Component {
     state = {
@@ -60,7 +54,7 @@ class Search extends Component {
         if (query === '') return;
         try {
             const payload = await this.spotifyApi.search(query);
-            console.log(JSON.parse(payload));
+            // console.log(JSON.parse(payload));
             let results = this.fuzzySort(JSON.parse(payload), query);
             this.setState({ results: results});
             this.setState({ query: query });

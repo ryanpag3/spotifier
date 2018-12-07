@@ -1,4 +1,4 @@
-import React, {
+import {
     Component
 } from 'react';
 import Util from '../util/Util';
@@ -7,7 +7,7 @@ export default class LibraryAPI extends Component {
 
     static async sync() {
         try {
-            const res = await fetch('/library/sync', {
+            await fetch('/library/sync', {
                 method: 'GET',
                 headers: {
                     ...Util.getReactHeader()
@@ -41,7 +41,7 @@ export default class LibraryAPI extends Component {
     }
 
     static async removeSelected(artists) {
-        const res = await fetch('/library/remove-selected', {
+        await fetch('/library/remove-selected', {
             method: 'POST',
             headers: {
                 ...Util.getReactHeader(),

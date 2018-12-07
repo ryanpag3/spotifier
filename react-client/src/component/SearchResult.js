@@ -24,14 +24,30 @@ class SearchResult extends Component {
         this.refs.forceUpdateGrid();
     }
 
+    onSearchBtnHover(id) {
+        console.log(id);
+    }
+
     renderRow({index, key, style}) {
         return (
-            <div key={key} style={style}>{this.renderARow(index)}</div>
-            
+            <div id={this.state.results[index].id} key={key} style={style} className="search-row-container">
+                <div className="search-btn-container">
+                    {
+                        this.state.results[index].selected || this.isInLibrary(index) ?
+                        <button></button> :
+                        <button></button>
+                    }
+                </div>
+                {this.renderResult(index)}
+            </div>
         );
     }
+
+    isInLibrary(index) {
+        
+    }
     
-    renderARow(index) {
+    renderResult(index) {
         switch (this.state.results[index].type) {
             case 'artist':
                 return this.renderArtistRow(index);

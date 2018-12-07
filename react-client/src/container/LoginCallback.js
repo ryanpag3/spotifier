@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
 import URI from 'urijs';
 import querystring from 'query-string';
 import Cookie from 'universal-cookie';

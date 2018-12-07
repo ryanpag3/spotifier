@@ -63,7 +63,7 @@ export default class SpotifyApi {
             method: 'GET',
             uri: SPOTIFY_BASE + SEARCH_PATH,
             qs: {
-                q: query,
+                q: query + '*',
                 type: 'album,artist,track'
             },
             headers: {
