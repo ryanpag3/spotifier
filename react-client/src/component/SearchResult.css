@@ -6,9 +6,41 @@
 .search-row {
     color: rgb(228, 228, 228);
     padding-left: .5rem;
+    display: flex;
+    flex-direction: column;
+    /* align-items: center; */
 }
 
 .search-btn-container {
+    display: flex;
+    justify-content: center;
     background-color: rgb(133, 145, 133);
-    width: 3rem;
+    width: 2rem;
+}
+
+.no-style-btn {
+    border: none;
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    height: 100%;
+    padding: 0;
+}
+
+.search-result-icon {
+    height: 2rem;
+    width: 2rem;
+}
+
+.search-result-icon:hover {
+    color: red;
+    height: 2.5rem;
+    width: 2.5rem;
+}
+
+.artist-anchors-container {
+    display: flex;
+    flex-direction: row;
 }

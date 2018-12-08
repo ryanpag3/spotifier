@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { IoMdAdd, IoMdClose, IoMdCheckmark } from 'react-icons';
 import Fuse from 'fuse.js';
 import SearchResult from './SearchResult';
 import SpotifyApi from '../util/SpotifyApi';
@@ -11,6 +10,7 @@ const SEARCH_RESULTS_LEN = 60;
 
 class Search extends Component {
     state = {
+        library: [],
         results : [],
         query: '',
         searchPrefs: {
@@ -24,6 +24,10 @@ class Search extends Component {
     async componentDidMount() {
         this.init();
         await this.spotifyApi.init();
+    }
+
+    componentWillReceiveProps(newProps) {
+        this.setState({ library: newProps.library });
     }
 
     init() {
@@ -109,7 +113,7 @@ class Search extends Component {
                     <input type="checkbox" onClick={(e) => this.toggleCheck('albums')} checked={this.state.searchPrefs.albums}/><label> albums </label>
                     <input type="checkbox" onClick={(e) => this.toggleCheck('tracks')} checked={this.state.searchPrefs.tracks}/><label> tracks </label>
                 </div>
-                <SearchResult query={this.state.query} results={this.state.results}/>
+                <SearchResult library={this.state.library} query={this.state.query} results={this.state.results}/>
             </div>
         );
     }

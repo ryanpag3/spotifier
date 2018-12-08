@@ -61,7 +61,7 @@ export default class ReleaseTable extends Component {
     renderRow({ index, key, style }) {
         return (
             <div key={key} style={style} className="row">
-                <div className="row-container flex-row center-vert">
+                <div onMouseEnter={(e) => console.log('you figured out onhover for rows :) line 64 ReleaseTable.js')} className="row-container flex-row center-vert">
                     {
                     String(this.state.selectEnabled) === 'true' ?
                     <div className="select-container">

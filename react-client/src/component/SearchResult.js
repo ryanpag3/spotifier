@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { List, AutoSizer } from 'react-virtualized';
+import { IoMdAdd, IoMdClose, IoMdCheckmark } from 'react-icons/io';
 
 import './SearchResult.css';
 
@@ -20,6 +21,7 @@ class SearchResult extends Component {
 
     componentWillReceiveProps(newProps) {
         this.setState({ results: newProps.results });
+        this.setState({ library: newProps.library });
         this.setState({ query: newProps.query });
         this.refs.forceUpdateGrid();
     }
@@ -31,11 +33,11 @@ class SearchResult extends Component {
     renderRow({index, key, style}) {
         return (
             <div id={this.state.results[index].id} key={key} style={style} className="search-row-container">
-                <div className="search-btn-container">
+                <div onMouseEnter={(e) => this.onSearchBtnHover('hi')} className="search-btn-container">
                     {
                         this.state.results[index].selected || this.isInLibrary(index) ?
-                        <button></button> :
-                        <button></button>
+                        <button className="no-style-btn"><IoMdCheckmark className="search-result-icon"/></button> :
+                        <button className="no-style-btn"><IoMdAdd className="search-result-icon"/></button>
                     }
                 </div>
                 {this.renderResult(index)}
@@ -44,7 +46,8 @@ class SearchResult extends Component {
     }
 
     isInLibrary(index) {
-        
+        const result = this.state.results[index];
+        return this.state.library.map((e) => e.name).indexOf(result.name) !== -1;
     }
     
     renderResult(index) {
@@ -63,8 +66,8 @@ class SearchResult extends Component {
     renderArtistRow(index) {
         return (
             <div className="search-row">
-                {this.state.results[index].name}<br/>
-                {this.state.results[index].type}
+                {this.state.results[index].name}
+                <div>{this.state.results[index].type}</div>
             </div>
         )
     }
@@ -72,9 +75,9 @@ class SearchResult extends Component {
     renderAlbumRow(index) {
         return (
             <div className="search-row">
-                {this.state.results[index].name}<br/>
-                {this.getArtistAnchors(index)}<br/>
-                {this.state.results[index].type}
+                {this.state.results[index].name}
+                <div className="artist-anchors-container">{this.getArtistAnchors(index)}</div>
+                <div>{this.state.results[index].type}</div>
             </div>
         )
     }
@@ -88,9 +91,9 @@ class SearchResult extends Component {
     renderTrackRow(index) {
         return (
             <div className="search-row">
-                {this.state.results[index].name}<br/>
-                {this.getArtistAnchors(index)}<br/>
-                {this.state.results[index].type}
+                {this.state.results[index].name}
+                <div className="artist-anchors-container">{this.getArtistAnchors(index)}</div>
+                <div>{this.state.results[index].type}</div>
             </div>
         )
     }
