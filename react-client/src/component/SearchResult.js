@@ -26,17 +26,31 @@ class SearchResult extends Component {
         this.refs.forceUpdateGrid();
     }
 
-    onSearchBtnHover(id) {
-        console.log(id);
+    onSearchBtnHover(index) {
+        const results = this.state.results;
+        results[index].hovering = true;
+        this.setState({ results: results });
+    }
+
+    onSearchBtnHoverExit(index) {
+        const results = this.state.results;
+        results[index].hovering = false;
+        this.setState({ results: results });
     }
 
     renderRow({index, key, style}) {
         return (
             <div id={this.state.results[index].id} key={key} style={style} className="search-row-container">
-                <div onMouseEnter={(e) => this.onSearchBtnHover('hi')} className="search-btn-container">
+                <div onMouseEnter={(e) => this.onSearchBtnHover(index)} onMouseLeave={(e) => this.onSearchBtnHoverExit(index)} className="search-btn-container">
                     {
                         this.state.results[index].selected || this.isInLibrary(index) ?
-                        <button className="no-style-btn"><IoMdCheckmark className="search-result-icon"/></button> :
+                        (
+                        this.state.results[index].hovering !== true ?
+                        <button className="no-style-btn">
+                            {<IoMdCheckmark className="search-result-icon"/>}
+                        </button> :
+                        <button className="no-style-btn"><IoMdClose className="search-result-icon"/></button>
+                        ) :
                         <button className="no-style-btn"><IoMdAdd className="search-result-icon"/></button>
                     }
                 </div>
@@ -47,7 +61,22 @@ class SearchResult extends Component {
 
     isInLibrary(index) {
         const result = this.state.results[index];
-        return this.state.library.map((e) => e.name).indexOf(result.name) !== -1;
+        const isInLibrary =  this.state.library.map((e) => e.name).indexOf(result.name) !== -1;
+        if (isInLibrary === true) this.enableSelected(index);
+        return isInLibrary;
+    }
+
+    enableSelected(index) {
+        const results = this.state.results;
+        results[index].selected = true;
+        console.log(results[index]);
+        this.setState({ results: results });
+    }
+
+    disableSelected(index) {
+        const results = this.state.results;
+        results[index].selected = false;
+        this.setState({ results: results }); 
     }
     
     renderResult(index) {

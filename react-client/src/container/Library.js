@@ -21,7 +21,8 @@ class Library extends Component {
             sort: {
                 type: null, // artist, release, date
                 sorted: null
-            }
+            },
+            hideSearch: false
         };
     };
 
@@ -152,6 +153,10 @@ class Library extends Component {
         }
     }
 
+    closeSearchWindowCallback() {
+        this.setState({ hideSearch: true })
+    }
+
     render() {
         return (
             <div className={`library-container`}>
@@ -169,7 +174,10 @@ class Library extends Component {
                     <button onClick={() => this.toggleSelectColumn()}>Select</button> &nbsp;|&nbsp;
                     <button onClick={() => this.toggleSelectAll()}>Select All</button>
                 </div>
-                <Search library={this.state.library}/>
+                {
+                this.state.hideSearch ? null :
+                <Search closeSearchWindowCallback={() => this.closeSearchWindowCallback()} library={this.state.library}/>
+                }
                 <ReleaseTable 
                     className="release-table"
                     library={this.state.library} 

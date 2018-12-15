@@ -3,6 +3,7 @@ import { List, AutoSizer } from 'react-virtualized';
 import { Checkbox } from 'semantic-ui-react';
 import { FiMinusCircle } from 'react-icons/fi';
 import moment from 'moment';
+import Vibrant from 'node-vibrant';
 import './ReleaseTable.css';
 
 import DummyAlbumArt from '../static/dummy-album-art.png';
@@ -31,7 +32,10 @@ export default class ReleaseTable extends Component {
         this.setState({ selectEnabled: enabled });
     }
 
-    getRecentReleaseImg(release) {
+    /**
+     * optional high res bool flag
+     */ 
+    getRecentReleaseImg(release, highRes) {
         if (!release.recent_release){
             return DummyAlbumArt;
         }
@@ -41,7 +45,9 @@ export default class ReleaseTable extends Component {
         }
         
         const imgs = release.recent_release.images;
-        return imgs[imgs.length-1].url;
+        const img = highRes === true ? imgs[0].url : imgs[imgs.length-1].url; 
+        
+        return img;
         
     }
 
@@ -58,10 +64,34 @@ export default class ReleaseTable extends Component {
         this.props.deletedCallback(index);
     }
 
+    enableRowBackground(index) {
+        const library = this.state.library;
+        library[index].showBackground = true;
+        this.setState({ library: library });
+        // console.log(library);
+        this.refs.forceUpdateGrid();
+    }
+
+    disableRowBackground(index) {
+        const library = this.state.library;
+        library[index].showBackground = false;
+        this.setState({ library: library });
+        this.refs.forceUpdateGrid();
+    }
+
     renderRow({ index, key, style }) {
         return (
             <div key={key} style={style} className="row">
-                <div onMouseEnter={(e) => console.log('you figured out onhover for rows :) line 64 ReleaseTable.js')} className="row-container flex-row center-vert">
+                <div onMouseEnter={(e) => this.enableRowBackground(index)} 
+                        onMouseLeave={(e) => this.disableRowBackground(index)}
+                        className="row-container flex-row center-vert">
+                    {
+                        this.state.library[index].showBackground ?
+                        <div className="row-background-container">
+                            <img className="background-img" src={this.getRecentReleaseImg(this.state.library[index])} alt=""></img>
+                        </div> :
+                        null
+                    }
                     {
                     String(this.state.selectEnabled) === 'true' ?
                     <div className="select-container">

@@ -104,6 +104,10 @@ class Search extends Component {
         // map rawResults and get artist release if it's an artist result
     }
 
+    closeSearchWindowCallback() {
+        this.props.closeSearchWindowCallback();
+    }
+
     render() {
         return (
             <div className="search-container">
@@ -113,6 +117,7 @@ class Search extends Component {
                     <input type="checkbox" onClick={(e) => this.toggleCheck('albums')} checked={this.state.searchPrefs.albums}/><label> albums </label>
                     <input type="checkbox" onClick={(e) => this.toggleCheck('tracks')} checked={this.state.searchPrefs.tracks}/><label> tracks </label>
                 </div>
+                <button onClick={(e) => this.closeSearchWindowCallback()}>close</button>
                 <SearchResult library={this.state.library} query={this.state.query} results={this.state.results}/>
             </div>
         );
