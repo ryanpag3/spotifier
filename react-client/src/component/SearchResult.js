@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { List, AutoSizer } from 'react-virtualized';
 import { IoMdAdd, IoMdClose, IoMdCheckmark } from 'react-icons/io';
+import LibraryAPI from '../api/libraryAPI';
 
 import './SearchResult.css';
 
@@ -38,6 +39,23 @@ class SearchResult extends Component {
         this.setState({ results: results });
     }
 
+    async addResult(index) {
+        console.log('add result')
+        try {
+            await LibraryAPI.addArtist(this.state.results[index]);
+        } catch (e) {
+            console.log(e);
+        }
+        // library api add artist
+        // set artist state selected = true
+    }
+
+    removeResult(index) {
+        console.log('remove result');
+        // library api remove selected
+        // set artist state selected = false
+    }
+
     renderRow({index, key, style}) {
         return (
             <div id={this.state.results[index].id} key={key} style={style} className="search-row-container">
@@ -51,7 +69,7 @@ class SearchResult extends Component {
                         </button> :
                         <button className="no-style-btn"><IoMdClose className="search-result-icon"/></button>
                         ) :
-                        <button className="no-style-btn"><IoMdAdd className="search-result-icon"/></button>
+                        <button onClick={(index) => this.addResult(index)} className="no-style-btn"><IoMdAdd className="add-icon search-result-icon"/></button>
                     }
                 </div>
                 {this.renderResult(index)}

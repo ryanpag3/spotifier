@@ -293,6 +293,13 @@ Db.prototype.removeArtists = async function (user, artists) {
 }
 
 /**
+ * add selected tracks, albums, artists and enable them as spotifier library entries
+ */
+Db.prototype.addSelectedResults = async function (user, results) {
+
+}
+
+/**
  * Updates an artist's values in the Artist collection
  * @param artist: updated schema values
  */

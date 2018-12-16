@@ -112,6 +112,7 @@ router.get('/sync-status', function (req, res) {
 router.post('/add', function (req, res) {
     var socketUtil = req.app.get('socketio');
     var db = new Db();
+    console.log('hi');
     // refresh a users access token if necessary
     refreshAccessToken(req)
         .then(function () {
@@ -170,6 +171,18 @@ router.post('/remove-selected', async function(req, res) {
         res.sendStatus(500);
     }
 });
+
+router.post('/add-selected', async function(req, res) {
+    const db = new Db();
+    try {
+        const user = AuthUtil.resolveUserHeader(req.headers.user);
+        db.addSelectedResults(user, req.body.results);
+        res.sendStatus(200);
+    } catch (e) {
+        console.log(e);
+        res.sendStatus(500);
+    }
+})
 
 /**
  * API endpoint for returning the currently authenticated
