@@ -22,7 +22,7 @@ class Library extends Component {
                 type: null, // artist, release, date
                 sorted: null
             },
-            hideSearch: false
+            hideSearch: true
         };
     };
 

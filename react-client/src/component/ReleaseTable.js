@@ -3,7 +3,7 @@ import { List, AutoSizer } from 'react-virtualized';
 import { Checkbox } from 'semantic-ui-react';
 import { FiMinusCircle } from 'react-icons/fi';
 import moment from 'moment';
-import Vibrant from 'node-vibrant';
+import * as Vibrant from 'node-vibrant';
 import './ReleaseTable.css';
 
 import DummyAlbumArt from '../static/dummy-album-art.png';
@@ -22,10 +22,14 @@ export default class ReleaseTable extends Component {
         };
     }
 
+    componentDidMount() {
+    }
+
     componentWillReceiveProps(newProps) {
         this.toggleSelectColumn(newProps.selectEnabled);
         this.setState({ library: newProps.library });
         this.refs.forceUpdateGrid();
+        setTimeout(() => this.buildVibranceMap(), 10);
     }
 
     toggleSelectColumn(enabled) {
@@ -79,6 +83,29 @@ export default class ReleaseTable extends Component {
         this.refs.forceUpdateGrid();
     }
 
+    async buildVibranceMap() {
+        let library = this.state.library;
+        try {
+            for (let i = 0; i < library.length; i++) {
+                const url = this.getRecentReleaseImg(library[i]);
+                const palette = await Vibrant.from(url).getPalette();
+                library[i].palette = palette;
+            }
+            this.setState({ library: library });
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    getRowStyle(index) {
+        if (!this.state.library[index] || !this.state.library[index].palette) return;
+        const { Vibrant, DarkMuted, DarkVibrant, LightMuted, LightVibrant, Muted } = this.state.library[index].palette; 
+        const Swatch = LightVibrant || DarkVibrant || Vibrant || Muted || LightMuted || DarkMuted || {r: 0, b: 0, g: 0};
+        return {
+            backgroundColor: `rgba(${Swatch.r}, ${Swatch.g}, ${Swatch.b}, .2)`
+        }
+    }
+
     renderRow({ index, key, style }) {
         return (
             <div key={key} style={style} className="row">
@@ -87,8 +114,8 @@ export default class ReleaseTable extends Component {
                         className="row-container flex-row center-vert">
                     {
                         this.state.library[index].showBackground ?
-                        <div className="row-background-container">
-                            <img className="background-img" src={this.getRecentReleaseImg(this.state.library[index])} alt=""></img>
+                        <div className="row-background-container" style={this.getRowStyle(index)}>
+                            {/* <img className="background-img" src={this.getRecentReleaseImg(this.state.library[index])} alt=""></img> */}
                         </div> :
                         null
                     }
