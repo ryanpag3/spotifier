@@ -1,3 +1,5 @@
+# This project is offline and deprecated with no plans for support in the future.
+
 # spotifier.io
 
 spotifier.io is a web application that aims to make tracking new releases on Spotify efficient, reliable, and effortless
